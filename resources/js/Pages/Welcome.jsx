@@ -1,4 +1,3 @@
-import {LaptopOutlined, NotificationOutlined, UserOutlined} from '@ant-design/icons';
 import {Flex, Typography} from 'antd';
 
 
