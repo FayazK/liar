@@ -1,19 +1,31 @@
 import GuestLayout from '@/Layouts/GuestLayout';
-import {Head, Link, router, useForm} from '@inertiajs/react';
+import {Head, Link, router} from '@inertiajs/react';
 import {Alert, Button, Checkbox, Flex, Form, Input} from "antd";
 import {useState} from "react";
+import {IconAt, IconPasswordUser} from "@tabler/icons-react";
 
 export default function Login({status, canResetPassword}) {
-
-
+    const [form] =Form.useForm();
     const [remember, setRemember] = useState(false);
+    const [processing, setProcessing] = useState(false);
 
     const submit = (values) => {
         values.remember = remember;
+        setProcessing(true);
 
         router.post(route('login'), values, {
-            onError: () => {
-                console.log('error')
+            onError: (errors) => {
+                Object.keys(errors).forEach((key) => {
+                    form.setFields([
+                        {
+                            name: key,
+                            errors: [errors[key]],
+                        },
+                    ]);
+                });
+            },
+            onFinish: () => {
+                setProcessing(false);
             },
         })
     };
@@ -27,27 +39,23 @@ export default function Login({status, canResetPassword}) {
 
         {status && <Alert message={status} type="success" showIcon closable/>}
 
-        <Form onFinish={submit}>
+        <Form onFinish={submit} form={form}>
             <Form.Item
-                label="Email"
                 name="email"
                 rules={[{required: true, message: 'Please input your email!',}, {
-                    type: 'email',
-                    message: 'The input is not valid E-mail!',
+                    type: 'email', message: 'The input is not valid E-mail!',
                 }]}
             >
-                <Input/>
+                <Input prefix={<IconAt size={16} />}/>
             </Form.Item>
 
             <Form.Item
-                label="Password"
                 name="password"
                 rules={[{required: true, message: 'Please input your password!',}, {
-                    min: 6,
-                    message: 'The input is not valid E-mail!',
+                    min: 6, message: 'The input is not valid password!',
                 }]}
             >
-                <Input.Password/>
+                <Input.Password prefix={<IconPasswordUser size={16} />}/>
             </Form.Item>
             <Form.Item>
                 <Flex justify={'space-between'}>

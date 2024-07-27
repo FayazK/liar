@@ -1,9 +1,9 @@
 import './bootstrap';
-import '../css/app.css';
 
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import {ConfigProvider} from "antd";
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -16,7 +16,7 @@ createInertiaApp({
             return
         }
 
-        hydrateRoot(el, <App {...props} />);
+        hydrateRoot(el, <ConfigProvider><App {...props} /></ConfigProvider>);
     },
     progress: {
         color: '#4B5563',
