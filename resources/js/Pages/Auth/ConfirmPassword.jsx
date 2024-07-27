@@ -1,54 +1,48 @@
-import GuestLayout from '@/Layouts/GuestLayout';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Head, useForm } from '@inertiajs/react';
+import { useState } from 'react'
+import { router } from '@inertiajs/react'
+import { Button, Form, Input, Typography } from 'antd'
+import { IconPasswordUser } from '@tabler/icons-react'
+import Guest from "@/Layouts/GuestLayout.jsx";
 
-export default function ConfirmPassword() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        password: '',
-    });
+export default function ConfirmPassword () {
+    const [form] = Form.useForm()
+    const [loading, setLoading] = useState(false)
 
-    const submit = (e) => {
-        e.preventDefault();
-
-        post(route('password.confirm'), {
-            onFinish: () => reset('password'),
-        });
-    };
+    const submit = (values) => {
+        setLoading(true)
+        router.post(route('password.confirm'), values, {
+            onError: (errors) => {
+                Object.keys(errors).forEach((key) => {
+                    form.setFields([{ name: key, errors: [errors[key]] }])
+                })
+            },
+            onFinish: () => {
+                setLoading(false)
+            },
+        })
+    }// submit
 
     return (
-        <GuestLayout>
-            <Head title="Confirm Password" />
+            <Guest title={'Confirm Password'}>
 
-            <div className="mb-4 text-sm text-gray-600">
-                This is a secure area of the application. Please confirm your password before continuing.
-            </div>
+                <Typography.Paragraph>
+                    This is a secure area of the application. Please confirm your password
+                    before continuing.
+                </Typography.Paragraph>
 
-            <form onSubmit={submit}>
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        isFocused={true}
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="flex items-center justify-end mt-4">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Confirm
-                    </PrimaryButton>
-                </div>
-            </form>
-        </GuestLayout>
-    );
+                <Form onFinish={submit} form={form}>
+                    <Form.Item name={'password'} rules={[
+                        { required: true, message: 'Please input your password!' },
+                    ]}>
+                        <Input.Password prefix={<IconPasswordUser size={18}/>}/>
+                    </Form.Item>
+                    <Form.Item>
+                        <Button block={true} htmlType={'submit'} type={'primary'}
+                                loading={loading}>
+                            Confirm
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Guest>
+    )
 }

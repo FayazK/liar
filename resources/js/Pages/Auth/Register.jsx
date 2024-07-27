@@ -1,112 +1,75 @@
-import GuestLayout from '@/Layouts/GuestLayout';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { useEffect, useState } from 'react'
+import { Head, Link, router, useForm } from '@inertiajs/react'
+import { Button, Flex, Form, Input } from 'antd'
+import { IconAt, IconPasswordUser, IconUser } from '@tabler/icons-react'
+import Guest from "@/Layouts/GuestLayout.jsx";
 
-export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-    });
+export default function Register () {
+    const [loading, setLoading] = useState(false)
+    const [form] = Form.useForm()
 
-    const submit = (e) => {
-        e.preventDefault();
-
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
-        });
-    };
+    const submit = (values) => {
+        setLoading(true)
+        router.post(route('register'), values, {
+            preserveScroll: true,
+            onError: (errors) => {
+                console.log(errors)
+                Object.keys(errors).forEach((key) => {
+                    form.setFields([{ name: key, errors: [errors[key]] }])
+                })
+                form.setFieldValue('password', '')
+            },
+            onFinish: () => setLoading(false),
+        })
+    }// submit
 
     return (
-        <GuestLayout>
-            <Head title="Register" />
+            <Guest title={'Register'}>
+                <Form onFinish={submit} form={form}>
+                    <Form.Item name={'name'} rules={[
+                        {
+                            required: true,
+                            message: 'Please input your name!',
+                        },
+                    ]}>
+                        <Input prefix={<IconUser size={18}/>}/>
+                    </Form.Item>
+                    <Form.Item name={'email'} rules={[
+                        { required: true, message: 'Please input your email!' },
+                        { type: 'email', message: 'The input is not valid E-mail!' },
+                    ]}>
+                        <Input prefix={<IconAt size={18}/>}/>
+                    </Form.Item>
+                    <Form.Item name={'password'} rules={[
+                        { required: true, message: 'Please input your password!' },
+                    ]}>
+                        <Input.Password prefix={<IconPasswordUser size={18}/>}/>
+                    </Form.Item>
+                    <Form.Item name={'password_confirmation'} rules={[
+                        { required: true, message: 'Please confirm your password!' },
+                        ({ getFieldValue }) => ({
+                            validator (rule, value) {
+                                if (!value || getFieldValue('password') === value) {
+                                    return Promise.resolve()
+                                }
+                                return Promise.reject(
+                                        'The two passwords that you entered do not match!')
+                            },
+                        }),
+                    ]}>
+                        <Input.Password prefix={<IconPasswordUser size={18}/>}/>
+                    </Form.Item>
+                    <Form.Item>
+                        <Button type={'primary'} block={true} loading={loading}
+                                htmlType={'submit'}>Register</Button>
+                    </Form.Item>
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
-
-                    <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
-                        className="mt-1 block w-full"
-                        autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.name} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-
-                    <TextInput
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.password_confirmation} className="mt-2" />
-                </div>
-
-                <div className="flex items-center justify-end mt-4">
-                    <Link
-                        href={route('login')}
-                        className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                        Already registered?
-                    </Link>
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
-                    </PrimaryButton>
-                </div>
-            </form>
-        </GuestLayout>
-    );
+                    <Flex justify={'space-around'}>
+                        <Link href={route('login')}>
+                            Already registered?
+                        </Link>
+                    </Flex>
+                </Form>
+            </Guest>
+    )
 }
