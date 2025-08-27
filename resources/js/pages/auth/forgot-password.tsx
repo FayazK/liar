@@ -26,7 +26,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
             setEmailSent(true);
             message.success('Password reset link sent to your email!');
             form.resetFields();
-        } catch (error: any) {
+        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             if (error.response?.status === 422) {
                 // Validation errors
                 const errors = error.response.data.errors;
@@ -109,7 +109,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                 <div style={{ textAlign: 'center' }}>
                     <Text type="secondary" style={{ fontSize: token.fontSizeSM }}>
                         Or, return to{' '}
-                        <Link href={login()} style={{ color: token.colorPrimary }}>
+                        <Link href={login().url} style={{ color: token.colorPrimary }}>
                             log in
                         </Link>
                     </Text>

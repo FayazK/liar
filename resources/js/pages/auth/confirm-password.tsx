@@ -1,8 +1,8 @@
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Alert, Button, Form, Input, Space, Typography, theme, message } from 'antd';
-import { LoadingOutlined, ShieldCheckOutlined } from '@ant-design/icons';
+import { LoadingOutlined, SafetyOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 
 const { Text } = Typography;
@@ -24,7 +24,7 @@ export default function ConfirmPassword() {
             message.success('Password confirmed successfully!');
             // Redirect back to the intended page
             window.history.back();
-        } catch (error: any) {
+        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             if (error.response?.status === 422) {
                 // Validation errors
                 const errors = error.response.data.errors;
@@ -55,7 +55,7 @@ export default function ConfirmPassword() {
                     description="For your security, please confirm your current password to continue accessing this protected area."
                     type="info"
                     showIcon
-                    icon={<ShieldCheckOutlined />}
+                    icon={<SafetyOutlined />}
                 />
 
                 <Form
@@ -87,7 +87,7 @@ export default function ConfirmPassword() {
                                 size="large"
                                 block
                                 loading={loading}
-                                icon={loading ? <LoadingOutlined /> : <ShieldCheckOutlined />}
+                                icon={loading ? <LoadingOutlined /> : <SafetyOutlined />}
                             >
                                 Confirm password
                             </Button>

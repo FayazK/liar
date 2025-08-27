@@ -1,17 +1,17 @@
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
-import InputError from '@/components/input-error';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
-import { Transition } from '@headlessui/react';
 import { Form, Head } from '@inertiajs/react';
 import { useRef } from 'react';
-
-import HeadingSmall from '@/components/heading-small';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, Input, Button, Space, Typography, Alert, theme, message } from 'antd';
+import type { InputRef } from 'antd';
+import { LockOutlined, LoadingOutlined } from '@ant-design/icons';
 import { edit } from '@/routes/password';
+
+const { Title, Text } = Typography;
+const { Password: PasswordInput } = Input;
+const { useToken } = theme;
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -21,101 +21,132 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Password() {
-    const passwordInput = useRef<HTMLInputElement>(null);
-    const currentPasswordInput = useRef<HTMLInputElement>(null);
+    const passwordInput = useRef<InputRef>(null);
+    const currentPasswordInput = useRef<InputRef>(null);
+    const { token } = useToken();
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Password settings" />
 
             <SettingsLayout>
-                <div className="space-y-6">
-                    <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
+                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                    <div>
+                        <Title level={3} style={{ marginBottom: token.marginXS }}>
+                            Update Password
+                        </Title>
+                        <Text type="secondary">
+                            Ensure your account is using a long, random password to stay secure.
+                        </Text>
+                    </div>
 
-                    <Form
-                        {...PasswordController.update.form()}
-                        options={{
-                            preserveScroll: true,
-                        }}
-                        resetOnError={['password', 'password_confirmation', 'current_password']}
-                        resetOnSuccess
-                        onError={(errors) => {
-                            if (errors.password) {
-                                passwordInput.current?.focus();
-                            }
+                    <Card title="Change Password" style={{ width: '100%' }}>
+                        <Form
+                            method="put"
+                            action={PasswordController.update.url()}
+                            options={{
+                                preserveScroll: true,
+                            }}
+                            resetOnError={['password', 'password_confirmation', 'current_password']}
+                            resetOnSuccess
+                            onError={(errors) => {
+                                if (errors.password) {
+                                    passwordInput.current?.focus();
+                                }
+                                if (errors.current_password) {
+                                    currentPasswordInput.current?.focus();
+                                }
+                            }}
+                            onSuccess={() => {
+                                message.success('Password updated successfully!');
+                            }}
+                        >
+                            {({ errors, processing }) => (
+                                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                                    <div>
+                                        <Text strong style={{ display: 'block', marginBottom: token.marginXS }}>
+                                            Current Password
+                                        </Text>
+                                        <PasswordInput
+                                            ref={currentPasswordInput}
+                                            name="current_password"
+                                            placeholder="Enter your current password"
+                                            autoComplete="current-password"
+                                            size="large"
+                                            prefix={<LockOutlined />}
+                                            status={errors.current_password ? 'error' : undefined}
+                                        />
+                                        {errors.current_password && (
+                                            <Alert
+                                                message={errors.current_password}
+                                                type="error"
+                                                showIcon
+                                                style={{ marginTop: token.marginXS }}
+                                            />
+                                        )}
+                                    </div>
 
-                            if (errors.current_password) {
-                                currentPasswordInput.current?.focus();
-                            }
-                        }}
-                        className="space-y-6"
-                    >
-                        {({ errors, processing, recentlySuccessful }) => (
-                            <>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="current_password">Current password</Label>
+                                    <div>
+                                        <Text strong style={{ display: 'block', marginBottom: token.marginXS }}>
+                                            New Password
+                                        </Text>
+                                        <PasswordInput
+                                            ref={passwordInput}
+                                            name="password"
+                                            placeholder="Enter your new password"
+                                            autoComplete="new-password"
+                                            size="large"
+                                            prefix={<LockOutlined />}
+                                            status={errors.password ? 'error' : undefined}
+                                        />
+                                        {errors.password && (
+                                            <Alert
+                                                message={errors.password}
+                                                type="error"
+                                                showIcon
+                                                style={{ marginTop: token.marginXS }}
+                                            />
+                                        )}
+                                    </div>
 
-                                    <Input
-                                        id="current_password"
-                                        ref={currentPasswordInput}
-                                        name="current_password"
-                                        type="password"
-                                        className="mt-1 block w-full"
-                                        autoComplete="current-password"
-                                        placeholder="Current password"
-                                    />
+                                    <div>
+                                        <Text strong style={{ display: 'block', marginBottom: token.marginXS }}>
+                                            Confirm New Password
+                                        </Text>
+                                        <PasswordInput
+                                            name="password_confirmation"
+                                            placeholder="Confirm your new password"
+                                            autoComplete="new-password"
+                                            size="large"
+                                            prefix={<LockOutlined />}
+                                            status={errors.password_confirmation ? 'error' : undefined}
+                                        />
+                                        {errors.password_confirmation && (
+                                            <Alert
+                                                message={errors.password_confirmation}
+                                                type="error"
+                                                showIcon
+                                                style={{ marginTop: token.marginXS }}
+                                            />
+                                        )}
+                                    </div>
 
-                                    <InputError message={errors.current_password} />
-                                </div>
-
-                                <div className="grid gap-2">
-                                    <Label htmlFor="password">New password</Label>
-
-                                    <Input
-                                        id="password"
-                                        ref={passwordInput}
-                                        name="password"
-                                        type="password"
-                                        className="mt-1 block w-full"
-                                        autoComplete="new-password"
-                                        placeholder="New password"
-                                    />
-
-                                    <InputError message={errors.password} />
-                                </div>
-
-                                <div className="grid gap-2">
-                                    <Label htmlFor="password_confirmation">Confirm password</Label>
-
-                                    <Input
-                                        id="password_confirmation"
-                                        name="password_confirmation"
-                                        type="password"
-                                        className="mt-1 block w-full"
-                                        autoComplete="new-password"
-                                        placeholder="Confirm password"
-                                    />
-
-                                    <InputError message={errors.password_confirmation} />
-                                </div>
-
-                                <div className="flex items-center gap-4">
-                                    <Button disabled={processing}>Save password</Button>
-
-                                    <Transition
-                                        show={recentlySuccessful}
-                                        enter="transition ease-in-out"
-                                        enterFrom="opacity-0"
-                                        leave="transition ease-in-out"
-                                        leaveTo="opacity-0"
-                                    >
-                                        <p className="text-sm text-neutral-600">Saved</p>
-                                    </Transition>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                </div>
+                                    <div style={{ paddingTop: token.paddingMD }}>
+                                        <Button
+                                            type="primary"
+                                            htmlType="submit"
+                                            loading={processing}
+                                            icon={processing ? <LoadingOutlined /> : <LockOutlined />}
+                                            size="large"
+                                        >
+                                            Update Password
+                                        </Button>
+                                    </div>
+                                </Space>
+                            )}
+                        </Form>
+                    </Card>
+                </Space>
             </SettingsLayout>
         </AppLayout>
     );

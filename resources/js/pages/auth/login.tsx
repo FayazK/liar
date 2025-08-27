@@ -5,7 +5,6 @@ import { Head, router } from '@inertiajs/react';
 import { Alert, Button, Checkbox, Form, Input, Space, Typography, theme, message } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-import { show } from '@/actions/App/Http/Controllers/Auth/ConfirmablePasswordController';
 import { register } from '@/routes';
 
 const { Link, Text } = Typography;
@@ -34,7 +33,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             message.success('Login successful!');
             // Redirect to intended page or dashboard
             router.visit('/dashboard');
-        } catch (error: any) {
+        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             if (error.response?.status === 422) {
                 // Validation errors
                 const errors = error.response.data.errors;
@@ -95,7 +94,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 <Text style={{ color: token.colorText }}>Password</Text>
                                 {canResetPassword && (
                                     <Link
-                                        href={request()}
+                                        href={request.url()}
                                         style={{
                                             fontSize: token.fontSizeSM,
                                             color: token.colorPrimary

@@ -1,18 +1,18 @@
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import { send } from '@/routes/verification';
 import { type BreadcrumbItem, type SharedData } from '@/types';
-import { Transition } from '@headlessui/react';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
-
-import DeleteUser from '@/components/delete-user';
-import HeadingSmall from '@/components/heading-small';
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, Input, Button, Space, Typography, Alert, theme, message, Modal } from 'antd';
+import type { InputRef } from 'antd';
+import { UserOutlined, MailOutlined, LoadingOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
+import { useRef } from 'react';
+
+const { Title, Text } = Typography;
+const { useToken } = theme;
+const { confirm } = Modal;
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,97 +23,185 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth } = usePage<SharedData>().props;
+    const { token } = useToken();
+    const passwordInput = useRef<InputRef>(null);
+
+    const showDeleteConfirm = () => {
+        confirm({
+            title: 'Are you sure you want to delete your account?',
+            icon: <ExclamationCircleOutlined />,
+            content: (
+                <div>
+                    <Text>
+                        Once your account is deleted, all of its resources and data will be permanently deleted. 
+                        Please enter your password to confirm you would like to permanently delete your account.
+                    </Text>
+                    <Input.Password
+                        ref={passwordInput}
+                        placeholder="Enter your password"
+                        style={{ marginTop: 16 }}
+                        name="password"
+                        autoComplete="current-password"
+                    />
+                </div>
+            ),
+            okText: 'Delete Account',
+            okType: 'danger',
+            cancelText: 'Cancel',
+            onOk() {
+                // Handle account deletion logic here
+                message.error('Account deletion functionality needs to be implemented');
+            },
+            onCancel() {
+                console.log('Cancel');
+            },
+        });
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Profile settings" />
 
             <SettingsLayout>
-                <div className="space-y-6">
-                    <HeadingSmall title="Profile information" description="Update your name and email address" />
+                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                    <div>
+                        <Title level={3} style={{ marginBottom: token.marginXS }}>
+                            Profile Information
+                        </Title>
+                        <Text type="secondary">
+                            Update your account's profile information and email address.
+                        </Text>
+                    </div>
 
-                    <Form
-                        {...ProfileController.update.form()}
-                        options={{
-                            preserveScroll: true,
-                        }}
-                        className="space-y-6"
-                    >
-                        {({ processing, recentlySuccessful, errors }) => (
-                            <>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="name">Name</Label>
-
-                                    <Input
-                                        id="name"
-                                        className="mt-1 block w-full"
-                                        defaultValue={auth.user.name}
-                                        name="name"
-                                        required
-                                        autoComplete="name"
-                                        placeholder="Full name"
-                                    />
-
-                                    <InputError className="mt-2" message={errors.name} />
-                                </div>
-
-                                <div className="grid gap-2">
-                                    <Label htmlFor="email">Email address</Label>
-
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        className="mt-1 block w-full"
-                                        defaultValue={auth.user.email}
-                                        name="email"
-                                        required
-                                        autoComplete="username"
-                                        placeholder="Email address"
-                                    />
-
-                                    <InputError className="mt-2" message={errors.email} />
-                                </div>
-
-                                {mustVerifyEmail && auth.user.email_verified_at === null && (
+                    <Card title="Personal Information" style={{ width: '100%' }}>
+                        <Form
+                            method="patch"
+                            action={ProfileController.update.url()}
+                            options={{
+                                preserveScroll: true,
+                            }}
+                            onSuccess={() => {
+                                message.success('Profile updated successfully!');
+                            }}
+                        >
+                            {({ processing, errors }) => (
+                                <Space direction="vertical" size="large" style={{ width: '100%' }}>
                                     <div>
-                                        <p className="-mt-4 text-sm text-muted-foreground">
-                                            Your email address is unverified.{' '}
-                                            <Link
-                                                href={send()}
-                                                as="button"
-                                                className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
-                                            >
-                                                Click here to resend the verification email.
-                                            </Link>
-                                        </p>
-
-                                        {status === 'verification-link-sent' && (
-                                            <div className="mt-2 text-sm font-medium text-green-600">
-                                                A new verification link has been sent to your email address.
-                                            </div>
+                                        <Text strong style={{ display: 'block', marginBottom: token.marginXS }}>
+                                            Full Name
+                                        </Text>
+                                        <Input
+                                            name="name"
+                                            defaultValue={auth.user.name}
+                                            placeholder="Enter your full name"
+                                            size="large"
+                                            prefix={<UserOutlined />}
+                                            required
+                                            autoComplete="name"
+                                            status={errors.name ? 'error' : undefined}
+                                        />
+                                        {errors.name && (
+                                            <Alert
+                                                message={errors.name}
+                                                type="error"
+                                                showIcon
+                                                style={{ marginTop: token.marginXS }}
+                                            />
                                         )}
                                     </div>
-                                )}
 
-                                <div className="flex items-center gap-4">
-                                    <Button disabled={processing}>Save</Button>
+                                    <div>
+                                        <Text strong style={{ display: 'block', marginBottom: token.marginXS }}>
+                                            Email Address
+                                        </Text>
+                                        <Input
+                                            name="email"
+                                            type="email"
+                                            defaultValue={auth.user.email}
+                                            placeholder="Enter your email address"
+                                            size="large"
+                                            prefix={<MailOutlined />}
+                                            required
+                                            autoComplete="username"
+                                            status={errors.email ? 'error' : undefined}
+                                        />
+                                        {errors.email && (
+                                            <Alert
+                                                message={errors.email}
+                                                type="error"
+                                                showIcon
+                                                style={{ marginTop: token.marginXS }}
+                                            />
+                                        )}
+                                    </div>
 
-                                    <Transition
-                                        show={recentlySuccessful}
-                                        enter="transition ease-in-out"
-                                        enterFrom="opacity-0"
-                                        leave="transition ease-in-out"
-                                        leaveTo="opacity-0"
-                                    >
-                                        <p className="text-sm text-neutral-600">Saved</p>
-                                    </Transition>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                </div>
+                                    {mustVerifyEmail && auth.user.email_verified_at === null && (
+                                        <Alert
+                                            message="Email Verification Required"
+                                            description={
+                                                <div>
+                                                    <Text>
+                                                        Your email address is unverified.{' '}
+                                                        <Link href={send()} as="button">
+                                                            <Button type="link" style={{ padding: 0 }}>
+                                                                Click here to resend the verification email.
+                                                            </Button>
+                                                        </Link>
+                                                    </Text>
+                                                    {status === 'verification-link-sent' && (
+                                                        <Text type="success" style={{ display: 'block', marginTop: token.marginXS }}>
+                                                            A new verification link has been sent to your email address.
+                                                        </Text>
+                                                    )}
+                                                </div>
+                                            }
+                                            type="warning"
+                                            showIcon
+                                        />
+                                    )}
 
-                <DeleteUser />
+                                    <div style={{ paddingTop: token.paddingMD }}>
+                                        <Button
+                                            type="primary"
+                                            htmlType="submit"
+                                            loading={processing}
+                                            icon={processing ? <LoadingOutlined /> : <UserOutlined />}
+                                            size="large"
+                                        >
+                                            Save Changes
+                                        </Button>
+                                    </div>
+                                </Space>
+                            )}
+                        </Form>
+                    </Card>
+
+                    <Card
+                        title={
+                            <Text style={{ color: token.colorError }}>
+                                Delete Account
+                            </Text>
+                        }
+                        style={{ width: '100%', borderColor: token.colorErrorBorder }}
+                    >
+                        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                            <Alert
+                                message="Warning"
+                                description="Once your account is deleted, all of its resources and data will be permanently deleted. Please proceed with caution as this cannot be undone."
+                                type="error"
+                                showIcon
+                            />
+                            <Button
+                                danger
+                                icon={<DeleteOutlined />}
+                                size="large"
+                                onClick={showDeleteConfirm}
+                            >
+                                Delete Account
+                            </Button>
+                        </Space>
+                    </Card>
+                </Space>
             </SettingsLayout>
         </AppLayout>
     );

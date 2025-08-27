@@ -1,7 +1,7 @@
-import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
 import { Link } from '@inertiajs/react';
 import { Card, Typography, Flex, Space, theme } from 'antd';
+import { CodeOutlined } from '@ant-design/icons';
 import { type PropsWithChildren, useEffect, useState } from 'react';
 
 const { Title, Text } = Typography;
@@ -20,17 +20,10 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
         setMounted(true);
     }, []);
 
-    const backgroundGradient = token.isDark 
-        ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%)'
-        : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-
-    const dotColor = token.isDark ? token.colorTextTertiary : token.colorBgContainer;
-    const logoBackgroundColor = token.isDark 
-        ? `rgba(${token.colorPrimary.slice(1).match(/.{2}/g)?.map(hex => parseInt(hex, 16)).join(',')}, 0.2)`
-        : 'rgba(255, 255, 255, 0.1)';
-    const logoBorderColor = token.isDark 
-        ? `rgba(${token.colorPrimary.slice(1).match(/.{2}/g)?.map(hex => parseInt(hex, 16)).join(',')}, 0.3)`
-        : 'rgba(255, 255, 255, 0.2)';
+    const backgroundGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    const dotColor = token.colorBgContainer;
+    const logoBackgroundColor = 'rgba(255, 255, 255, 0.1)';
+    const logoBorderColor = 'rgba(255, 255, 255, 0.2)';
 
     return (
         <div 
@@ -47,7 +40,7 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
                                     radial-gradient(circle at 75% 75%, ${dotColor} 2px, transparent 2px)`,
                     backgroundSize: '60px 60px',
                     backgroundPosition: '0 0, 30px 30px',
-                    opacity: token.isDark ? 0.05 : 0.1,
+                    opacity: 0.1,
                 }}
             />
             
@@ -80,10 +73,10 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
                                         border: `1px solid ${logoBorderColor}`,
                                     }}
                                 >
-                                    <AppLogoIcon 
-                                        className="h-10 w-10 drop-shadow-sm" 
+                                    <CodeOutlined 
                                         style={{ 
-                                            color: token.isDark ? token.colorPrimary : token.colorBgContainer 
+                                            fontSize: '40px',
+                                            color: token.colorBgContainer 
                                         }}
                                     />
                                 </div>

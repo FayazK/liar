@@ -28,7 +28,7 @@ export default function Register() {
             message.success('Account created successfully!');
             // Redirect to dashboard or email verification
             router.visit('/dashboard');
-        } catch (error: any) {
+        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             if (error.response?.status === 422) {
                 // Validation errors
                 const errors = error.response.data.errors;
@@ -144,7 +144,7 @@ export default function Register() {
             <div style={{ textAlign: 'center', marginTop: token.marginLG }}>
                 <Text type="secondary" style={{ fontSize: token.fontSizeSM }}>
                     Already have an account?{' '}
-                    <Link href={login()} style={{ color: token.colorPrimary }}>
+                    <Link href={login().url} style={{ color: token.colorPrimary }}>
                         Log in
                     </Link>
                 </Text>

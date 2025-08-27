@@ -1,12 +1,12 @@
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
-import { logout } from '@/routes';
+// import { logout } from '@/routes'; // Unused for now
 import { Head, router } from '@inertiajs/react';
 import { Alert, Button, Space, Typography, theme, message } from 'antd';
 import { LoadingOutlined, MailOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 
-const { Link, Text } = Typography;
+const { Link } = Typography;
 const { useToken } = theme;
 
 export default function VerifyEmail({ status }: { status?: string }) {
@@ -20,7 +20,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
             await api.post('/email/verification-notification');
             setEmailSent(true);
             message.success('Verification email sent!');
-        } catch (error: any) {
+        } catch {
             message.error('Failed to send verification email. Please try again.');
         } finally {
             setLoading(false);
@@ -31,7 +31,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
         try {
             await api.post('/logout');
             router.visit('/login');
-        } catch (error) {
+        } catch {
             // If logout fails, still redirect to login
             router.visit('/login');
         }
