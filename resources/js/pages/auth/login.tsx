@@ -95,9 +95,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 {canResetPassword && (
                                     <Link
                                         href={request()}
-                                        style={{ 
+                                        style={{
                                             fontSize: token.fontSizeSM,
-                                            color: token.colorPrimary 
+                                            color: token.colorPrimary
                                         }}
                                     >
                                         Forgot password?
@@ -138,7 +138,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             <div style={{ textAlign: 'center', marginTop: token.marginLG }}>
                 <Text type="secondary" style={{ fontSize: token.fontSizeSM }}>
                     Don't have an account?{' '}
-                    <Link href={register()} style={{ color: token.colorPrimary }}>
+                    <Link href={route('register')} style={{ color: token.colorPrimary }}>
                         Sign up
                     </Link>
                 </Text>
