@@ -1,11 +1,12 @@
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
-import { register } from '@/routes';
 import { request } from '@/routes/password';
 import { Head, router } from '@inertiajs/react';
 import { Alert, Button, Checkbox, Form, Input, Space, Typography, theme, message } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useState } from 'react';
+import { show } from '@/actions/App/Http/Controllers/Auth/ConfirmablePasswordController';
+import { register } from '@/routes';
 
 const { Link, Text } = Typography;
 const { useToken } = theme;
@@ -138,7 +139,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             <div style={{ textAlign: 'center', marginTop: token.marginLG }}>
                 <Text type="secondary" style={{ fontSize: token.fontSizeSM }}>
                     Don't have an account?{' '}
-                    <Link href={route('register')} style={{ color: token.colorPrimary }}>
+                    <Link href={register.url()} style={{ color: token.colorPrimary }}>
                         Sign up
                     </Link>
                 </Text>
