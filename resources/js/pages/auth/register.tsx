@@ -1,100 +1,154 @@
-import RegisteredUserController from '@/actions/App/Http/Controllers/Auth/RegisteredUserController';
-import { login } from '@/routes';
-import { Form, Head } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import api from '@/lib/axios';
+import { login } from '@/routes';
+import { Head, router } from '@inertiajs/react';
+import { Button, Form, Input, Space, Typography, theme, message } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+
+const { Link, Text } = Typography;
+const { useToken } = theme;
+
+interface RegisterFormData {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+}
 
 export default function Register() {
+    const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
+    const { token } = useToken();
+
+    const handleSubmit = async (values: RegisterFormData) => {
+        setLoading(true);
+        try {
+            await api.post('/register', values);
+            message.success('Account created successfully!');
+            // Redirect to dashboard or email verification
+            router.visit('/dashboard');
+        } catch (error: any) {
+            if (error.response?.status === 422) {
+                // Validation errors
+                const errors = error.response.data.errors;
+                form.setFields(
+                    Object.keys(errors).map(field => ({
+                        name: field,
+                        errors: errors[field],
+                    }))
+                );
+            } else {
+                message.error('Registration failed. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <AuthLayout title="Create an account" description="Enter your details below to create your account">
             <Head title="Register" />
+
             <Form
-                {...RegisteredUserController.store.form()}
-                resetOnSuccess={['password', 'password_confirmation']}
-                disableWhileProcessing
-                className="flex flex-col gap-6"
+                form={form}
+                onFinish={handleSubmit}
+                layout="vertical"
+                requiredMark={false}
             >
-                {({ processing, errors }) => (
-                    <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
-                                <Input
-                                    id="name"
-                                    type="text"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="name"
-                                    name="name"
-                                    placeholder="Full name"
-                                />
-                                <InputError message={errors.name} className="mt-2" />
-                            </div>
+                <Space direction="vertical" size="middle" className="w-full">
+                    <Form.Item
+                        name="name"
+                        label={<Text style={{ color: token.colorText }}>Name</Text>}
+                        rules={[
+                            { required: true, message: 'Please input your name!' },
+                            { min: 2, message: 'Name must be at least 2 characters' }
+                        ]}
+                    >
+                        <Input
+                            placeholder="Full name"
+                            autoComplete="name"
+                            autoFocus
+                            size="large"
+                        />
+                    </Form.Item>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="email"
-                                    name="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
+                    <Form.Item
+                        name="email"
+                        label={<Text style={{ color: token.colorText }}>Email address</Text>}
+                        rules={[
+                            { required: true, message: 'Please input your email!' },
+                            { type: 'email', message: 'Please enter a valid email!' }
+                        ]}
+                    >
+                        <Input
+                            placeholder="email@example.com"
+                            autoComplete="email"
+                            size="large"
+                        />
+                    </Form.Item>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    required
-                                    tabIndex={3}
-                                    autoComplete="new-password"
-                                    name="password"
-                                    placeholder="Password"
-                                />
-                                <InputError message={errors.password} />
-                            </div>
+                    <Form.Item
+                        name="password"
+                        label={<Text style={{ color: token.colorText }}>Password</Text>}
+                        rules={[
+                            { required: true, message: 'Please input your password!' },
+                            { min: 8, message: 'Password must be at least 8 characters' }
+                        ]}
+                    >
+                        <Input.Password
+                            placeholder="Password"
+                            autoComplete="new-password"
+                            size="large"
+                        />
+                    </Form.Item>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">Confirm password</Label>
-                                <Input
-                                    id="password_confirmation"
-                                    type="password"
-                                    required
-                                    tabIndex={4}
-                                    autoComplete="new-password"
-                                    name="password_confirmation"
-                                    placeholder="Confirm password"
-                                />
-                                <InputError message={errors.password_confirmation} />
-                            </div>
+                    <Form.Item
+                        name="password_confirmation"
+                        label={<Text style={{ color: token.colorText }}>Confirm password</Text>}
+                        dependencies={['password']}
+                        rules={[
+                            { required: true, message: 'Please confirm your password!' },
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    if (!value || getFieldValue('password') === value) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(new Error('The passwords do not match!'));
+                                },
+                            }),
+                        ]}
+                    >
+                        <Input.Password
+                            placeholder="Confirm password"
+                            autoComplete="new-password"
+                            size="large"
+                        />
+                    </Form.Item>
 
-                            <Button type="submit" className="mt-2 w-full" tabIndex={5}>
-                                {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                Create account
-                            </Button>
-                        </div>
-
-                        <div className="text-center text-sm text-muted-foreground">
-                            Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={6}>
-                                Log in
-                            </TextLink>
-                        </div>
-                    </>
-                )}
+                    <Form.Item>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            size="large"
+                            block
+                            loading={loading}
+                            icon={loading ? <LoadingOutlined /> : null}
+                        >
+                            Create account
+                        </Button>
+                    </Form.Item>
+                </Space>
             </Form>
+
+            <div style={{ textAlign: 'center', marginTop: token.marginLG }}>
+                <Text type="secondary" style={{ fontSize: token.fontSizeSM }}>
+                    Already have an account?{' '}
+                    <Link href={login()} style={{ color: token.colorPrimary }}>
+                        Log in
+                    </Link>
+                </Text>
+            </div>
         </AuthLayout>
     );
 }

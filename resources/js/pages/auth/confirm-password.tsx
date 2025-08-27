@@ -1,13 +1,47 @@
-import ConfirmablePasswordController from '@/actions/App/Http/Controllers/Auth/ConfirmablePasswordController';
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
-import { Form, Head } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import api from '@/lib/axios';
+import { Head, router } from '@inertiajs/react';
+import { Alert, Button, Form, Input, Space, Typography, theme, message } from 'antd';
+import { LoadingOutlined, ShieldCheckOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+
+const { Text } = Typography;
+const { useToken } = theme;
+
+interface ConfirmPasswordFormData {
+    password: string;
+}
 
 export default function ConfirmPassword() {
+    const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
+    const { token } = useToken();
+
+    const handleSubmit = async (values: ConfirmPasswordFormData) => {
+        setLoading(true);
+        try {
+            await api.post('/confirm-password', values);
+            message.success('Password confirmed successfully!');
+            // Redirect back to the intended page
+            window.history.back();
+        } catch (error: any) {
+            if (error.response?.status === 422) {
+                // Validation errors
+                const errors = error.response.data.errors;
+                form.setFields(
+                    Object.keys(errors).map(field => ({
+                        name: field,
+                        errors: errors[field],
+                    }))
+                );
+            } else {
+                message.error('Password confirmation failed. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <AuthLayout
             title="Confirm your password"
@@ -15,25 +49,52 @@ export default function ConfirmPassword() {
         >
             <Head title="Confirm password" />
 
-            <Form {...ConfirmablePasswordController.store.form()} resetOnSuccess={['password']}>
-                {({ processing, errors }) => (
-                    <div className="space-y-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input id="password" type="password" name="password" placeholder="Password" autoComplete="current-password" autoFocus />
+            <Space direction="vertical" size="large" className="w-full">
+                <Alert
+                    message="Security Check Required"
+                    description="For your security, please confirm your current password to continue accessing this protected area."
+                    type="info"
+                    showIcon
+                    icon={<ShieldCheckOutlined />}
+                />
 
-                            <InputError message={errors.password} />
-                        </div>
+                <Form
+                    form={form}
+                    onFinish={handleSubmit}
+                    layout="vertical"
+                    requiredMark={false}
+                >
+                    <Space direction="vertical" size="middle" className="w-full">
+                        <Form.Item
+                            name="password"
+                            label={<Text style={{ color: token.colorText }}>Current Password</Text>}
+                            rules={[
+                                { required: true, message: 'Please input your current password!' }
+                            ]}
+                        >
+                            <Input.Password
+                                placeholder="Enter your current password"
+                                autoComplete="current-password"
+                                autoFocus
+                                size="large"
+                            />
+                        </Form.Item>
 
-                        <div className="flex items-center">
-                            <Button className="w-full" disabled={processing}>
-                                {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                        <Form.Item>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                size="large"
+                                block
+                                loading={loading}
+                                icon={loading ? <LoadingOutlined /> : <ShieldCheckOutlined />}
+                            >
                                 Confirm password
                             </Button>
-                        </div>
-                    </div>
-                )}
-            </Form>
+                        </Form.Item>
+                    </Space>
+                </Form>
+            </Space>
         </AuthLayout>
     );
 }

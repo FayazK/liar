@@ -1,69 +1,137 @@
-import NewPasswordController from '@/actions/App/Http/Controllers/Auth/NewPasswordController';
-import { Form, Head } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import api from '@/lib/axios';
+import { Head, router } from '@inertiajs/react';
+import { Button, Form, Input, Space, Typography, theme, message } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+
+const { Text } = Typography;
+const { useToken } = theme;
 
 interface ResetPasswordProps {
     token: string;
     email: string;
 }
 
+interface ResetPasswordFormData {
+    email: string;
+    password: string;
+    password_confirmation: string;
+    token: string;
+}
+
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
+    const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
+    const { token: themeToken } = useToken();
+
+    const handleSubmit = async (values: Omit<ResetPasswordFormData, 'token'>) => {
+        setLoading(true);
+        try {
+            await api.post('/reset-password', {
+                ...values,
+                token,
+            });
+            message.success('Password reset successfully!');
+            // Redirect to login page
+            router.visit('/login');
+        } catch (error: any) {
+            if (error.response?.status === 422) {
+                // Validation errors
+                const errors = error.response.data.errors;
+                form.setFields(
+                    Object.keys(errors).map(field => ({
+                        name: field,
+                        errors: errors[field],
+                    }))
+                );
+            } else {
+                message.error('Failed to reset password. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <AuthLayout title="Reset password" description="Please enter your new password below">
             <Head title="Reset password" />
 
             <Form
-                {...NewPasswordController.store.form()}
-                transform={(data) => ({ ...data, token, email })}
-                resetOnSuccess={['password', 'password_confirmation']}
+                form={form}
+                onFinish={handleSubmit}
+                layout="vertical"
+                requiredMark={false}
+                initialValues={{ email }}
             >
-                {({ processing, errors }) => (
-                    <div className="grid gap-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" name="email" autoComplete="email" value={email} className="mt-1 block w-full" readOnly />
-                            <InputError message={errors.email} className="mt-2" />
-                        </div>
+                <Space direction="vertical" size="middle" className="w-full">
+                    <Form.Item
+                        name="email"
+                        label={<Text style={{ color: themeToken.colorText }}>Email</Text>}
+                    >
+                        <Input
+                            value={email}
+                            readOnly
+                            size="large"
+                            style={{ 
+                                backgroundColor: themeToken.colorFillTertiary,
+                                color: themeToken.colorTextSecondary 
+                            }}
+                        />
+                    </Form.Item>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                name="password"
-                                autoComplete="new-password"
-                                className="mt-1 block w-full"
-                                autoFocus
-                                placeholder="Password"
-                            />
-                            <InputError message={errors.password} />
-                        </div>
+                    <Form.Item
+                        name="password"
+                        label={<Text style={{ color: themeToken.colorText }}>New Password</Text>}
+                        rules={[
+                            { required: true, message: 'Please input your new password!' },
+                            { min: 8, message: 'Password must be at least 8 characters' }
+                        ]}
+                    >
+                        <Input.Password
+                            placeholder="New password"
+                            autoComplete="new-password"
+                            autoFocus
+                            size="large"
+                        />
+                    </Form.Item>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">Confirm password</Label>
-                            <Input
-                                id="password_confirmation"
-                                type="password"
-                                name="password_confirmation"
-                                autoComplete="new-password"
-                                className="mt-1 block w-full"
-                                placeholder="Confirm password"
-                            />
-                            <InputError message={errors.password_confirmation} className="mt-2" />
-                        </div>
+                    <Form.Item
+                        name="password_confirmation"
+                        label={<Text style={{ color: themeToken.colorText }}>Confirm New Password</Text>}
+                        dependencies={['password']}
+                        rules={[
+                            { required: true, message: 'Please confirm your password!' },
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    if (!value || getFieldValue('password') === value) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(new Error('The passwords do not match!'));
+                                },
+                            }),
+                        ]}
+                    >
+                        <Input.Password
+                            placeholder="Confirm new password"
+                            autoComplete="new-password"
+                            size="large"
+                        />
+                    </Form.Item>
 
-                        <Button type="submit" className="mt-4 w-full" disabled={processing}>
-                            {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                    <Form.Item>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            size="large"
+                            block
+                            loading={loading}
+                            icon={loading ? <LoadingOutlined /> : null}
+                        >
                             Reset password
                         </Button>
-                    </div>
-                )}
+                    </Form.Item>
+                </Space>
             </Form>
         </AuthLayout>
     );
