@@ -1,14 +1,13 @@
 import { dashboard } from '@/routes';
-import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
+import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { 
-    Layout, 
-    Menu, 
-    Breadcrumb, 
-    Dropdown, 
-    Avatar, 
-    Button, 
-    Space,
+import {
+    Layout,
+    Menu,
+    Dropdown,
+    Avatar,
+    Button,
+    Flex,
     Typography,
     theme
 } from 'antd';
@@ -20,18 +19,18 @@ import {
     LogoutOutlined,
     SettingOutlined,
     GithubOutlined,
-    BookOutlined,
-    HomeOutlined
+    BookOutlined
 } from '@ant-design/icons';
 import { type ReactNode, useState } from 'react';
 
 const { Header, Sider, Content } = Layout;
-const { Text } = Typography;
+const { Text, Title } = Typography;
 const { useToken } = theme;
 
 interface AppLayoutProps {
     children: ReactNode;
-    breadcrumbs?: BreadcrumbItem[];
+    pageTitle?: string;
+    actions?: ReactNode;
 }
 
 const mainNavItems: NavItem[] = [
@@ -55,7 +54,7 @@ const footerNavItems: NavItem[] = [
     },
 ];
 
-export default function AppLayout({ children, breadcrumbs = [] }: AppLayoutProps) {
+export default function AppLayout({ children, pageTitle, actions }: AppLayoutProps) {
     const [collapsed, setCollapsed] = useState(false);
     const { auth } = usePage<SharedData>().props;
     const { token } = useToken();
@@ -109,112 +108,149 @@ export default function AppLayout({ children, breadcrumbs = [] }: AppLayoutProps
         })),
     ];
 
-    const breadcrumbItems = [
-        {
-            title: (
-                <Link href={dashboard()}>
-                    <HomeOutlined />
-                </Link>
-            ),
-        },
-        ...breadcrumbs.map(crumb => ({
-            title: crumb.href ? (
-                <Link href={crumb.href}>{crumb.title}</Link>
-            ) : (
-                <Text>{crumb.title}</Text>
-            ),
-        })),
-    ];
-
     return (
         <Layout style={{ minHeight: '100vh' }}>
-            <Sider 
-                trigger={null} 
-                collapsible 
+            <Sider
+                trigger={null}
+                collapsible
                 collapsed={collapsed}
                 style={{
                     background: token.colorBgContainer,
                     borderRight: `1px solid ${token.colorBorderSecondary}`,
+                    height: '100vh',
+                    position: 'fixed',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
                 }}
             >
-                <div style={{
-                    height: '64px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: collapsed ? 'center' : 'flex-start',
-                    padding: collapsed ? '0' : '0 16px',
-                    borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                }}>
-                    {!collapsed ? (
-                        <Link href={dashboard()} prefetch>
-                            <Text strong style={{ fontSize: '18px', color: token.colorPrimary }}>
-                                Liar
-                            </Text>
-                        </Link>
-                    ) : (
-                        <Link href={dashboard()} prefetch>
-                            <Text strong style={{ fontSize: '20px', color: token.colorPrimary }}>
-                                L
-                            </Text>
-                        </Link>
-                    )}
-                </div>
-                
-                <Menu
-                    mode="inline"
-                    items={menuItems}
-                    style={{
-                        height: 'calc(100vh - 64px)',
-                        borderRight: 0,
-                        background: 'transparent',
-                    }}
-                />
+                <Flex vertical style={{ height: '100%' }}>
+                    {/* Logo Section */}
+                    <Flex
+                        align="center"
+                        justify={collapsed ? 'center' : 'flex-start'}
+                        style={{
+                            height: '64px',
+                            padding: collapsed ? '0' : '0 16px',
+                            borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                        }}
+                    >
+                        {!collapsed ? (
+                            <Link href={dashboard()} prefetch>
+                                <Text strong style={{ fontSize: '18px', color: token.colorPrimary }}>
+                                    Liar
+                                </Text>
+                            </Link>
+                        ) : (
+                            <Link href={dashboard()} prefetch>
+                                <Text strong style={{ fontSize: '20px', color: token.colorPrimary }}>
+                                    L
+                                </Text>
+                            </Link>
+                        )}
+                    </Flex>
+
+                    {/* Menu Section - Takes up remaining space */}
+                    <Flex flex={1} style={{ overflow: 'auto' }}>
+                        <Menu
+                            mode="inline"
+                            items={menuItems}
+                            style={{
+                                width: '100%',
+                                borderRight: 0,
+                                background: 'transparent',
+                            }}
+                        />
+                    </Flex>
+
+                    {/* Avatar Section - Fixed at bottom */}
+                    <Flex
+                        align="center"
+                        justify="center"
+                        style={{
+                            padding: collapsed ? '16px 8px' : '16px',
+                            borderTop: `1px solid ${token.colorBorderSecondary}`,
+                            minHeight: '64px',
+                        }}
+                    >
+                        <Dropdown
+                            menu={{ items: userMenuItems }}
+                            placement="top"
+                            arrow
+                        >
+                            <Flex
+                                align="center"
+                                gap="small"
+                                style={{
+                                    cursor: 'pointer',
+                                    width: collapsed ? 'auto' : '100%',
+                                    justifyContent: collapsed ? 'center' : 'flex-start'
+                                }}
+                            >
+                                <Avatar
+                                    src={auth.user.avatar}
+                                    icon={<UserOutlined />}
+                                    size="small"
+                                />
+                                {!collapsed && <Text>{auth.user.name}</Text>}
+                            </Flex>
+                        </Dropdown>
+                    </Flex>
+                </Flex>
             </Sider>
-            
-            <Layout>
+
+            <Layout style={{ marginLeft: collapsed ? 80 : 200, transition: 'margin-left 0.2s' }}>
                 <Header style={{
-                    padding: '0 16px',
+                    padding: '16px 10px',
                     background: token.colorBgContainer,
                     borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
+                    position: 'fixed',
+                    top: 0,
+                    right: 0,
+                    left: collapsed ? 80 : 200,
+                    zIndex: 1,
+                    transition: 'left 0.2s',
+                    height: '64px',
                 }}>
-                    <Space>
-                        <Button
-                            type="text"
-                            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                            onClick={() => setCollapsed(!collapsed)}
-                            style={{ fontSize: '16px' }}
-                        />
-                        
-                        {breadcrumbItems.length > 1 && (
-                            <Breadcrumb items={breadcrumbItems} />
-                        )}
-                    </Space>
-
-                    <Dropdown
-                        menu={{ items: userMenuItems }}
-                        placement="bottomRight"
-                        arrow
-                    >
-                        <Space style={{ cursor: 'pointer' }}>
-                            <Avatar 
-                                src={auth.user.avatar} 
-                                icon={<UserOutlined />}
-                                size="small"
+                    <Flex justify="space-between" align="center" style={{ height: '32px' }}>
+                        {/* Left Section: Collapse Button and Title */}
+                        <Flex align="center" gap="middle" flex={1}>
+                            <Button
+                                type="text"
+                                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                                onClick={() => setCollapsed(!collapsed)}
+                                style={{ fontSize: '16px' }}
                             />
-                            <Text>{auth.user.name}</Text>
-                        </Space>
-                    </Dropdown>
+                            {pageTitle && (
+                                <Title
+                                    level={4}
+                                    style={{
+                                        margin: 0,
+                                        color: token.colorText,
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    {pageTitle}
+                                </Title>
+                            )}
+                        </Flex>
+
+                        {/* Right Section: Action Buttons */}
+                        {actions && (
+                            <Flex align="center" style={{ marginLeft: '16px' }}>
+                                {actions}
+                            </Flex>
+                        )}
+                    </Flex>
                 </Header>
-                
+
                 <Content style={{
-                    margin: '16px',
+                    margin: '74px 10px 10px',
                     padding: '16px',
                     background: token.colorBgContainer,
                     borderRadius: token.borderRadiusLG,
                     overflow: 'auto',
+                    minHeight: 'calc(100vh - 112px)',
                 }}>
                     {children}
                 </Content>

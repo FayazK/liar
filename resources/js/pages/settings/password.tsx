@@ -1,24 +1,16 @@
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { type BreadcrumbItem } from '@/types';
 import { Form, Head } from '@inertiajs/react';
 import { useRef } from 'react';
 import { Card, Input, Button, Space, Typography, Alert, theme, message } from 'antd';
 import type { InputRef } from 'antd';
 import { LockOutlined, LoadingOutlined } from '@ant-design/icons';
-import { edit } from '@/routes/password';
 
 const { Title, Text } = Typography;
 const { Password: PasswordInput } = Input;
 const { useToken } = theme;
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Password settings',
-        href: edit().url,
-    },
-];
 
 export default function Password() {
     const passwordInput = useRef<InputRef>(null);
@@ -26,7 +18,7 @@ export default function Password() {
     const { token } = useToken();
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout>
             <Head title="Password settings" />
 
             <SettingsLayout>

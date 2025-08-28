@@ -1,6 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { dashboard } from '@/routes';
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { 
     Row, 
@@ -13,6 +12,8 @@ import {
     Progress,
     List,
     Tag,
+    Button,
+    Dropdown,
     theme
 } from 'antd';
 import {
@@ -22,18 +23,17 @@ import {
     TeamOutlined,
     ShoppingOutlined,
     DollarOutlined,
-    ClockCircleOutlined
+    ClockCircleOutlined,
+    PlusOutlined,
+    DownloadOutlined,
+    MoreOutlined,
+    ReloadOutlined,
+    FilterOutlined
 } from '@ant-design/icons';
 
 const { Title, Text, Paragraph } = Typography;
 const { useToken } = theme;
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard().url,
-    },
-];
 
 export default function Dashboard() {
     const { auth } = usePage<SharedData>().props;
@@ -94,8 +94,56 @@ export default function Dashboard() {
         },
     ];
 
+    // Action buttons for the header
+    const headerActions = (
+        <Space>
+            <Button 
+                icon={<ReloadOutlined />} 
+                onClick={() => window.location.reload()}
+            >
+                Refresh
+            </Button>
+            <Button 
+                icon={<FilterOutlined />}
+                type="default"
+            >
+                Filter
+            </Button>
+            <Button 
+                icon={<DownloadOutlined />}
+                type="default"
+            >
+                Export
+            </Button>
+            <Dropdown
+                menu={{
+                    items: [
+                        {
+                            key: 'new-user',
+                            icon: <UserOutlined />,
+                            label: 'Add User',
+                        },
+                        {
+                            key: 'new-report',
+                            icon: <PlusOutlined />,
+                            label: 'Create Report',
+                        },
+                    ],
+                }}
+                trigger={['click']}
+            >
+                <Button type="primary" icon={<PlusOutlined />}>
+                    New <MoreOutlined />
+                </Button>
+            </Dropdown>
+        </Space>
+    );
+
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout 
+            pageTitle="Dashboard"
+            actions={headerActions}
+        >
             <Head title="Dashboard" />
             
             <Space direction="vertical" size="large" style={{ width: '100%' }}>

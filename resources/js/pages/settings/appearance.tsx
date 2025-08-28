@@ -2,20 +2,12 @@ import { Head } from '@inertiajs/react';
 import { Card, Typography, Space, Segmented, theme } from 'antd';
 import { BulbOutlined, BulbFilled, DesktopOutlined } from '@ant-design/icons';
 import { useAppearance, type Appearance } from '@/hooks/use-appearance';
-import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { appearance } from '@/routes';
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Appearance settings',
-        href: appearance().url,
-    },
-];
 
 export default function Appearance() {
     const { appearance: currentAppearance, updateAppearance } = useAppearance();
@@ -40,7 +32,7 @@ export default function Appearance() {
     ];
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout>
             <Head title="Appearance settings" />
 
             <SettingsLayout>

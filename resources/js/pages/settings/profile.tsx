@@ -1,25 +1,18 @@
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import { send } from '@/routes/verification';
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type SharedData } from '@/types';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { Card, Input, Button, Space, Typography, Alert, theme, message, Modal } from 'antd';
 import type { InputRef } from 'antd';
 import { UserOutlined, MailOutlined, LoadingOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { edit } from '@/routes/profile';
 import { useRef } from 'react';
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
 const { confirm } = Modal;
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Profile settings',
-        href: edit().url,
-    },
-];
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth } = usePage<SharedData>().props;
@@ -59,7 +52,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout>
             <Head title="Profile settings" />
 
             <SettingsLayout>
