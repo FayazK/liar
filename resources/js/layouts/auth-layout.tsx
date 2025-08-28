@@ -1,8 +1,8 @@
 import { home } from '@/routes';
 import { Link } from '@inertiajs/react';
 import { Card, Typography, Flex, Space, theme } from 'antd';
-import { CodeOutlined } from '@ant-design/icons';
 import { type PropsWithChildren, useEffect, useState } from 'react';
+import logo from '../../images/logo.svg'
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
@@ -26,14 +26,14 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
     const logoBorderColor = 'rgba(255, 255, 255, 0.2)';
 
     return (
-        <div 
+        <div
             className="min-h-screen relative overflow-hidden"
             style={{
                 background: backgroundGradient,
             }}
         >
             {/* Background decoration */}
-            <div 
+            <div
                 className="absolute inset-0"
                 style={{
                     backgroundImage: `radial-gradient(circle at 25% 25%, ${dotColor} 2px, transparent 2px),
@@ -43,18 +43,18 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
                     opacity: 0.1,
                 }}
             />
-            
-            <Flex 
-                align="center" 
-                justify="center" 
+
+            <Flex
+                align="center"
+                justify="center"
                 className="min-h-screen"
-                style={{ 
-                    position: 'relative', 
+                style={{
+                    position: 'relative',
                     zIndex: 1,
                     padding: token.padding,
                 }}
             >
-                <div 
+                <div
                     className={`w-full max-w-md transition-all duration-700 ease-out transform ${
                         mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
                     }`}
@@ -62,21 +62,24 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
                     <Space direction="vertical" size="large" className="w-full">
                         {/* Logo */}
                         <Flex justify="center">
-                            <Link 
-                                href={home()} 
+                            <Link
+                                href={home()}
                                 className="group transition-transform duration-300 hover:scale-105"
                             >
-                                <div 
+                                <div
                                     className="flex h-16 w-16 items-center justify-center rounded-full backdrop-blur-sm shadow-lg"
                                     style={{
                                         backgroundColor: logoBackgroundColor,
                                         border: `1px solid ${logoBorderColor}`,
                                     }}
                                 >
-                                    <CodeOutlined 
-                                        style={{ 
-                                            fontSize: '40px',
-                                            color: token.colorBgContainer 
+                                    <img
+                                        src={logo}
+                                        alt="Liar Logo"
+                                        style={{
+                                            height: '40px',
+                                            width: '40px',
+                                            filter: 'brightness(0) invert(1)'
                                         }}
                                     />
                                 </div>
@@ -93,7 +96,7 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
                                 boxShadow: token.boxShadowSecondary,
                             }}
                             styles={{
-                                body: { 
+                                body: {
                                     padding: token.paddingXL,
                                 }
                             }}
@@ -101,10 +104,10 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
                             <Space direction="vertical" size="large" className="w-full">
                                 {/* Header */}
                                 <div className="text-center">
-                                    <Title 
-                                        level={2} 
+                                    <Title
+                                        level={2}
                                         className="!mb-2"
-                                        style={{ 
+                                        style={{
                                             color: token.colorText,
                                             fontWeight: 600,
                                             fontSize: token.fontSizeHeading2,
@@ -114,8 +117,8 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
                                     >
                                         {title}
                                     </Title>
-                                    <Text 
-                                        style={{ 
+                                    <Text
+                                        style={{
                                             fontSize: token.fontSizeSM,
                                             lineHeight: token.lineHeight,
                                             color: token.colorTextSecondary,

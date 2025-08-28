@@ -22,6 +22,8 @@ import {
     BookOutlined
 } from '@ant-design/icons';
 import { type ReactNode, useState } from 'react';
+import profile from '@/routes/profile';
+import logo from '../../images/logo.svg'
 
 const { Header, Sider, Content } = Layout;
 const { Text, Title } = Typography;
@@ -63,12 +65,12 @@ export default function AppLayout({ children, pageTitle, actions }: AppLayoutPro
         {
             key: 'profile',
             icon: <UserOutlined />,
-            label: 'Profile',
+            label: <Link href={profile.edit().url}>Profile</Link>,
         },
         {
             key: 'settings',
             icon: <SettingOutlined />,
-            label: 'Settings',
+            label: <Link href={profile.edit().url}>Settings</Link>,
         },
         {
             type: 'divider' as const,
@@ -137,15 +139,30 @@ export default function AppLayout({ children, pageTitle, actions }: AppLayoutPro
                     >
                         {!collapsed ? (
                             <Link href={dashboard()} prefetch>
-                                <Text strong style={{ fontSize: '18px', color: token.colorPrimary }}>
-                                    Liar
-                                </Text>
+                                <Flex align="center" gap="small" >
+                                    <img
+                                        src={logo}
+                                        alt="Liar Logo"
+                                        style={{
+                                            height: '32px',
+                                            width: '32px'
+                                        }}
+                                    />
+                                    <Text strong style={{ fontSize: '24px', color: token.colorPrimary }}>
+                                        Liar
+                                    </Text>
+                                </Flex>
                             </Link>
                         ) : (
                             <Link href={dashboard()} prefetch>
-                                <Text strong style={{ fontSize: '20px', color: token.colorPrimary }}>
-                                    L
-                                </Text>
+                                <img
+                                    src="/images/logo.svg"
+                                    alt="Liar Logo"
+                                    style={{
+                                        height: '28px',
+                                        width: '28px'
+                                    }}
+                                />
                             </Link>
                         )}
                     </Flex>
