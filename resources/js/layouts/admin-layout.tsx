@@ -1,20 +1,20 @@
 import { type ReactNode } from 'react';
 import MasterLayout from './master-layout';
-import { appMainNavItems, appFooterNavItems } from './menus/app-menu';
+import { adminMainNavItems, adminFooterNavItems } from './menus/admin-menu';
 
-interface AppLayoutProps {
+interface AdminLayoutProps {
     children: ReactNode;
     pageTitle?: string;
     actions?: ReactNode;
 }
 
-export default function AppLayout({ children, pageTitle, actions }: AppLayoutProps) {
+export default function AdminLayout({ children, pageTitle, actions }: AdminLayoutProps) {
     return (
         <MasterLayout
             pageTitle={pageTitle}
             actions={actions}
-            mainNavItems={appMainNavItems}
-            footerNavItems={appFooterNavItems}
+            mainNavItems={adminMainNavItems}
+            footerNavItems={adminFooterNavItems}
         >
             {children}
         </MasterLayout>
