@@ -103,3 +103,5 @@ Use `composer dev` to start the full stack:
 - **Tests**: `tests/Feature/` and `tests/Unit/`
 - use Ant Design theme tokens and dynamic styles/classes which shall be compatible with dark/light mode
 - Use Wayfinder for route and linking in frontend
+- ALWAYS follow DRY and KISS principles.
+- ALWAYS follow Service and Repository Pattern.
