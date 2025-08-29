@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class UserService
 {
@@ -77,6 +78,22 @@ class UserService
     public function getActiveUsers()
     {
         return $this->userRepository->getActiveUsers();
+    }
+
+    public function getPaginatedUsers(
+        int $perPage = 15,
+        ?string $search = null,
+        ?array $filters = null,
+        ?string $sortBy = 'created_at',
+        string $sortDirection = 'desc'
+    ): LengthAwarePaginator {
+        return $this->userRepository->paginateUsers(
+            $perPage,
+            $search,
+            $filters,
+            $sortBy,
+            $sortDirection
+        );
     }
 
     public function isEmailTaken(string $email): bool

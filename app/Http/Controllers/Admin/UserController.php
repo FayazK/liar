@@ -26,9 +26,29 @@ class UserController extends Controller
 
     public function data(Request $request)
     {
-        $users = $this->userService->getActiveUsers();
+        $perPage = (int) $request->get('per_page', 15);
+        $search = $request->get('search');
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        
+        // Parse filters
+        $filters = [];
+        if ($request->has('is_active')) {
+            $filters['is_active'] = $request->get('is_active');
+        }
+        if ($request->has('date_range')) {
+            $filters['created_at'] = $request->get('date_range');
+        }
 
-        return new UserCollection($users);
+        $paginatedUsers = $this->userService->getPaginatedUsers(
+            $perPage,
+            $search,
+            $filters,
+            $sortBy,
+            $sortDirection
+        );
+
+        return new UserCollection($paginatedUsers);
     }
 
     public function show(int $id): JsonResponse

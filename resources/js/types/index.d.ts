@@ -51,3 +51,47 @@ export interface User {
     initials: string; // Computed attribute from Laravel
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface PaginationLinks {
+    first: string | null;
+    last: string | null;
+    prev: string | null;
+    next: string | null;
+}
+
+export interface PaginationMeta {
+    current_page: number;
+    from: number | null;
+    last_page: number;
+    per_page: number;
+    to: number | null;
+    total: number;
+    path: string;
+}
+
+export interface LaravelPaginatedResponse<T = any> {
+    data: T[];
+    links: PaginationLinks;
+    meta: PaginationMeta;
+}
+
+export interface DataTableProps<T = any> {
+    fetchUrl: string;
+    columns: Array<{
+        title: string;
+        dataIndex?: string;
+        key: string;
+        width?: number;
+        sorter?: boolean;
+        searchable?: boolean;
+        filterable?: boolean;
+        render?: (value: any, record: T, index: number) => React.ReactNode;
+    }>;
+    searchPlaceholder?: string;
+    defaultPageSize?: number;
+    className?: string;
+}
+
+export interface DataTableFilters {
+    [key: string]: any;
+}
