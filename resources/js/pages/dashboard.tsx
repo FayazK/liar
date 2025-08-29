@@ -149,7 +149,7 @@ export default function Dashboard() {
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
                 <div>
                     <Title level={2} style={{ marginBottom: token.marginXS }}>
-                        Welcome back, {auth.user.name}!
+                        Welcome back, {auth.user.full_name}!
                     </Title>
                     <Paragraph type="secondary">
                         Here's what's happening with your account today.

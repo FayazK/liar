@@ -33,11 +33,21 @@ export interface SharedData {
 
 export interface User {
     id: number;
-    name: string;
+    first_name: string;
+    last_name: string;
     email: string;
+    phone?: string;
+    date_of_birth?: string;
     avatar?: string;
+    bio?: string;
+    timezone: string;
+    locale: string;
+    is_active: boolean;
+    last_login_at?: string;
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
+    full_name: string; // Computed attribute from Laravel
+    initials: string; // Computed attribute from Laravel
     [key: string]: unknown; // This allows for additional properties...
 }

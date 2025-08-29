@@ -10,7 +10,8 @@ const { Link, Text } = Typography;
 const { useToken } = theme;
 
 interface RegisterFormData {
-    name: string;
+    first_name: string;
+    last_name: string;
     email: string;
     password: string;
     password_confirmation: string;
@@ -58,17 +59,32 @@ export default function Register() {
             >
                 <Space direction="vertical" size="middle" className="w-full">
                     <Form.Item
-                        name="name"
-                        label={<Text style={{ color: token.colorText }}>Name</Text>}
+                        name="first_name"
+                        label={<Text style={{ color: token.colorText }}>First Name</Text>}
                         rules={[
-                            { required: true, message: 'Please input your name!' },
-                            { min: 2, message: 'Name must be at least 2 characters' }
+                            { required: true, message: 'Please input your first name!' },
+                            { min: 2, message: 'First name must be at least 2 characters' }
                         ]}
                     >
                         <Input
-                            placeholder="Full name"
-                            autoComplete="name"
+                            placeholder="First name"
+                            autoComplete="given-name"
                             autoFocus
+                            size="large"
+                        />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="last_name"
+                        label={<Text style={{ color: token.colorText }}>Last Name</Text>}
+                        rules={[
+                            { required: true, message: 'Please input your last name!' },
+                            { min: 2, message: 'Last name must be at least 2 characters' }
+                        ]}
+                    >
+                        <Input
+                            placeholder="Last name"
+                            autoComplete="family-name"
                             size="large"
                         />
                     </Form.Item>

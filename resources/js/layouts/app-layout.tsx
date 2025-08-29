@@ -209,7 +209,7 @@ export default function AppLayout({ children, pageTitle, actions }: AppLayoutPro
                                     icon={<UserOutlined />}
                                     size="small"
                                 />
-                                {!collapsed && <Text>{auth.user.name}</Text>}
+                                {!collapsed && <Text>{auth.user.full_name}</Text>}
                             </Flex>
                         </Dropdown>
                     </Flex>
