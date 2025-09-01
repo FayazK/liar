@@ -46,6 +46,14 @@ export default function UsersIndex() {
             ),
         },
         {
+            title: 'Phone',
+            dataIndex: 'phone',
+            key: 'phone',
+            width: 150,
+            sorter: true,
+            render: (phone: string | null) => phone || 'N/A',
+        },
+        {
             title: 'Last Login',
             dataIndex: 'last_login_at',
             key: 'last_login_at',
