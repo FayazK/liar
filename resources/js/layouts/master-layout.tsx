@@ -34,12 +34,12 @@ interface MasterLayoutProps {
     footerNavItems?: NavItem[];
 }
 
-export default function MasterLayout({ 
-    children, 
-    pageTitle, 
-    actions, 
-    mainNavItems, 
-    footerNavItems = [] 
+export default function MasterLayout({
+    children,
+    pageTitle,
+    actions,
+    mainNavItems,
+    footerNavItems = []
 }: MasterLayoutProps) {
     const [collapsed, setCollapsed] = useState(false);
     const { auth } = usePage<SharedData>().props;
@@ -188,9 +188,16 @@ export default function MasterLayout({
                                 <Avatar
                                     src={auth.user.avatar}
                                     icon={<UserOutlined />}
-                                    size="small"
                                 />
-                                {!collapsed && <Text>{auth.user.full_name}</Text>}
+                                {!collapsed && (
+                                    <div style={{ lineHeight: '1.2' }}>
+                                        <Text strong>{auth.user.full_name}</Text>
+                                        <br />
+                                        <Text type="secondary" style={{ fontSize: '12px' }}>
+                                            {auth.user.email}
+                                        </Text>
+                                    </div>
+                                )}
                             </Flex>
                         </Dropdown>
                     </Flex>
