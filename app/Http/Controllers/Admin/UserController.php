@@ -7,6 +7,8 @@ use App\Http\Requests\Admin\UserStoreRequest;
 use App\Http\Requests\Admin\UserUpdateRequest;
 use App\Http\Resources\Admin\UserCollection;
 use App\Http\Resources\UserDetailResource;
+use App\Models\User;
+use App\Queries\UserDataTableQueryService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,32 +26,14 @@ class UserController extends Controller
         return Inertia::render('admin/users/index');
     }
 
-    public function data(Request $request)
+    public function data(Request $request): UserCollection
     {
-        $perPage = (int) $request->get('per_page', 15);
-        $search = $request->get('search');
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = $request->get('sort_direction', 'desc');
-        
-        // Parse filters
-        $filters = [];
-        if ($request->has('is_active')) {
-            $filters['is_active'] = $request->get('is_active');
-        }
-        if ($request->has('date_range')) {
-            $filters['created_at'] = $request->get('date_range');
-        }
-
-        $paginatedUsers = $this->userService->getPaginatedUsers(
-            $perPage,
-            $search,
-            $filters,
-            $sortBy,
-            $sortDirection
-        );
+        $query = User::query();
+        $paginatedUsers = (new UserDataTableQueryService($query, $request))->getResults();
 
         return new UserCollection($paginatedUsers);
     }
+
 
     public function show(int $id): JsonResponse
     {
