@@ -4,6 +4,7 @@ import { router } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import api from '@/lib/axios';
 import { useEffect, useState } from 'react';
+import AdvancedSelect from '@/components/advanced-select';
 
 interface UserFormProps {
     user?: User;
@@ -22,13 +23,13 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
             phone: user?.phone || '',
             date_of_birth: user?.date_of_birth ? dayjs(user.date_of_birth) : null,
             bio: user?.bio || '',
-            timezone: user?.timezone || 'UTC',
-            locale: user?.locale || 'en',
+            timezone_id: user?.timezone_id,
+            language_id: user?.language_id,
             is_active: user?.is_active ?? true,
         });
     }, [user, form]);
 
-    const onFinish = async (values: any) => {
+    const onFinish = async (values: Partial<User>) => {
         setLoading(true);
         const requestData = {
             ...values,
@@ -44,7 +45,7 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
                 message: response.data.message || `User ${isEdit ? 'updated' : 'created'} successfully`,
             });
             router.visit('/admin/users');
-        } catch (error: any) {
+                } catch (error: { response?: { status: number; data: { errors: { [key: string]: string[] }; message: string; }; }; }) {
             if (error.response && error.response.status === 422) {
                 const validationErrors = error.response.data.errors;
                 const formErrors = Object.keys(validationErrors).map(key => ({
@@ -160,17 +161,17 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
                 <Col span={12}>
                     <Form.Item
                         label="Timezone"
-                        name="timezone"
+                        name="timezone_id"
                     >
-                        <Input />
+                        <AdvancedSelect type="timezones" id={user?.timezone_id} />
                     </Form.Item>
                 </Col>
                 <Col span={12}>
                     <Form.Item
-                        label="Locale"
-                        name="locale"
+                        label="Language"
+                        name="language_id"
                     >
-                        <Input />
+                        <AdvancedSelect type="languages" id={user?.language_id} />
                     </Form.Item>
                 </Col>
             </Row>
