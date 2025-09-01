@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -22,8 +21,8 @@ return new class extends Migration
             $table->date('date_of_birth')->nullable();
             $table->string('avatar')->nullable();
             $table->text('bio')->nullable();
-            $table->string('timezone')->default('UTC');
-            $table->string('locale')->default('en');
+            $table->unsignedBigInteger('timezone_id');
+            $table->unsignedBigInteger('language_id');
             $table->boolean('is_active')->default(true);
             $table->timestamp('last_login_at')->nullable();
             $table->rememberToken();

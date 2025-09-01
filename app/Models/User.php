@@ -26,8 +26,8 @@ class User extends Authenticatable
         'date_of_birth',
         'avatar',
         'bio',
-        'timezone',
-        'locale',
+        'timezone_id',
+        'language_id',
         'is_active',
         'last_login_at',
     ];
