@@ -5,7 +5,7 @@ import { Link } from '@inertiajs/react';
 import AdminLayout from '@/layouts/admin-layout';
 import DataTable from '@/components/ui/DataTable';
 import type { User } from '@/types';
-import { show, edit, data } from '@/routes/admin/users';
+import { show, edit, data, create } from '@/routes/admin/users';
 
 
 export default function UsersIndex() {
@@ -92,7 +92,7 @@ export default function UsersIndex() {
                     {
                         key: 'edit',
                         label: (
-                            <Link href={edit.url(record.id)}>
+                            <Link href={edit({user: record.id}).url}>
                                 <Space>
                                     <EditOutlined />
                                     Edit
@@ -133,9 +133,11 @@ export default function UsersIndex() {
     ];
 
     return (
-        <AdminLayout pageTitle={"Users"} actions={<Button type="primary" icon={<UserOutlined />}>
-            Add User
-        </Button>}>
+        <AdminLayout pageTitle={"Users"} actions={        <Link href={create.url()}>
+            <Button type="primary" icon={<UserOutlined />}>
+                Add User
+            </Button>
+        </Link>}>
             <DataTable<User>
                 fetchUrl={data.url()}
                 columns={columns}

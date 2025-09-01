@@ -19,11 +19,18 @@ class UserController extends Controller
 {
     public function __construct(
         private UserService $userService
-    ) {}
+    )
+    {
+    }
 
     public function index(): Response
     {
         return Inertia::render('admin/users/index');
+    }
+
+    public function create(): Response
+    {
+        return Inertia::render('admin/users/create');
     }
 
     public function data(Request $request): UserCollection
@@ -46,16 +53,10 @@ class UserController extends Controller
         return response()->json(new UserDetailResource($user));
     }
 
-    public function edit(int $id): Response
+    public function edit(User $user): Response
     {
-        $user = $this->userService->findUser($id);
-
-        if (!$user) {
-            abort(404, 'User not found');
-        }
-
         return Inertia::render('admin/users/edit', [
-            'user' => new UserDetailResource($user)
+            'user' => $user
         ]);
     }
 
