@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Table, Input, Select, DatePicker, Space, Typography, Card } from 'antd';
+import { Table, Input, Select, DatePicker, Space, Typography } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import type { TableProps, TableColumnType } from 'antd';
 import axios from '@/lib/axios';
@@ -22,12 +22,11 @@ interface DataTableState<T> {
     };
 }
 
-function DataTable<T extends Record<string, any>>({
+function DataTable<T extends Record<string, unknown>>({
     fetchUrl,
     columns,
     searchPlaceholder = "Search...",
     defaultPageSize = 15,
-    className = ""
 }: DataTableProps<T>) {
     const [state, setState] = useState<DataTableState<T>>({
         data: [],
@@ -48,6 +47,8 @@ function DataTable<T extends Record<string, any>>({
         field?: string | number;
         order?: 'ascend' | 'descend';
     }>({});
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [pageSize, setPageSize] = useState<number>(defaultPageSize);
 
     const fetchData = useCallback(async (params: {
         page?: number;
@@ -61,7 +62,7 @@ function DataTable<T extends Record<string, any>>({
 
         try {
             const queryParams = new URLSearchParams();
-            
+
             if (params.page) queryParams.set('page', params.page.toString());
             if (params.per_page) queryParams.set('per_page', params.per_page.toString());
             if (params.search) queryParams.set('search', params.search);
@@ -102,9 +103,12 @@ function DataTable<T extends Record<string, any>>({
     }, [fetchUrl]);
 
     const debouncedFetchData = useCallback(
-        debounce((params: Parameters<typeof fetchData>[0]) => {
-            fetchData(params);
-        }, 300),
+        (params: Parameters<typeof fetchData>[0]) => {
+            const debouncedFn = debounce((p: Parameters<typeof fetchData>[0]) => {
+                fetchData(p);
+            }, 300);
+            debouncedFn(params);
+        },
         [fetchData]
     );
 
@@ -117,8 +121,8 @@ function DataTable<T extends Record<string, any>>({
 
     useEffect(() => {
         const params = {
-            page: state.pagination.current,
-            per_page: state.pagination.pageSize,
+            page: currentPage,
+            per_page: pageSize,
             search: search || undefined,
             filters: Object.keys(filters).length > 0 ? filters : undefined,
             sort_by: sorter.field ? String(sorter.field) : undefined,
@@ -130,15 +134,21 @@ function DataTable<T extends Record<string, any>>({
         } else {
             fetchData(params);
         }
-    }, [search, filters, sorter, fetchData, debouncedFetchData, state.pagination.current, state.pagination.pageSize]);
+    }, [search, filters, sorter, fetchData, debouncedFetchData, currentPage, pageSize]);
 
     const handleTableChange: TableProps<T>['onChange'] = (pagination, _, sorter) => {
+        const newPage = pagination.current || 1;
+        const newPageSize = pagination.pageSize || defaultPageSize;
+        
+        setCurrentPage(newPage);
+        setPageSize(newPageSize);
+        
         setState(prev => ({
             ...prev,
             pagination: {
                 ...prev.pagination,
-                current: pagination.current || 1,
-                pageSize: pagination.pageSize || defaultPageSize,
+                current: newPage,
+                pageSize: newPageSize,
             },
         }));
 
@@ -151,17 +161,19 @@ function DataTable<T extends Record<string, any>>({
 
     const handleSearch = (value: string) => {
         setSearch(value);
+        setCurrentPage(1);
         setState(prev => ({
             ...prev,
             pagination: { ...prev.pagination, current: 1 },
         }));
     };
 
-    const handleFilter = (key: string, value: any) => {
+    const handleFilter = (key: string, value: unknown) => {
         setFilters(prev => ({
             ...prev,
             [key]: value,
         }));
+        setCurrentPage(1);
         setState(prev => ({
             ...prev,
             pagination: { ...prev.pagination, current: 1 },
@@ -172,6 +184,7 @@ function DataTable<T extends Record<string, any>>({
         setSearch('');
         setFilters({});
         setSorter({});
+        setCurrentPage(1);
         setState(prev => ({
             ...prev,
             pagination: { ...prev.pagination, current: 1 },
@@ -251,9 +264,9 @@ function DataTable<T extends Record<string, any>>({
     };
 
     return (
-        <Card className={className}>
+        <>
             {renderSearchAndFilters()}
-            
+
             <Table<T>
                 columns={processedColumns}
                 dataSource={state.data}
@@ -274,7 +287,7 @@ function DataTable<T extends Record<string, any>>({
                     </Text>
                 </div>
             )}
-        </Card>
+        </>
     );
 }
 

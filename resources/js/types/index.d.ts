@@ -69,13 +69,13 @@ export interface PaginationMeta {
     path: string;
 }
 
-export interface LaravelPaginatedResponse<T = any> {
+export interface LaravelPaginatedResponse<T = unknown> {
     data: T[];
     links: PaginationLinks;
     meta: PaginationMeta;
 }
 
-export interface DataTableProps<T = any> {
+export interface DataTableProps<T = unknown> {
     fetchUrl: string;
     columns: Array<{
         title: string;
@@ -85,7 +85,7 @@ export interface DataTableProps<T = any> {
         sorter?: boolean;
         searchable?: boolean;
         filterable?: boolean;
-        render?: (value: any, record: T, index: number) => React.ReactNode;
+        render?: (value: unknown, record: T, index: number) => React.ReactNode;
     }>;
     searchPlaceholder?: string;
     defaultPageSize?: number;
@@ -93,5 +93,5 @@ export interface DataTableProps<T = any> {
 }
 
 export interface DataTableFilters {
-    [key: string]: any;
+    [key: string]: unknown;
 }

@@ -1,13 +1,12 @@
 import React from 'react';
-import { Button, Space, Tag, Typography, Dropdown, Avatar } from 'antd';
+import { Button, Space, Tag, Dropdown, Avatar } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined, MoreOutlined } from '@ant-design/icons';
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/layouts/admin-layout';
 import DataTable from '@/components/ui/DataTable';
 import type { User } from '@/types';
-import { route } from '@/wayfinder';
+import { show, edit, data } from '@/routes/admin/users';
 
-const { Title } = Typography;
 
 export default function UsersIndex() {
     const columns = [
@@ -17,10 +16,10 @@ export default function UsersIndex() {
             key: 'user',
             searchable: true,
             sorter: true,
-            render: (_: any, record: User) => (
+            render: (_: unknown, record: User) => (
                 <Space>
-                    <Avatar 
-                        src={record.avatar} 
+                    <Avatar
+                        src={record.avatar}
                         icon={<UserOutlined />}
                         size={32}
                     >
@@ -69,12 +68,12 @@ export default function UsersIndex() {
             title: 'Actions',
             key: 'actions',
             width: 100,
-            render: (_: any, record: User) => {
+            render: (_: unknown, record: User) => {
                 const menuItems = [
                     {
                         key: 'view',
                         label: (
-                            <Link href={route('admin.users.show', { id: record.id })}>
+                            <Link href={show.url(record.id)}>
                                 <Space>
                                     <EyeOutlined />
                                     View
@@ -85,7 +84,7 @@ export default function UsersIndex() {
                     {
                         key: 'edit',
                         label: (
-                            <Link href={route('admin.users.edit', { id: record.id })}>
+                            <Link href={edit.url(record.id)}>
                                 <Space>
                                     <EditOutlined />
                                     Edit
@@ -126,29 +125,15 @@ export default function UsersIndex() {
     ];
 
     return (
-        <AdminLayout>
-            <div style={{ padding: '24px' }}>
-                <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    marginBottom: '24px' 
-                }}>
-                    <Title level={2} style={{ margin: 0 }}>
-                        Users Management
-                    </Title>
-                    <Button type="primary" icon={<UserOutlined />}>
-                        Add User
-                    </Button>
-                </div>
-
-                <DataTable<User>
-                    fetchUrl={route('admin.users.data')}
-                    columns={columns}
-                    searchPlaceholder="Search users by name or email..."
-                    defaultPageSize={15}
-                />
-            </div>
+        <AdminLayout pageTitle={"Users"} actions={<Button type="primary" icon={<UserOutlined />}>
+            Add User
+        </Button>}>
+            <DataTable<User>
+                fetchUrl={data.url()}
+                columns={columns}
+                searchPlaceholder="Search users by name or email..."
+                defaultPageSize={15}
+            />
         </AdminLayout>
     );
 }
