@@ -3,7 +3,6 @@ import { Card, Typography, Space, Segmented, theme } from 'antd';
 import { BulbOutlined, BulbFilled, DesktopOutlined } from '@ant-design/icons';
 import { useAppearance, type Appearance } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
-import SettingsLayout from '@/layouts/settings/layout';
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
@@ -32,11 +31,10 @@ export default function Appearance() {
     ];
 
     return (
-        <AppLayout>
+        <AppLayout pageTitle="Appearance">
             <Head title="Appearance settings" />
 
-            <SettingsLayout>
-                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
                     <div>
                         <Title level={3} style={{ marginBottom: token.marginXS }}>
                             Appearance Settings
@@ -67,7 +65,6 @@ export default function Appearance() {
                         </Space>
                     </Card>
                 </Space>
-            </SettingsLayout>
         </AppLayout>
     );
 }

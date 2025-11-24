@@ -1,6 +1,5 @@
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
 import AppLayout from '@/layouts/app-layout';
-import SettingsLayout from '@/layouts/settings/layout';
 import { Form, Head } from '@inertiajs/react';
 import { useRef } from 'react';
 import { Card, Input, Button, Space, Typography, Alert, theme, message } from 'antd';
@@ -18,11 +17,10 @@ export default function Password() {
     const { token } = useToken();
 
     return (
-        <AppLayout>
+        <AppLayout pageTitle="Password">
             <Head title="Password settings" />
 
-            <SettingsLayout>
-                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
                     <div>
                         <Title level={3} style={{ marginBottom: token.marginXS }}>
                             Update Password
@@ -139,7 +137,6 @@ export default function Password() {
                         </Form>
                     </Card>
                 </Space>
-            </SettingsLayout>
         </AppLayout>
     );
 }

@@ -1,5 +1,5 @@
-import { type NavItem, type SharedData } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
+import { type BreadcrumbItem, type NavGroup, type NavItem, type SharedData } from '@/types';
+import { Link, router, usePage } from '@inertiajs/react';
 import {
     Layout,
     Menu,
@@ -8,19 +8,27 @@ import {
     Button,
     Flex,
     Typography,
-    theme
+    Drawer,
+    theme,
 } from 'antd';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
+    MenuOutlined,
     UserOutlined,
     LogoutOutlined,
-    SettingOutlined
+    SettingOutlined,
+    SearchOutlined,
 } from '@ant-design/icons';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode } from 'react';
 import profile from '@/routes/profile';
 import { dashboard } from '@/routes';
 import logo from '../../images/logo.svg';
+import { useSidebarState } from '@/hooks/use-sidebar-state';
+import { useIsMobile } from '@/hooks/use-mobile';
+import GlobalSearch, { useGlobalSearch } from '@/components/global-search';
+import NotificationsCenter from '@/components/notifications-center';
+import Breadcrumb from '@/components/breadcrumb';
 
 const { Header, Sider, Content } = Layout;
 const { Text, Title } = Typography;
@@ -31,7 +39,9 @@ interface MasterLayoutProps {
     pageTitle?: string;
     actions?: ReactNode;
     mainNavItems: NavItem[];
+    navGroups?: NavGroup[];
     footerNavItems?: NavItem[];
+    breadcrumbs?: BreadcrumbItem[];
 }
 
 export default function MasterLayout({
@@ -39,11 +49,27 @@ export default function MasterLayout({
     pageTitle,
     actions,
     mainNavItems,
-    footerNavItems = []
+    navGroups = [],
+    footerNavItems = [],
+    breadcrumbs = [],
 }: MasterLayoutProps) {
-    const [collapsed, setCollapsed] = useState(false);
+    const { collapsed, toggleCollapsed } = useSidebarState();
+    const isMobile = useIsMobile();
     const { auth } = usePage<SharedData>().props;
     const { token } = useToken();
+    const { isOpen: isSearchOpen, openSearch, closeSearch } = useGlobalSearch();
+
+    // Mobile drawer state uses sidebar collapsed state
+    const isMobileMenuOpen = isMobile && !collapsed;
+    const closeMobileMenu = () => {
+        if (isMobile) {
+            toggleCollapsed();
+        }
+    };
+
+    const handleLogout = () => {
+        router.post('/logout');
+    };
 
     const userMenuItems = [
         {
@@ -62,10 +88,8 @@ export default function MasterLayout({
         {
             key: 'logout',
             icon: <LogoutOutlined />,
-            label: 'Logout',
-            onClick: () => {
-                window.location.href = '/logout';
-            },
+            label: 'Sign Out',
+            onClick: handleLogout,
         },
     ];
 
@@ -74,192 +98,343 @@ export default function MasterLayout({
             key: typeof item.href === 'string' ? item.href : item.href.url,
             icon: item.icon ? <item.icon /> : null,
             label: (
-                <Link href={item.href} prefetch>
+                <Link
+                    href={item.href}
+                    prefetch
+                    onClick={isMobile ? closeMobileMenu : undefined}
+                >
                     {item.title}
                 </Link>
             ),
+        })),
+        ...navGroups.map(group => ({
+            key: `group-${group.title.toLowerCase().replace(/\s+/g, '-')}`,
+            label: group.title,
+            type: 'group' as const,
+            children: group.items.map(item => ({
+                key: typeof item.href === 'string' ? item.href : item.href.url,
+                icon: item.icon ? <item.icon /> : null,
+                label: (
+                    <Link
+                        href={item.href}
+                        prefetch
+                        onClick={isMobile ? closeMobileMenu : undefined}
+                    >
+                        {item.title}
+                    </Link>
+                ),
+            })),
         })),
         ...(footerNavItems.length > 0 ? [{ type: 'divider' as const }] : []),
         ...footerNavItems.map(item => ({
             key: typeof item.href === 'string' ? item.href : item.href.url,
             icon: item.icon ? <item.icon /> : null,
             label: (
-                <a href={typeof item.href === 'string' ? item.href : item.href.url} target="_blank" rel="noopener noreferrer">
+                <a
+                    href={typeof item.href === 'string' ? item.href : item.href.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${item.title} (opens in new tab)`}
+                >
                     {item.title}
                 </a>
             ),
         })),
     ];
 
-    return (
-        <Layout style={{ minHeight: '100vh' }}>
-            <Sider
-                trigger={null}
-                collapsible
-                collapsed={collapsed}
+    // Sidebar content (shared between fixed sidebar and mobile drawer)
+    const sidebarContent = (
+        <Flex vertical style={{ height: '100%' }}>
+            {/* Logo Section - Reduced from 64px to 56px */}
+            <Flex
+                align="center"
+                justify={collapsed && !isMobile ? 'center' : 'flex-start'}
                 style={{
-                    background: token.colorBgContainer,
-                    borderRight: `1px solid ${token.colorBorderSecondary}`,
-                    height: '100vh',
-                    position: 'fixed',
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
+                    height: '56px',
+                    padding: collapsed && !isMobile ? '0' : `0 ${token.paddingMD}px`,
+                    borderBottom: `1px solid ${token.colorBorderSecondary}`,
                 }}
             >
-                <Flex vertical style={{ height: '100%' }}>
-                    {/* Logo Section */}
-                    <Flex
-                        align="center"
-                        justify={collapsed ? 'center' : 'flex-start'}
-                        style={{
-                            height: '64px',
-                            padding: collapsed ? '0' : '0 16px',
-                            borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                        }}
-                    >
-                        {!collapsed ? (
-                            <Link href={dashboard()} prefetch>
-                                <Flex align="center" gap="small" >
-                                    <img
-                                        src={logo}
-                                        alt="Liar Logo"
-                                        style={{
-                                            height: '32px',
-                                            width: '32px'
-                                        }}
-                                    />
-                                    <Text strong style={{ fontSize: '24px', color: token.colorPrimary }}>
-                                        Liar
-                                    </Text>
-                                </Flex>
-                            </Link>
-                        ) : (
-                            <Link href={dashboard()} prefetch>
-                                <img
-                                    src="/images/logo.svg"
-                                    alt="Liar Logo"
-                                    style={{
-                                        height: '28px',
-                                        width: '28px'
-                                    }}
-                                />
-                            </Link>
-                        )}
-                    </Flex>
-
-                    {/* Menu Section - Takes up remaining space */}
-                    <Flex flex={1} style={{ overflow: 'auto' }}>
-                        <Menu
-                            mode="inline"
-                            items={menuItems}
+                {!collapsed || isMobile ? (
+                    <Link href={dashboard()} prefetch onClick={isMobile ? closeMobileMenu : undefined}>
+                        <Flex align="center" gap="small">
+                            <img
+                                src={logo}
+                                alt="Liar Logo"
+                                width="32"
+                                height="32"
+                                style={{
+                                    height: '32px',
+                                    width: '32px',
+                                }}
+                            />
+                            <Text
+                                strong
+                                style={{ fontSize: '24px', color: token.colorPrimary }}
+                            >
+                                Liar
+                            </Text>
+                        </Flex>
+                    </Link>
+                ) : (
+                    <Link href={dashboard()} prefetch>
+                        <img
+                            src={logo}
+                            alt="Liar Logo"
+                            width="28"
+                            height="28"
                             style={{
-                                width: '100%',
-                                borderRight: 0,
-                                background: 'transparent',
+                                height: '28px',
+                                width: '28px',
                             }}
                         />
-                    </Flex>
+                    </Link>
+                )}
+            </Flex>
 
-                    {/* Avatar Section - Fixed at bottom */}
+            {/* Menu Section - Takes up remaining space */}
+            <Flex flex={1} style={{ overflow: 'auto' }}>
+                <Menu
+                    mode="inline"
+                    items={menuItems}
+                    style={{
+                        width: '100%',
+                        borderRight: 0,
+                        background: 'transparent',
+                    }}
+                />
+            </Flex>
+
+            {/* Avatar Section - Reduced from 64px to 56px min-height */}
+            <Flex
+                align="center"
+                justify="center"
+                style={{
+                    padding:
+                        collapsed && !isMobile
+                            ? `${token.paddingMD}px ${token.paddingXS}px`
+                            : `${token.paddingMD}px`,
+                    borderTop: `1px solid ${token.colorBorderSecondary}`,
+                    minHeight: '56px',
+                }}
+            >
+                <Dropdown menu={{ items: userMenuItems }} placement="top" arrow>
                     <Flex
                         align="center"
-                        justify="center"
+                        gap="small"
                         style={{
-                            padding: collapsed ? '16px 8px' : '16px',
-                            borderTop: `1px solid ${token.colorBorderSecondary}`,
-                            minHeight: '64px',
+                            cursor: 'pointer',
+                            width: collapsed && !isMobile ? 'auto' : '100%',
+                            justifyContent: collapsed && !isMobile ? 'center' : 'flex-start',
                         }}
                     >
-                        <Dropdown
-                            menu={{ items: userMenuItems }}
-                            placement="top"
-                            arrow
-                        >
-                            <Flex
-                                align="center"
-                                gap="small"
-                                style={{
-                                    cursor: 'pointer',
-                                    width: collapsed ? 'auto' : '100%',
-                                    justifyContent: collapsed ? 'center' : 'flex-start'
-                                }}
-                            >
-                                <Avatar
-                                    src={auth.user.avatar}
-                                    icon={<UserOutlined />}
-                                />
-                                {!collapsed && (
-                                    <div style={{ lineHeight: '1.2' }}>
-                                        <Text strong>{auth.user.full_name}</Text>
-                                        <br />
-                                        <Text type="secondary" style={{ fontSize: '12px' }}>
-                                            {auth.user.email}
-                                        </Text>
-                                    </div>
-                                )}
-                            </Flex>
-                        </Dropdown>
-                    </Flex>
-                </Flex>
-            </Sider>
-
-            <Layout style={{ marginLeft: collapsed ? 80 : 200, transition: 'margin-left 0.2s' }}>
-                <Header style={{
-                    padding: '16px 10px',
-                    background: token.colorBgContainer,
-                    borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                    position: 'fixed',
-                    top: 0,
-                    right: 0,
-                    left: collapsed ? 80 : 200,
-                    zIndex: 1,
-                    transition: 'left 0.2s',
-                    height: '64px',
-                }}>
-                    <Flex justify="space-between" align="center" style={{ height: '32px' }}>
-                        {/* Left Section: Collapse Button and Title */}
-                        <Flex align="center" gap="middle" flex={1}>
-                            <Button
-                                type="text"
-                                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                                onClick={() => setCollapsed(!collapsed)}
-                                style={{ fontSize: '16px' }}
-                            />
-                            {pageTitle && (
-                                <Title
-                                    level={4}
-                                    style={{
-                                        margin: 0,
-                                        color: token.colorText,
-                                        fontWeight: 600,
-                                    }}
-                                >
-                                    {pageTitle}
-                                </Title>
-                            )}
-                        </Flex>
-
-                        {/* Right Section: Action Buttons */}
-                        {actions && (
-                            <Flex align="center" style={{ marginLeft: '16px' }}>
-                                {actions}
-                            </Flex>
+                        <Avatar src={auth.user.avatar} icon={<UserOutlined />} />
+                        {(!collapsed || isMobile) && (
+                            <div style={{ lineHeight: '1.2' }}>
+                                <Text strong>{auth.user.full_name}</Text>
+                                <br />
+                                <Text type="secondary" style={{ fontSize: '12px' }}>
+                                    {auth.user.email}
+                                </Text>
+                            </div>
                         )}
                     </Flex>
-                </Header>
+                </Dropdown>
+            </Flex>
+        </Flex>
+    );
 
-                <Content style={{
-                    margin: '74px 10px 10px',
-                    padding: '16px',
-                    background: token.colorBgContainer,
-                    borderRadius: token.borderRadiusLG,
-                    overflow: 'auto',
-                    minHeight: 'calc(100vh - 112px)',
-                }}>
-                    {children}
-                </Content>
+    return (
+        <>
+            {/* Skip to main content link for accessibility */}
+            <a
+                href="#main-content"
+                style={{
+                    position: 'absolute',
+                    left: '-9999px',
+                    zIndex: 999,
+                    padding: '8px 16px',
+                    background: token.colorPrimary,
+                    color: '#fff',
+                    textDecoration: 'none',
+                    borderRadius: token.borderRadius,
+                }}
+                onFocus={e => {
+                    e.currentTarget.style.left = '16px';
+                    e.currentTarget.style.top = '16px';
+                }}
+                onBlur={e => {
+                    e.currentTarget.style.left = '-9999px';
+                }}
+            >
+                Skip to main content
+            </a>
+
+            {/* Global Search Modal */}
+            <GlobalSearch open={isSearchOpen} onClose={closeSearch} />
+
+            <Layout style={{ minHeight: '100vh' }}>
+                {/* Desktop Sidebar */}
+                {!isMobile && (
+                    <Sider
+                        trigger={null}
+                        collapsible
+                        collapsed={collapsed}
+                        width={200}
+                        collapsedWidth={80}
+                        style={{
+                            background: token.colorBgContainer,
+                            borderRight: `1px solid ${token.colorBorderSecondary}`,
+                            height: '100vh',
+                            position: 'fixed',
+                            left: 0,
+                            top: 0,
+                            bottom: 0,
+                        }}
+                    >
+                        <nav aria-label="Main navigation">{sidebarContent}</nav>
+                    </Sider>
+                )}
+
+                {/* Mobile Drawer */}
+                {isMobile && (
+                    <Drawer
+                        placement="left"
+                        onClose={closeMobileMenu}
+                        open={isMobileMenuOpen}
+                        closable={false}
+                        width={280}
+                        styles={{
+                            body: { padding: 0 },
+                        }}
+                    >
+                        <nav aria-label="Main navigation">{sidebarContent}</nav>
+                    </Drawer>
+                )}
+
+                <Layout
+                    style={{
+                        marginLeft: isMobile ? 0 : collapsed ? 80 : 200,
+                        transition: 'margin-left 0.2s',
+                    }}
+                >
+                    {/* Header - Reduced from 64px to 56px */}
+                    <Header
+                        style={{
+                            padding: `${token.paddingSM}px ${token.paddingMD}px`,
+                            background: token.colorBgContainer,
+                            borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                            position: 'fixed',
+                            top: 0,
+                            right: 0,
+                            left: isMobile ? 0 : collapsed ? 80 : 200,
+                            zIndex: 10,
+                            transition: 'left 0.2s',
+                            height: '56px',
+                        }}
+                    >
+                        <Flex
+                            justify="space-between"
+                            align="center"
+                            style={{ height: '100%' }}
+                        >
+                            {/* Left Section: Collapse/Menu Button and Title */}
+                            <Flex align="center" gap="middle" flex={1}>
+                                <Button
+                                    type="text"
+                                    icon={
+                                        isMobile ? (
+                                            <MenuOutlined />
+                                        ) : collapsed ? (
+                                            <MenuUnfoldOutlined />
+                                        ) : (
+                                            <MenuFoldOutlined />
+                                        )
+                                    }
+                                    onClick={toggleCollapsed}
+                                    style={{ fontSize: '16px' }}
+                                    aria-label={
+                                        isMobile
+                                            ? 'Toggle navigation menu'
+                                            : collapsed
+                                              ? 'Expand sidebar'
+                                              : 'Collapse sidebar'
+                                    }
+                                />
+                                {pageTitle && (
+                                    <Title
+                                        level={4}
+                                        style={{
+                                            margin: 0,
+                                            color: token.colorText,
+                                            fontWeight: 600,
+                                        }}
+                                    >
+                                        {pageTitle}
+                                    </Title>
+                                )}
+                            </Flex>
+
+                            {/* Right Section: Search, Notifications, Action Buttons */}
+                            <Flex align="center" gap="small">
+                                {/* Search Button */}
+                                {!isMobile && (
+                                    <Button
+                                        type="text"
+                                        icon={
+                                            <SearchOutlined style={{ fontSize: '18px' }} />
+                                        }
+                                        onClick={openSearch}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            height: '40px',
+                                            width: '40px',
+                                        }}
+                                        aria-label="Open search (Ctrl+K)"
+                                    />
+                                )}
+
+                                {/* Notifications */}
+                                <NotificationsCenter />
+
+                                {/* Page-specific Actions */}
+                                {actions}
+                            </Flex>
+                        </Flex>
+                    </Header>
+
+                    {/* Main Content with max-width constraint */}
+                    <Content
+                        id="main-content"
+                        role="main"
+                        style={{
+                            margin: `${56 + token.marginMD}px ${token.marginMD}px ${token.marginMD}px`,
+                            padding: token.paddingLG,
+                            background: token.colorBgContainer,
+                            borderRadius: token.borderRadiusLG,
+                            overflow: 'auto',
+                            minHeight: `calc(100vh - ${56 + token.marginMD * 2 + 16}px)`,
+                        }}
+                    >
+                        {/* Content Wrapper with max-width */}
+                        <div
+                            style={{
+                                maxWidth: '1400px',
+                                margin: '0 auto',
+                                width: '100%',
+                            }}
+                        >
+                            {/* Breadcrumbs */}
+                            {breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />}
+
+                            {/* Page Content */}
+                            {children}
+                        </div>
+                    </Content>
+                </Layout>
             </Layout>
-        </Layout>
+        </>
     );
 }

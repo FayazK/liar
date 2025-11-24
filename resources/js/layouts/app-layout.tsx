@@ -1,6 +1,10 @@
 import { type ReactNode } from 'react';
 import MasterLayout from './master-layout';
-import { appMainNavItems, appFooterNavItems } from './menus/app-menu';
+import {
+    appMainNavItems,
+    appSettingsNavItems,
+    appFooterNavItems,
+} from './menus/app-menu';
 
 interface AppLayoutProps {
     children: ReactNode;
@@ -14,6 +18,12 @@ export default function AppLayout({ children, pageTitle, actions }: AppLayoutPro
             pageTitle={pageTitle}
             actions={actions}
             mainNavItems={appMainNavItems}
+            navGroups={[
+                {
+                    title: 'Settings',
+                    items: appSettingsNavItems,
+                },
+            ]}
             footerNavItems={appFooterNavItems}
         >
             {children}

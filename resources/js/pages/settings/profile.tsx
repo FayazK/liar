@@ -7,7 +7,6 @@ import type { InputRef } from 'antd';
 import { UserOutlined, MailOutlined, LoadingOutlined, DeleteOutlined, ExclamationCircleOutlined, PhoneOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AppLayout from '@/layouts/app-layout';
-import SettingsLayout from '@/layouts/settings/layout';
 import { useRef } from 'react';
 
 const { Title, Text } = Typography;
@@ -53,11 +52,10 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
     };
 
     return (
-        <AppLayout>
+        <AppLayout pageTitle="Profile">
             <Head title="Profile settings" />
 
-            <SettingsLayout>
-                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
                     <div>
                         <Title level={3} style={{ marginBottom: token.marginXS }}>
                             Profile Information
@@ -356,7 +354,6 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                         </Space>
                     </Card>
                 </Space>
-            </SettingsLayout>
         </AppLayout>
     );
 }
