@@ -3,11 +3,10 @@
 namespace App\Repositories;
 
 use App\Models\User;
-use App\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class UserRepository implements UserRepositoryInterface
+class UserRepository
 {
     public function find(int $id): ?User
     {

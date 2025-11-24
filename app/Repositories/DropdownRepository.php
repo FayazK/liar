@@ -2,12 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\DropdownRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 
-class DropdownRepository implements DropdownRepositoryInterface
+class DropdownRepository
 {
     public function get(string $type, array $params = []): array
     {

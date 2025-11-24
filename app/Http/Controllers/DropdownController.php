@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\Contracts\DropdownRepositoryInterface;
+use App\Repositories\DropdownRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class DropdownController extends Controller
 {
-    public function __construct(private readonly DropdownRepositoryInterface $dropdownRepository)
+    public function __construct(private readonly DropdownRepository $dropdownRepository)
     {
     }
 

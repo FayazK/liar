@@ -18,7 +18,7 @@ use Inertia\Response;
 class UserController extends Controller
 {
     public function __construct(
-        private UserService $userService
+        private readonly UserService $userService
     )
     {
     }

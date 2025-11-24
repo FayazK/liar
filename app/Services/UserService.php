@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\UserRepository;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -11,7 +11,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 class UserService
 {
     public function __construct(
-        private UserRepositoryInterface $userRepository
+        private UserRepository $userRepository
     ) {}
 
     public function createUser(array $data): User
