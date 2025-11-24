@@ -144,56 +144,58 @@ export default function MasterLayout({
 
     // Sidebar content (shared between fixed sidebar and mobile drawer)
     const sidebarContent = (
-        <Flex vertical style={{ height: '100%' }}>
-            {/* Logo Section - Reduced from 64px to 56px */}
-            <Flex
-                align="center"
-                justify={collapsed && !isMobile ? 'center' : 'flex-start'}
-                style={{
-                    height: '56px',
-                    padding: collapsed && !isMobile ? '0' : `0 ${token.paddingMD}px`,
-                    borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                }}
-            >
-                {!collapsed || isMobile ? (
-                    <Link href={dashboard()} prefetch onClick={isMobile ? closeMobileMenu : undefined}>
-                        <Flex align="center" gap="small">
+        <Flex vertical justify="space-between" style={{ height: '100%' }}>
+            {/* Top Section - Logo and Menu */}
+            <Flex vertical style={{ overflow: 'auto', minHeight: 0 }}>
+                {/* Logo Section - Reduced from 64px to 56px */}
+                <Flex
+                    align="center"
+                    justify={collapsed && !isMobile ? 'center' : 'flex-start'}
+                    style={{
+                        height: '56px',
+                        padding: collapsed && !isMobile ? '0' : `0 ${token.paddingMD}px`,
+                        borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                        flexShrink: 0,
+                    }}
+                >
+                    {!collapsed || isMobile ? (
+                        <Link href={dashboard()} prefetch onClick={isMobile ? closeMobileMenu : undefined}>
+                            <Flex align="center" gap="small">
+                                <img
+                                    src={logo}
+                                    alt="Liar Logo"
+                                    width="32"
+                                    height="32"
+                                    style={{
+                                        height: '32px',
+                                        width: '32px',
+                                    }}
+                                />
+                                <Text
+                                    strong
+                                    style={{ fontSize: '24px', color: token.colorPrimary }}
+                                >
+                                    Liar
+                                </Text>
+                            </Flex>
+                        </Link>
+                    ) : (
+                        <Link href={dashboard()} prefetch>
                             <img
                                 src={logo}
                                 alt="Liar Logo"
-                                width="32"
-                                height="32"
+                                width="28"
+                                height="28"
                                 style={{
-                                    height: '32px',
-                                    width: '32px',
+                                    height: '28px',
+                                    width: '28px',
                                 }}
                             />
-                            <Text
-                                strong
-                                style={{ fontSize: '24px', color: token.colorPrimary }}
-                            >
-                                Liar
-                            </Text>
-                        </Flex>
-                    </Link>
-                ) : (
-                    <Link href={dashboard()} prefetch>
-                        <img
-                            src={logo}
-                            alt="Liar Logo"
-                            width="28"
-                            height="28"
-                            style={{
-                                height: '28px',
-                                width: '28px',
-                            }}
-                        />
-                    </Link>
-                )}
-            </Flex>
+                        </Link>
+                    )}
+                </Flex>
 
-            {/* Menu Section - Takes up remaining space */}
-            <Flex flex={1} style={{ overflow: 'auto' }}>
+                {/* Menu Section */}
                 <Menu
                     mode="inline"
                     items={menuItems}
@@ -216,6 +218,7 @@ export default function MasterLayout({
                             : `${token.paddingMD}px`,
                     borderTop: `1px solid ${token.colorBorderSecondary}`,
                     minHeight: '56px',
+                    flexShrink: 0,
                 }}
             >
                 <Dropdown menu={{ items: userMenuItems }} placement="top" arrow>
@@ -292,7 +295,7 @@ export default function MasterLayout({
                             bottom: 0,
                         }}
                     >
-                        <nav aria-label="Main navigation">{sidebarContent}</nav>
+                        <nav aria-label="Main navigation" style={{ height: '100%' }}>{sidebarContent}</nav>
                     </Sider>
                 )}
 
@@ -305,10 +308,10 @@ export default function MasterLayout({
                         closable={false}
                         width={280}
                         styles={{
-                            body: { padding: 0 },
+                            body: { padding: 0, height: '100%' },
                         }}
                     >
-                        <nav aria-label="Main navigation">{sidebarContent}</nav>
+                        <nav aria-label="Main navigation" style={{ height: '100%' }}>{sidebarContent}</nav>
                     </Drawer>
                 )}
 
@@ -410,12 +413,12 @@ export default function MasterLayout({
                         id="main-content"
                         role="main"
                         style={{
-                            margin: `${56 + token.marginMD}px ${token.marginMD}px ${token.marginMD}px`,
+                            margin: `${56 + token.marginSM}px ${token.marginSM}px ${token.marginSM}px`,
                             padding: token.paddingLG,
                             background: token.colorBgContainer,
                             borderRadius: token.borderRadiusLG,
                             overflow: 'auto',
-                            minHeight: `calc(100vh - ${56 + token.marginMD * 2 + 16}px)`,
+                            minHeight: `calc(100vh - ${56 + token.marginSM * 2 + 16}px)`,
                         }}
                     >
                         {/* Content Wrapper with max-width */}
