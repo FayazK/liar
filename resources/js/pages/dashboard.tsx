@@ -1,14 +1,14 @@
 import AppLayout from '@/layouts/app-layout';
 import { type SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import { 
-    Row, 
-    Col, 
-    Card, 
-    Statistic, 
-    Typography, 
-    Space, 
-    Avatar, 
+import {
+    Row,
+    Col,
+    Card,
+    Statistic,
+    Typography,
+    Space,
+    Avatar,
     Progress,
     List,
     Tag,
@@ -140,7 +140,7 @@ export default function Dashboard() {
     );
 
     return (
-        <AppLayout 
+        <AppLayout
             pageTitle="Dashboard"
             actions={headerActions}
         >

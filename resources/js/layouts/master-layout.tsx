@@ -1,4 +1,4 @@
-import { type BreadcrumbItem, type NavGroup, type NavItem, type SharedData } from '@/types';
+import { type NavGroup, type NavItem, type SharedData } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
     Layout,
@@ -28,7 +28,6 @@ import { useSidebarState } from '@/hooks/use-sidebar-state';
 import { useIsMobile } from '@/hooks/use-mobile';
 import GlobalSearch, { useGlobalSearch } from '@/components/global-search';
 import NotificationsCenter from '@/components/notifications-center';
-import Breadcrumb from '@/components/breadcrumb';
 
 const { Header, Sider, Content } = Layout;
 const { Text, Title } = Typography;
@@ -41,7 +40,6 @@ interface MasterLayoutProps {
     mainNavItems: NavItem[];
     navGroups?: NavGroup[];
     footerNavItems?: NavItem[];
-    breadcrumbs?: BreadcrumbItem[];
 }
 
 export default function MasterLayout({
@@ -51,7 +49,6 @@ export default function MasterLayout({
     mainNavItems,
     navGroups = [],
     footerNavItems = [],
-    breadcrumbs = [],
 }: MasterLayoutProps) {
     const { collapsed, toggleCollapsed } = useSidebarState();
     const isMobile = useIsMobile();
@@ -429,9 +426,6 @@ export default function MasterLayout({
                                 width: '100%',
                             }}
                         >
-                            {/* Breadcrumbs */}
-                            {breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />}
-
                             {/* Page Content */}
                             {children}
                         </div>
