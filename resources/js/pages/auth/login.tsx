@@ -2,7 +2,7 @@ import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
 import { request } from '@/routes/password';
 import { Head, router } from '@inertiajs/react';
-import { Alert, Button, Checkbox, Form, Input, Space, Typography, theme, message } from 'antd';
+import { Alert, Button, Checkbox, Flex, Form, Input, Typography, theme, message } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { register } from '@/routes';
@@ -30,7 +30,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         setLoading(true);
         try {
             await api.post('/login', values);
-            message.success('Login successful!');
+            message.success('Sign in successful');
             // Redirect to intended page or dashboard
             router.visit('/dashboard');
         } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -44,7 +44,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     }))
                 );
             } else {
-                message.error('Login failed. Please try again.');
+                message.error('Sign in failed. Please check your email and password.');
             }
         } finally {
             setLoading(false);
@@ -52,15 +52,15 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     };
 
     return (
-        <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
-            <Head title="Log in" />
+        <AuthLayout title="Sign in to your account" description="Enter your email and password to continue">
+            <Head title="Sign in" />
 
             {status && (
                 <Alert
                     message={status}
                     type="success"
                     showIcon
-                    style={{ marginBottom: token.marginLG }}
+                    style={{ marginBottom: token.marginMD }}
                 />
             )}
 
@@ -70,79 +70,88 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 layout="vertical"
                 requiredMark={false}
             >
-                <Space direction="vertical" size="middle" className="w-full">
-                    <Form.Item
-                        name="email"
-                        label={<Text style={{ color: token.colorText }}>Email address</Text>}
-                        rules={[
-                            { required: true, message: 'Please input your email!' },
-                            { type: 'email', message: 'Please enter a valid email!' }
-                        ]}
-                    >
-                        <Input
-                            placeholder="email@example.com"
-                            autoComplete="email"
-                            autoFocus
-                            size="large"
-                        />
-                    </Form.Item>
+                <Form.Item
+                    name="email"
+                    label={<Text style={{ color: token.colorText, fontSize: token.fontSize }}>Email address</Text>}
+                    rules={[
+                        { required: true, message: 'Please enter your email address' },
+                        { type: 'email', message: 'Please enter a valid email address' }
+                    ]}
+                    style={{ marginBottom: token.marginLG }}
+                >
+                    <Input
+                        placeholder="email@example.com"
+                        autoComplete="email"
+                        autoFocus
+                        size="large"
+                    />
+                </Form.Item>
 
-                    <Form.Item
-                        name="password"
-                        label={
-                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                <Text style={{ color: token.colorText }}>Password</Text>
-                                {canResetPassword && (
-                                    <Link
-                                        href={request.url()}
-                                        style={{
-                                            fontSize: token.fontSizeSM,
-                                            color: token.colorPrimary
-                                        }}
-                                    >
-                                        Forgot password?
-                                    </Link>
-                                )}
-                            </div>
-                        }
-                        rules={[{ required: true, message: 'Please input your password!' }]}
-                    >
-                        <Input.Password
-                            placeholder="Password"
-                            autoComplete="current-password"
-                            size="large"
-                        />
-                    </Form.Item>
+                <Form.Item
+                    name="password"
+                    label={<Text style={{ color: token.colorText, fontSize: token.fontSize }}>Password</Text>}
+                    rules={[{ required: true, message: 'Please enter your password' }]}
+                    style={{ marginBottom: token.marginMD }}
+                >
+                    <Input.Password
+                        placeholder="Enter your password"
+                        autoComplete="current-password"
+                        size="large"
+                    />
+                </Form.Item>
 
-                    <Form.Item name="remember" valuePropName="checked">
-                        <Checkbox style={{ color: token.colorText }}>
-                            Remember me
+                <Flex justify="space-between" align="center" style={{ marginBottom: token.marginLG }}>
+                    <Form.Item name="remember" valuePropName="checked" style={{ marginBottom: 0 }}>
+                        <Checkbox>
+                            <Text style={{ color: token.colorText, fontSize: token.fontSize }}>
+                                Remember me
+                            </Text>
                         </Checkbox>
                     </Form.Item>
 
-                    <Form.Item>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            size="large"
-                            block
-                            loading={loading}
-                            icon={loading ? <LoadingOutlined /> : null}
+                    {canResetPassword && (
+                        <Link
+                            href={request.url()}
+                            style={{
+                                fontSize: token.fontSize,
+                                color: token.colorPrimary,
+                            }}
                         >
-                            Log in
-                        </Button>
-                    </Form.Item>
-                </Space>
+                            Forgot password?
+                        </Link>
+                    )}
+                </Flex>
+
+                <Form.Item style={{ marginBottom: 0 }}>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        size="large"
+                        block
+                        loading={loading}
+                        icon={loading ? <LoadingOutlined /> : null}
+                    >
+                        Sign in
+                    </Button>
+                </Form.Item>
             </Form>
 
-            <div style={{ textAlign: 'center', marginTop: token.marginLG }}>
-                <Text type="secondary" style={{ fontSize: token.fontSizeSM }}>
+            <Flex
+                justify="center"
+                align="center"
+                style={{
+                    marginTop: token.marginLG,
+                    paddingTop: token.paddingLG,
+                    borderTop: `1px solid ${token.colorBorderSecondary}`,
+                }}
+            >
+                <Text style={{ color: token.colorTextSecondary, fontSize: token.fontSize }}>
                     Don't have an account?{' '}
-                    <Link href={register.url()} style={{ color: token.colorPrimary }}>
-                        Sign up
+                    <Link href={register.url()} style={{ color: token.colorPrimary, fontWeight: 500 }}>
+                        Create account
                     </Link>
                 </Text>
-            </div>
+            </Flex>
         </AuthLayout>
     );
 }

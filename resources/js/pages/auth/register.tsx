@@ -2,7 +2,7 @@ import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
 import { login } from '@/routes';
 import { Head, router } from '@inertiajs/react';
-import { Button, Form, Input, Space, Typography, theme, message } from 'antd';
+import { Button, Flex, Form, Input, Typography, theme, message } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 
@@ -26,7 +26,7 @@ export default function Register() {
         setLoading(true);
         try {
             await api.post('/register', values);
-            message.success('Account created successfully!');
+            message.success('Account created successfully');
             // Redirect to dashboard or email verification
             router.visit('/dashboard');
         } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -40,7 +40,7 @@ export default function Register() {
                     }))
                 );
             } else {
-                message.error('Registration failed. Please try again.');
+                message.error('Account creation failed. Please try again.');
             }
         } finally {
             setLoading(false);
@@ -48,8 +48,8 @@ export default function Register() {
     };
 
     return (
-        <AuthLayout title="Create an account" description="Enter your details below to create your account">
-            <Head title="Register" />
+        <AuthLayout title="Create an account" description="Enter your details to get started">
+            <Head title="Create account" />
 
             <Form
                 form={form}
@@ -57,114 +57,125 @@ export default function Register() {
                 layout="vertical"
                 requiredMark={false}
             >
-                <Space direction="vertical" size="middle" className="w-full">
-                    <Form.Item
-                        name="first_name"
-                        label={<Text style={{ color: token.colorText }}>First Name</Text>}
-                        rules={[
-                            { required: true, message: 'Please input your first name!' },
-                            { min: 2, message: 'First name must be at least 2 characters' }
-                        ]}
-                    >
-                        <Input
-                            placeholder="First name"
-                            autoComplete="given-name"
-                            autoFocus
-                            size="large"
-                        />
-                    </Form.Item>
+                <Form.Item
+                    name="first_name"
+                    label={<Text style={{ color: token.colorText, fontSize: token.fontSize }}>First name</Text>}
+                    rules={[
+                        { required: true, message: 'Please enter your first name' },
+                        { min: 2, message: 'First name must be at least 2 characters' }
+                    ]}
+                    style={{ marginBottom: token.marginLG }}
+                >
+                    <Input
+                        placeholder="Enter your first name"
+                        autoComplete="given-name"
+                        autoFocus
+                        size="large"
+                    />
+                </Form.Item>
 
-                    <Form.Item
-                        name="last_name"
-                        label={<Text style={{ color: token.colorText }}>Last Name</Text>}
-                        rules={[
-                            { required: true, message: 'Please input your last name!' },
-                            { min: 2, message: 'Last name must be at least 2 characters' }
-                        ]}
-                    >
-                        <Input
-                            placeholder="Last name"
-                            autoComplete="family-name"
-                            size="large"
-                        />
-                    </Form.Item>
+                <Form.Item
+                    name="last_name"
+                    label={<Text style={{ color: token.colorText, fontSize: token.fontSize }}>Last name</Text>}
+                    rules={[
+                        { required: true, message: 'Please enter your last name' },
+                        { min: 2, message: 'Last name must be at least 2 characters' }
+                    ]}
+                    style={{ marginBottom: token.marginLG }}
+                >
+                    <Input
+                        placeholder="Enter your last name"
+                        autoComplete="family-name"
+                        size="large"
+                    />
+                </Form.Item>
 
-                    <Form.Item
-                        name="email"
-                        label={<Text style={{ color: token.colorText }}>Email address</Text>}
-                        rules={[
-                            { required: true, message: 'Please input your email!' },
-                            { type: 'email', message: 'Please enter a valid email!' }
-                        ]}
-                    >
-                        <Input
-                            placeholder="email@example.com"
-                            autoComplete="email"
-                            size="large"
-                        />
-                    </Form.Item>
+                <Form.Item
+                    name="email"
+                    label={<Text style={{ color: token.colorText, fontSize: token.fontSize }}>Email address</Text>}
+                    rules={[
+                        { required: true, message: 'Please enter your email address' },
+                        { type: 'email', message: 'Please enter a valid email address' }
+                    ]}
+                    style={{ marginBottom: token.marginLG }}
+                >
+                    <Input
+                        placeholder="email@example.com"
+                        autoComplete="email"
+                        size="large"
+                    />
+                </Form.Item>
 
-                    <Form.Item
-                        name="password"
-                        label={<Text style={{ color: token.colorText }}>Password</Text>}
-                        rules={[
-                            { required: true, message: 'Please input your password!' },
-                            { min: 8, message: 'Password must be at least 8 characters' }
-                        ]}
-                    >
-                        <Input.Password
-                            placeholder="Password"
-                            autoComplete="new-password"
-                            size="large"
-                        />
-                    </Form.Item>
+                <Form.Item
+                    name="password"
+                    label={<Text style={{ color: token.colorText, fontSize: token.fontSize }}>Password</Text>}
+                    rules={[
+                        { required: true, message: 'Please enter your password' },
+                        { min: 8, message: 'Password must be at least 8 characters' }
+                    ]}
+                    style={{ marginBottom: token.marginLG }}
+                >
+                    <Input.Password
+                        placeholder="Create a password"
+                        autoComplete="new-password"
+                        size="large"
+                    />
+                </Form.Item>
 
-                    <Form.Item
-                        name="password_confirmation"
-                        label={<Text style={{ color: token.colorText }}>Confirm password</Text>}
-                        dependencies={['password']}
-                        rules={[
-                            { required: true, message: 'Please confirm your password!' },
-                            ({ getFieldValue }) => ({
-                                validator(_, value) {
-                                    if (!value || getFieldValue('password') === value) {
-                                        return Promise.resolve();
-                                    }
-                                    return Promise.reject(new Error('The passwords do not match!'));
-                                },
-                            }),
-                        ]}
-                    >
-                        <Input.Password
-                            placeholder="Confirm password"
-                            autoComplete="new-password"
-                            size="large"
-                        />
-                    </Form.Item>
+                <Form.Item
+                    name="password_confirmation"
+                    label={<Text style={{ color: token.colorText, fontSize: token.fontSize }}>Confirm password</Text>}
+                    dependencies={['password']}
+                    rules={[
+                        { required: true, message: 'Please confirm your password' },
+                        ({ getFieldValue }) => ({
+                            validator(_, value) {
+                                if (!value || getFieldValue('password') === value) {
+                                    return Promise.resolve();
+                                }
+                                return Promise.reject(new Error('Passwords do not match'));
+                            },
+                        }),
+                    ]}
+                    style={{ marginBottom: token.marginLG }}
+                >
+                    <Input.Password
+                        placeholder="Confirm your password"
+                        autoComplete="new-password"
+                        size="large"
+                    />
+                </Form.Item>
 
-                    <Form.Item>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            size="large"
-                            block
-                            loading={loading}
-                            icon={loading ? <LoadingOutlined /> : null}
-                        >
-                            Create account
-                        </Button>
-                    </Form.Item>
-                </Space>
+                <Form.Item style={{ marginBottom: 0 }}>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        size="large"
+                        block
+                        loading={loading}
+                        icon={loading ? <LoadingOutlined /> : null}
+                    >
+                        Create account
+                    </Button>
+                </Form.Item>
             </Form>
 
-            <div style={{ textAlign: 'center', marginTop: token.marginLG }}>
-                <Text type="secondary" style={{ fontSize: token.fontSizeSM }}>
+            <Flex
+                justify="center"
+                align="center"
+                style={{
+                    marginTop: token.marginLG,
+                    paddingTop: token.paddingLG,
+                    borderTop: `1px solid ${token.colorBorderSecondary}`,
+                }}
+            >
+                <Text style={{ color: token.colorTextSecondary, fontSize: token.fontSize }}>
                     Already have an account?{' '}
-                    <Link href={login().url} style={{ color: token.colorPrimary }}>
-                        Log in
+                    <Link href={login().url} style={{ color: token.colorPrimary, fontWeight: 500 }}>
+                        Sign in
                     </Link>
                 </Text>
-            </div>
+            </Flex>
         </AuthLayout>
     );
 }
