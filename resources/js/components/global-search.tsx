@@ -9,8 +9,6 @@ import {
     FileTextOutlined,
 } from '@ant-design/icons';
 import { dashboard } from '@/routes';
-import profile from '@/routes/profile';
-import { appearance } from '@/routes';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -35,18 +33,34 @@ const searchableItems: SearchResult[] = [
         category: 'pages',
     },
     {
+        id: 'account',
+        title: 'Account',
+        description: 'Manage your account settings',
+        url: '/settings/account',
+        icon: <SettingOutlined />,
+        category: 'settings',
+    },
+    {
         id: 'profile',
         title: 'Profile',
         description: 'Edit your profile information',
-        url: profile.edit().url,
+        url: '/settings/account#profile',
         icon: <UserOutlined />,
+        category: 'settings',
+    },
+    {
+        id: 'password',
+        title: 'Password',
+        description: 'Change your password',
+        url: '/settings/account#password',
+        icon: <SettingOutlined />,
         category: 'settings',
     },
     {
         id: 'appearance',
         title: 'Appearance',
         description: 'Customize theme and appearance',
-        url: appearance().url,
+        url: '/settings/account#appearance',
         icon: <SettingOutlined />,
         category: 'settings',
     },

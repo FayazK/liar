@@ -19,11 +19,11 @@ class ProfileController extends Controller
     ) {}
 
     /**
-     * Show the user's profile settings page.
+     * Show the user's account settings page.
      */
     public function edit(Request $request): Response
     {
-        return Inertia::render('settings/profile', [
+        return Inertia::render('settings/account', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
         ]);
@@ -36,7 +36,7 @@ class ProfileController extends Controller
     {
         $this->userService->updateProfile($request->user()->id, $request->validated());
 
-        return to_route('profile.edit');
+        return to_route('account');
     }
 
     /**

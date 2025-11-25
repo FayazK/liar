@@ -21,7 +21,6 @@ import {
     SearchOutlined,
 } from '@ant-design/icons';
 import { type ReactNode } from 'react';
-import profile from '@/routes/profile';
 import { dashboard } from '@/routes';
 import logo from '../../images/logo.svg';
 import { useSidebarState } from '@/hooks/use-sidebar-state';
@@ -70,14 +69,9 @@ export default function MasterLayout({
 
     const userMenuItems = [
         {
-            key: 'profile',
-            icon: <UserOutlined />,
-            label: <Link href={profile.edit().url}>Profile</Link>,
-        },
-        {
-            key: 'settings',
+            key: 'account',
             icon: <SettingOutlined />,
-            label: <Link href={profile.edit().url}>Settings</Link>,
+            label: <Link href="/settings/account">Account</Link>,
         },
         {
             type: 'divider' as const,

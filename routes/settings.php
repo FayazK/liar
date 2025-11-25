@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::middleware('auth')->group(function () {
-    Route::redirect('settings', '/settings/profile');
+Route::middleware('auth')->group(function (): void {
+    // Main account page with tabs
+    Route::get('settings/account', [ProfileController::class, 'edit'])->name('account');
 
-    Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    // Redirect old URLs to account page with appropriate tab hash
+    Route::redirect('settings', '/settings/account');
+    Route::redirect('settings/profile', '/settings/account#profile');
+    Route::redirect('settings/password', '/settings/account#password');
+    Route::redirect('settings/appearance', '/settings/account#appearance');
+
+    // Form submission routes (keep existing for form actions)
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
 
     Route::put('settings/password', [PasswordController::class, 'update'])
         ->middleware('throttle:6,1')
         ->name('password.update');
-
-    Route::get('settings/appearance', function () {
-        return Inertia::render('settings/appearance');
-    })->name('appearance');
 });
