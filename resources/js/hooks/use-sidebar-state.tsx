@@ -1,38 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
-
-const STORAGE_KEY = 'sidebar_collapsed';
+import { useSidebarStore } from '@/stores/sidebar-store';
 
 /**
- * Hook to manage sidebar collapsed state with localStorage persistence
+ * Hook to manage sidebar collapsed state with localStorage persistence.
+ * Uses Zustand store under the hood.
  */
 export function useSidebarState() {
-    const [collapsed, setCollapsed] = useState(false);
-
-    const toggleCollapsed = useCallback(() => {
-        setCollapsed(prev => {
-            const newValue = !prev;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(newValue));
-            return newValue;
-        });
-    }, []);
-
-    const updateCollapsed = useCallback((value: boolean) => {
-        setCollapsed(value);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
-    }, []);
-
-    useEffect(() => {
-        // Load persisted state on mount
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored !== null) {
-            try {
-                setCollapsed(JSON.parse(stored));
-            } catch {
-                // Invalid JSON, use default
-                setCollapsed(false);
-            }
-        }
-    }, []);
+    const collapsed = useSidebarStore((state) => state.collapsed);
+    const toggleCollapsed = useSidebarStore((state) => state.toggleCollapsed);
+    const updateCollapsed = useSidebarStore((state) => state.setCollapsed);
 
     return { collapsed, toggleCollapsed, updateCollapsed } as const;
 }
