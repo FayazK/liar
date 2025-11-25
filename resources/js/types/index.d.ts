@@ -38,7 +38,8 @@ export interface User {
     email: string;
     phone?: string;
     date_of_birth?: string;
-    avatar?: string;
+    avatar_url?: string;
+    avatar_thumb_url?: string;
     bio?: string;
     timezone: string;
     locale: string;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -7,11 +9,15 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Image\Enums\Fit;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, InteractsWithMedia, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -25,7 +31,6 @@ class User extends Authenticatable
         'password',
         'phone',
         'date_of_birth',
-        'avatar',
         'bio',
         'timezone_id',
         'language_id',
@@ -51,6 +56,8 @@ class User extends Authenticatable
     protected $appends = [
         'full_name',
         'initials',
+        'avatar_url',
+        'avatar_thumb_url',
     ];
 
     /**
@@ -82,6 +89,42 @@ class User extends Authenticatable
      */
     public function getInitialsAttribute(): string
     {
-        return strtoupper(substr($this->first_name, 0, 1) . substr($this->last_name, 0, 1));
+        return strtoupper(substr($this->first_name, 0, 1).substr($this->last_name, 0, 1));
+    }
+
+    /**
+     * Register media collections for the user.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('avatar')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
+    }
+
+    /**
+     * Register media conversions for thumbnails.
+     */
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->fit(Fit::Crop, 150, 150)
+            ->nonQueued();
+    }
+
+    /**
+     * Get the user's avatar URL.
+     */
+    public function getAvatarUrlAttribute(): ?string
+    {
+        return $this->getFirstMediaUrl('avatar') ?: null;
+    }
+
+    /**
+     * Get the user's avatar thumbnail URL.
+     */
+    public function getAvatarThumbUrlAttribute(): ?string
+    {
+        return $this->getFirstMediaUrl('avatar', 'thumb') ?: null;
     }
 }

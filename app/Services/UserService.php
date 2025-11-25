@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
     public function __construct(
-        private UserRepository $userRepository
+        private UserRepository $userRepository,
+        private MediaService $mediaService
     ) {}
 
     public function createUser(array $data): User
@@ -27,7 +31,7 @@ class UserService
         ];
 
         $user = $this->userRepository->create($userData);
-        
+
         event(new Registered($user));
 
         return $user;
@@ -36,10 +40,10 @@ class UserService
     public function updateProfile(int $userId, array $data): User
     {
         $updateData = [];
-        
+
         $allowedFields = [
-            'first_name', 'last_name', 'email', 'phone', 
-            'date_of_birth', 'avatar', 'bio', 'timezone', 'locale'
+            'first_name', 'last_name', 'email', 'phone',
+            'date_of_birth', 'bio', 'timezone', 'locale',
         ];
 
         foreach ($allowedFields as $field) {
@@ -99,5 +103,25 @@ class UserService
     public function isEmailTaken(string $email): bool
     {
         return $this->userRepository->existsByEmail($email);
+    }
+
+    /**
+     * Update user's avatar.
+     */
+    public function updateAvatar(User $user, UploadedFile $file): User
+    {
+        $this->mediaService->addMedia($user, $file, 'avatar');
+
+        return $user->fresh();
+    }
+
+    /**
+     * Remove user's avatar.
+     */
+    public function removeAvatar(User $user): User
+    {
+        $this->mediaService->clearCollection($user, 'avatar');
+
+        return $user->fresh();
     }
 }

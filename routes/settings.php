@@ -20,6 +20,10 @@ Route::middleware('auth')->group(function (): void {
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Avatar routes
+    Route::post('settings/avatar', [ProfileController::class, 'updateAvatar'])->name('avatar.update');
+    Route::delete('settings/avatar', [ProfileController::class, 'destroyAvatar'])->name('avatar.destroy');
+
     Route::put('settings/password', [PasswordController::class, 'update'])
         ->middleware('throttle:6,1')
         ->name('password.update');

@@ -1,4 +1,5 @@
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import AvatarUpload from '@/components/settings/avatar-upload';
 import { send } from '@/routes/verification';
 import { type SharedData } from '@/types';
 import { Form, Link, usePage } from '@inertiajs/react';
@@ -57,6 +58,12 @@ export default function ProfileForm({ mustVerifyEmail, status }: ProfileFormProp
 
     return (
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Card title="Profile Photo" style={{ width: '100%' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: token.paddingLG }}>
+                    <AvatarUpload />
+                </div>
+            </Card>
+
             <Card title="Personal Information" style={{ width: '100%' }}>
                 <Form
                     method="patch"

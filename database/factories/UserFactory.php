@@ -34,10 +34,9 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'phone' => fake()->optional()->phoneNumber(),
             'date_of_birth' => fake()->optional()->dateTimeBetween('-80 years', '-18 years')?->format('Y-m-d'),
-            'avatar' => fake()->optional()->imageUrl(200, 200, 'people'),
             'bio' => fake()->optional()->paragraph(),
-            'timezone' => fake()->randomElement(['UTC', 'America/New_York', 'America/Los_Angeles', 'Europe/London', 'Asia/Tokyo']),
-            'locale' => fake()->randomElement(['en', 'es', 'fr', 'de', 'ja']),
+            'timezone_id' => fake()->numberBetween(1, 100),
+            'language_id' => fake()->numberBetween(1, 10),
             'is_active' => fake()->boolean(90), // 90% chance of being active
             'last_login_at' => fake()->optional()->dateTimeBetween('-1 month', 'now'),
         ];
