@@ -1,14 +1,33 @@
 import React from 'react';
-import { Button, Space, Tag, Dropdown, Avatar } from 'antd';
+import { Button, Space, Tag, Dropdown, Avatar, theme } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined, MoreOutlined } from '@ant-design/icons';
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/layouts/admin-layout';
 import DataTable from '@/components/ui/DataTable';
-import type { User } from '@/types';
+import type { User, FilterConfig } from '@/types';
 import { show, edit, data, create } from '@/routes/admin/users';
 
+const { useToken } = theme;
+
+// Filter configurations for the DataTable
+const filters: FilterConfig[] = [
+    {
+        type: 'boolean',
+        key: 'is_active',
+        label: 'Status',
+        trueLabel: 'Active',
+        falseLabel: 'Inactive',
+    },
+    {
+        type: 'dateRange',
+        key: 'created_at',
+        label: 'Created Date',
+    },
+];
 
 export default function UsersIndex() {
+    const { token } = useToken();
+
     const columns = [
         {
             title: 'User',
@@ -27,7 +46,7 @@ export default function UsersIndex() {
                     </Avatar>
                     <div>
                         <div style={{ fontWeight: 500 }}>{record.full_name}</div>
-                        <div style={{ color: '#666', fontSize: '12px' }}>{record.email}</div>
+                        <div style={{ color: token.colorTextSecondary, fontSize: '12px' }}>{record.email}</div>
                     </div>
                 </Space>
             ),
@@ -39,7 +58,7 @@ export default function UsersIndex() {
             width: 100,
             filterable: true,
             sorter: true,
-            render: (isActive: boolean) => (
+            render: (isActive: unknown) => (
                 <Tag color={isActive ? 'green' : 'red'}>
                     {isActive ? 'Active' : 'Inactive'}
                 </Tag>
@@ -51,7 +70,7 @@ export default function UsersIndex() {
             key: 'phone',
             width: 150,
             sorter: true,
-            render: (phone: string | null) => phone || 'N/A',
+            render: (phone: unknown) => (phone as string) || 'N/A',
         },
         {
             title: 'Last Login',
@@ -59,8 +78,8 @@ export default function UsersIndex() {
             key: 'last_login_at',
             width: 140,
             sorter: true,
-            render: (lastLogin: string | null) => (
-                lastLogin ? new Date(lastLogin).toLocaleDateString() : 'Never'
+            render: (lastLogin: unknown) => (
+                lastLogin ? new Date(lastLogin as string).toLocaleDateString() : 'Never'
             ),
         },
         {
@@ -70,7 +89,7 @@ export default function UsersIndex() {
             width: 120,
             filterable: true,
             sorter: true,
-            render: (createdAt: string) => new Date(createdAt).toLocaleDateString(),
+            render: (createdAt: unknown) => new Date(createdAt as string).toLocaleDateString(),
         },
         {
             title: 'Actions',
@@ -114,7 +133,6 @@ export default function UsersIndex() {
                         danger: true,
                         onClick: () => {
                             // TODO: Implement delete confirmation modal
-                            console.log('Delete user:', record.id);
                         },
                     },
                 ];
@@ -133,16 +151,24 @@ export default function UsersIndex() {
     ];
 
     return (
-        <AdminLayout pageTitle={"Users"} actions={        <Link href={create.url()}>
-            <Button type="primary" icon={<UserOutlined />}>
-                Add User
-            </Button>
-        </Link>}>
+        <AdminLayout
+            pageTitle="Users"
+            actions={
+                <Link href={create.url()}>
+                    <Button type="primary" icon={<UserOutlined />}>
+                        Add User
+                    </Button>
+                </Link>
+            }
+        >
             <DataTable<User>
                 fetchUrl={data.url()}
                 columns={columns}
+                filters={filters}
                 searchPlaceholder="Search users by name or email..."
                 defaultPageSize={15}
+                emptyMessage="No users have been created yet."
+                emptyFilterMessage="No users match your search criteria."
             />
         </AdminLayout>
     );

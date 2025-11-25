@@ -49,7 +49,7 @@ export interface User {
     updated_at: string;
     full_name: string; // Computed attribute from Laravel
     initials: string; // Computed attribute from Laravel
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: string | number | boolean | null | undefined; // Required for DataTable generic constraint
 }
 
 export interface PaginationLinks {
@@ -75,23 +75,17 @@ export interface LaravelPaginatedResponse<T = unknown> {
     meta: PaginationMeta;
 }
 
-export interface DataTableProps<T = unknown> {
-    fetchUrl: string;
-    columns: Array<{
-        title: string;
-        dataIndex?: string;
-        key: string;
-        width?: number;
-        sorter?: boolean;
-        searchable?: boolean;
-        filterable?: boolean;
-        render?: (value: unknown, record: T, index: number) => React.ReactNode;
-    }>;
-    searchPlaceholder?: string;
-    defaultPageSize?: number;
-    className?: string;
-}
-
-export interface DataTableFilters {
-    [key: string]: unknown;
-}
+// Re-export DataTable types from dedicated module
+export type {
+    FilterConfig,
+    BooleanFilterConfig,
+    SelectFilterConfig,
+    DateRangeFilterConfig,
+    CustomFilterConfig,
+    SortState,
+    DataTableError,
+    DataTableColumn,
+    DataTableProps,
+    DataTableFilters,
+    DataTableQueryParams,
+} from './datatable';

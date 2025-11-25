@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UserDataTableRequest;
 use App\Http\Requests\Admin\UserStoreRequest;
 use App\Http\Requests\Admin\UserUpdateRequest;
 use App\Http\Resources\Admin\UserCollection;
@@ -11,7 +12,6 @@ use App\Models\User;
 use App\Queries\UserDataTableQueryService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,9 +19,7 @@ class UserController extends Controller
 {
     public function __construct(
         private readonly UserService $userService
-    )
-    {
-    }
+    ) {}
 
     public function index(): Response
     {
@@ -33,7 +31,7 @@ class UserController extends Controller
         return Inertia::render('admin/users/create');
     }
 
-    public function data(Request $request): UserCollection
+    public function data(UserDataTableRequest $request): UserCollection
     {
         $query = User::query();
         $paginatedUsers = (new UserDataTableQueryService($query, $request))->getResults();
@@ -41,12 +39,11 @@ class UserController extends Controller
         return new UserCollection($paginatedUsers);
     }
 
-
     public function show(int $id): JsonResponse
     {
         $user = $this->userService->findUser($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
@@ -56,7 +53,7 @@ class UserController extends Controller
     public function edit(User $user): Response
     {
         return Inertia::render('admin/users/edit', [
-            'user' => $user
+            'user' => $user,
         ]);
     }
 
@@ -66,7 +63,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'User created successfully',
-            'data' => new UserDetailResource($user)
+            'data' => new UserDetailResource($user),
         ], 201);
     }
 
@@ -76,7 +73,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'User updated successfully',
-            'data' => new UserDetailResource($user)
+            'data' => new UserDetailResource($user),
         ]);
     }
 
@@ -84,14 +81,14 @@ class UserController extends Controller
     {
         $user = $this->userService->findUser($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
         $this->userService->deleteUser($id);
 
         return response()->json([
-            'message' => 'User deleted successfully'
+            'message' => 'User deleted successfully',
         ]);
     }
 }
