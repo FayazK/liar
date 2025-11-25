@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "/usr/bin/php8.3",
+            "args": [
+                "/mnt/DataDisk/Sites/liar/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
