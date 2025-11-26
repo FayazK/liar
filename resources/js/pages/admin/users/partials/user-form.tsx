@@ -1,10 +1,10 @@
-import { Form, Input, Button, Switch, DatePicker, Row, Col, notification } from 'antd';
+import AdvancedSelect from '@/components/advanced-select';
+import api from '@/lib/axios';
 import { User } from '@/types';
 import { router } from '@inertiajs/react';
+import { Button, Col, DatePicker, Form, Input, notification, Row, Switch } from 'antd';
 import dayjs from 'dayjs';
-import api from '@/lib/axios';
 import { useEffect, useState } from 'react';
-import AdvancedSelect from '@/components/advanced-select';
 
 interface UserFormProps {
     user?: User;
@@ -45,10 +45,10 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
                 message: response.data.message || `User ${isEdit ? 'updated' : 'created'} successfully`,
             });
             router.visit('/admin/users');
-                } catch (error: { response?: { status: number; data: { errors: { [key: string]: string[] }; message: string; }; }; }) {
+        } catch (error: { response?: { status: number; data: { errors: { [key: string]: string[] }; message: string } } }) {
             if (error.response && error.response.status === 422) {
                 const validationErrors = error.response.data.errors;
-                const formErrors = Object.keys(validationErrors).map(key => ({
+                const formErrors = Object.keys(validationErrors).map((key) => ({
                     name: key,
                     errors: validationErrors[key],
                 }));
@@ -58,7 +58,7 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
                     description: error.response.data.message,
                 });
             } else {
-                 notification.error({
+                notification.error({
                     message: 'Error',
                     description: 'An unexpected error occurred.',
                 });
@@ -69,37 +69,21 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
     };
 
     return (
-        <Form
-            form={form}
-            layout="vertical"
-            onFinish={onFinish}
-        >
+        <Form form={form} layout="vertical" onFinish={onFinish}>
             <Row gutter={16}>
                 <Col span={12}>
-                    <Form.Item
-                        label="First Name"
-                        name="first_name"
-                        rules={[{ required: true, message: 'Please input the first name!' }]}
-                    >
+                    <Form.Item label="First Name" name="first_name" rules={[{ required: true, message: 'Please input the first name!' }]}>
                         <Input />
                     </Form.Item>
                 </Col>
                 <Col span={12}>
-                    <Form.Item
-                        label="Last Name"
-                        name="last_name"
-                        rules={[{ required: true, message: 'Please input the last name!' }]}
-                    >
+                    <Form.Item label="Last Name" name="last_name" rules={[{ required: true, message: 'Please input the last name!' }]}>
                         <Input />
                     </Form.Item>
                 </Col>
             </Row>
 
-            <Form.Item
-                label="Email"
-                name="email"
-                rules={[{ required: true, type: 'email', message: 'Please input a valid email!' }]}
-            >
+            <Form.Item label="Email" name="email" rules={[{ required: true, type: 'email', message: 'Please input a valid email!' }]}>
                 <Input type="email" />
             </Form.Item>
 
@@ -136,51 +120,32 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
                 </Col>
             </Row>
 
-            <Form.Item
-                label="Phone"
-                name="phone"
-            >
+            <Form.Item label="Phone" name="phone">
                 <Input />
             </Form.Item>
 
-            <Form.Item
-                label="Date of Birth"
-                name="date_of_birth"
-            >
+            <Form.Item label="Date of Birth" name="date_of_birth">
                 <DatePicker style={{ width: '100%' }} />
             </Form.Item>
 
-            <Form.Item
-                label="Bio"
-                name="bio"
-            >
+            <Form.Item label="Bio" name="bio">
                 <Input.TextArea rows={4} />
             </Form.Item>
-            
+
             <Row gutter={16}>
                 <Col span={12}>
-                    <Form.Item
-                        label="Timezone"
-                        name="timezone_id"
-                    >
+                    <Form.Item label="Timezone" name="timezone_id">
                         <AdvancedSelect type="timezones" id={user?.timezone_id} />
                     </Form.Item>
                 </Col>
                 <Col span={12}>
-                    <Form.Item
-                        label="Language"
-                        name="language_id"
-                    >
+                    <Form.Item label="Language" name="language_id">
                         <AdvancedSelect type="languages" id={user?.language_id} />
                     </Form.Item>
                 </Col>
             </Row>
 
-            <Form.Item
-                label="Active Status"
-                name="is_active"
-                valuePropName="checked"
-            >
+            <Form.Item label="Active Status" name="is_active" valuePropName="checked">
                 <Switch />
             </Form.Item>
 

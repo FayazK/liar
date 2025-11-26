@@ -40,6 +40,7 @@ function DataTable<T extends Record<string, unknown>>({
     defaultPageSize = 15,
     emptyMessage,
     emptyFilterMessage,
+    params: additionalParams = {},
 }: DataTableProps<T>) {
     const { token } = useToken();
     const searchInputRef = useRef<InputRef>(null);
@@ -106,6 +107,13 @@ function DataTable<T extends Record<string, unknown>>({
                     }
                 });
             }
+
+            // Add additional params from props
+            Object.entries(additionalParams).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    queryParams.set(key, String(value));
+                }
+            });
 
             const url = `${fetchUrl}?${queryParams.toString()}`;
             const response = await axios.get<LaravelPaginatedResponse<T>>(url);

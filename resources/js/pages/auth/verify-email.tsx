@@ -1,9 +1,9 @@
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
 // import { logout } from '@/routes'; // Unused for now
+import { LoadingOutlined, LogoutOutlined, MailOutlined } from '@ant-design/icons';
 import { Head, router } from '@inertiajs/react';
-import { Alert, Button, Space, Typography, theme, message } from 'antd';
-import { LoadingOutlined, MailOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Alert, Button, Space, Typography, message, theme } from 'antd';
 import { useState } from 'react';
 
 const { Link } = Typography;
@@ -38,10 +38,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
     };
 
     return (
-        <AuthLayout 
-            title="Verify your email" 
-            description="Please verify your email address by clicking on the link we just emailed to you."
-        >
+        <AuthLayout title="Verify your email" description="Please verify your email address by clicking on the link we just emailed to you.">
             <Head title="Email verification" />
 
             <Space direction="vertical" size="large" className="w-full">
@@ -78,15 +75,15 @@ export default function VerifyEmail({ status }: { status?: string }) {
                             Resend verification email
                         </Button>
 
-                        <Link 
+                        <Link
                             onClick={handleLogout}
-                            style={{ 
+                            style={{
                                 color: token.colorTextSecondary,
                                 fontSize: token.fontSizeSM,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '4px'
+                                gap: '4px',
                             }}
                         >
                             <LogoutOutlined />

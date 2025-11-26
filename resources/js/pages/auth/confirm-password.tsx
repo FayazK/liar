@@ -1,8 +1,8 @@
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
-import { Head } from '@inertiajs/react';
-import { Alert, Button, Form, Input, Space, Typography, theme, message } from 'antd';
 import { LoadingOutlined, SafetyOutlined } from '@ant-design/icons';
+import { Head } from '@inertiajs/react';
+import { Alert, Button, Form, Input, Space, Typography, message, theme } from 'antd';
 import { useState } from 'react';
 
 const { Text } = Typography;
@@ -24,15 +24,15 @@ export default function ConfirmPassword() {
             message.success('Password confirmed successfully!');
             // Redirect back to the intended page
             window.history.back();
-        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
             if (error.response?.status === 422) {
                 // Validation errors
                 const errors = error.response.data.errors;
                 form.setFields(
-                    Object.keys(errors).map(field => ({
+                    Object.keys(errors).map((field) => ({
                         name: field,
                         errors: errors[field],
-                    }))
+                    })),
                 );
             } else {
                 message.error('Password confirmation failed. Please try again.');
@@ -58,26 +58,14 @@ export default function ConfirmPassword() {
                     icon={<SafetyOutlined />}
                 />
 
-                <Form
-                    form={form}
-                    onFinish={handleSubmit}
-                    layout="vertical"
-                    requiredMark={false}
-                >
+                <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
                     <Space direction="vertical" size="middle" className="w-full">
                         <Form.Item
                             name="password"
                             label={<Text style={{ color: token.colorText }}>Current Password</Text>}
-                            rules={[
-                                { required: true, message: 'Please input your current password!' }
-                            ]}
+                            rules={[{ required: true, message: 'Please input your current password!' }]}
                         >
-                            <Input.Password
-                                placeholder="Enter your current password"
-                                autoComplete="current-password"
-                                autoFocus
-                                size="large"
-                            />
+                            <Input.Password placeholder="Enter your current password" autoComplete="current-password" autoFocus size="large" />
                         </Form.Item>
 
                         <Form.Item>

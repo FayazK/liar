@@ -1,6 +1,6 @@
+import { AntdIconProps } from '@ant-design/icons/lib/components/AntdIcon';
 import { InertiaLinkProps } from '@inertiajs/react';
 import { ForwardRefExoticComponent, RefAttributes } from 'react';
-import { AntdIconProps } from '@ant-design/icons/lib/components/AntdIcon';
 
 export interface Auth {
     user: User;
@@ -78,15 +78,15 @@ export interface LaravelPaginatedResponse<T = unknown> {
 
 // Re-export DataTable types from dedicated module
 export type {
-    FilterConfig,
     BooleanFilterConfig,
-    SelectFilterConfig,
-    DateRangeFilterConfig,
     CustomFilterConfig,
-    SortState,
-    DataTableError,
     DataTableColumn,
-    DataTableProps,
+    DataTableError,
     DataTableFilters,
+    DataTableProps,
     DataTableQueryParams,
+    DateRangeFilterConfig,
+    FilterConfig,
+    SelectFilterConfig,
+    SortState,
 } from './datatable';

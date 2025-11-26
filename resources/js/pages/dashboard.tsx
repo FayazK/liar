@@ -1,39 +1,24 @@
 import AppLayout from '@/layouts/app-layout';
 import { type SharedData } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
 import {
-    Row,
-    Col,
-    Card,
-    Statistic,
-    Typography,
-    Space,
-    Avatar,
-    Progress,
-    List,
-    Tag,
-    Button,
-    Dropdown,
-    theme
-} from 'antd';
-import {
-    UserOutlined,
-    RiseOutlined,
-    EyeOutlined,
-    TeamOutlined,
-    ShoppingOutlined,
-    DollarOutlined,
     ClockCircleOutlined,
-    PlusOutlined,
+    DollarOutlined,
     DownloadOutlined,
+    EyeOutlined,
+    FilterOutlined,
     MoreOutlined,
+    PlusOutlined,
     ReloadOutlined,
-    FilterOutlined
+    RiseOutlined,
+    ShoppingOutlined,
+    TeamOutlined,
+    UserOutlined,
 } from '@ant-design/icons';
+import { Head, usePage } from '@inertiajs/react';
+import { Avatar, Button, Card, Col, Dropdown, List, Progress, Row, Space, Statistic, Tag, theme, Typography } from 'antd';
 
 const { Title, Text, Paragraph } = Typography;
 const { useToken } = theme;
-
 
 export default function Dashboard() {
     const { auth } = usePage<SharedData>().props;
@@ -97,22 +82,13 @@ export default function Dashboard() {
     // Action buttons for the header
     const headerActions = (
         <Space>
-            <Button 
-                icon={<ReloadOutlined />} 
-                onClick={() => window.location.reload()}
-            >
+            <Button icon={<ReloadOutlined />} onClick={() => window.location.reload()}>
                 Refresh
             </Button>
-            <Button 
-                icon={<FilterOutlined />}
-                type="default"
-            >
+            <Button icon={<FilterOutlined />} type="default">
                 Filter
             </Button>
-            <Button 
-                icon={<DownloadOutlined />}
-                type="default"
-            >
+            <Button icon={<DownloadOutlined />} type="default">
                 Export
             </Button>
             <Dropdown
@@ -140,20 +116,15 @@ export default function Dashboard() {
     );
 
     return (
-        <AppLayout
-            pageTitle="Dashboard"
-            actions={headerActions}
-        >
+        <AppLayout pageTitle="Dashboard" actions={headerActions}>
             <Head title="Dashboard" />
-            
+
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
                 <div>
                     <Title level={2} style={{ marginBottom: token.marginXS }}>
                         Welcome back, {auth.user.full_name}!
                     </Title>
-                    <Paragraph type="secondary">
-                        Here's what's happening with your account today.
-                    </Paragraph>
+                    <Paragraph type="secondary">Here's what's happening with your account today.</Paragraph>
                 </div>
 
                 <Row gutter={[16, 16]}>
@@ -195,7 +166,7 @@ export default function Dashboard() {
                             />
                         </Card>
                     </Col>
-                    
+
                     <Col xs={24} lg={8}>
                         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                             <Card title="Performance">

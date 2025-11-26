@@ -1,6 +1,6 @@
-import { Card, Typography, Space, Segmented } from 'antd';
-import { BulbOutlined, BulbFilled, DesktopOutlined } from '@ant-design/icons';
 import { useAppearance, type Appearance } from '@/hooks/use-appearance';
+import { BulbFilled, BulbOutlined, DesktopOutlined } from '@ant-design/icons';
+import { Card, Segmented, Space, Typography } from 'antd';
 
 const { Text } = Typography;
 
@@ -41,8 +41,7 @@ export default function AppearanceForm() {
                         ? 'Theme will automatically adjust based on your system preferences.'
                         : currentAppearance === 'light'
                           ? 'Interface will use a light color scheme.'
-                          : 'Interface will use a dark color scheme.'
-                    }
+                          : 'Interface will use a dark color scheme.'}
                 </Text>
             </Space>
         </Card>

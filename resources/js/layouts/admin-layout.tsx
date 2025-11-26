@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import MasterLayout from './master-layout';
-import { adminMainNavItems, adminFooterNavItems } from './menus/admin-menu';
+import { adminFooterNavItems, adminMainNavItems } from './menus/admin-menu';
 
 interface AdminLayoutProps {
     children: ReactNode;
@@ -10,12 +10,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children, pageTitle, actions }: AdminLayoutProps) {
     return (
-        <MasterLayout
-            pageTitle={pageTitle}
-            actions={actions}
-            mainNavItems={adminMainNavItems}
-            footerNavItems={adminFooterNavItems}
-        >
+        <MasterLayout pageTitle={pageTitle} actions={actions} mainNavItems={adminMainNavItems} footerNavItems={adminFooterNavItems}>
             {children}
         </MasterLayout>
     );

@@ -1,11 +1,11 @@
-import React from 'react';
-import { Button, Space, Tag, Dropdown, Avatar, theme } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined, MoreOutlined } from '@ant-design/icons';
-import { Link } from '@inertiajs/react';
-import AdminLayout from '@/layouts/admin-layout';
 import DataTable from '@/components/ui/DataTable';
-import type { User, FilterConfig } from '@/types';
-import { show, edit, data, create } from '@/routes/admin/users';
+import AdminLayout from '@/layouts/admin-layout';
+import { create, data, edit, show } from '@/routes/admin/users';
+import type { FilterConfig, User } from '@/types';
+import { DeleteOutlined, EditOutlined, EyeOutlined, MoreOutlined, UserOutlined } from '@ant-design/icons';
+import { Link } from '@inertiajs/react';
+import { Avatar, Button, Dropdown, Space, Tag, theme } from 'antd';
+import React from 'react';
 
 const { useToken } = theme;
 
@@ -37,11 +37,7 @@ export default function UsersIndex() {
             sorter: true,
             render: (_: unknown, record: User) => (
                 <Space>
-                    <Avatar
-                        src={record.avatar}
-                        icon={<UserOutlined />}
-                        size={32}
-                    >
+                    <Avatar src={record.avatar} icon={<UserOutlined />} size={32}>
                         {record.initials}
                     </Avatar>
                     <div>
@@ -58,11 +54,7 @@ export default function UsersIndex() {
             width: 100,
             filterable: true,
             sorter: true,
-            render: (isActive: unknown) => (
-                <Tag color={isActive ? 'green' : 'red'}>
-                    {isActive ? 'Active' : 'Inactive'}
-                </Tag>
-            ),
+            render: (isActive: unknown) => <Tag color={isActive ? 'green' : 'red'}>{isActive ? 'Active' : 'Inactive'}</Tag>,
         },
         {
             title: 'Phone',
@@ -78,9 +70,7 @@ export default function UsersIndex() {
             key: 'last_login_at',
             width: 140,
             sorter: true,
-            render: (lastLogin: unknown) => (
-                lastLogin ? new Date(lastLogin as string).toLocaleDateString() : 'Never'
-            ),
+            render: (lastLogin: unknown) => (lastLogin ? new Date(lastLogin as string).toLocaleDateString() : 'Never'),
         },
         {
             title: 'Created',
@@ -111,7 +101,7 @@ export default function UsersIndex() {
                     {
                         key: 'edit',
                         label: (
-                            <Link href={edit({user: record.id}).url}>
+                            <Link href={edit({ user: record.id }).url}>
                                 <Space>
                                     <EditOutlined />
                                     Edit
@@ -138,11 +128,7 @@ export default function UsersIndex() {
                 ];
 
                 return (
-                    <Dropdown
-                        menu={{ items: menuItems }}
-                        trigger={['click']}
-                        placement="bottomRight"
-                    >
+                    <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
                         <Button type="text" icon={<MoreOutlined />} />
                     </Dropdown>
                 );

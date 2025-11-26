@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { Avatar, Button, message, Space, theme, Upload } from 'antd';
-import { DeleteOutlined, LoadingOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
-import type { RcFile, UploadProps } from 'antd/es/upload';
-import { router, usePage } from '@inertiajs/react';
 import type { SharedData } from '@/types';
+import { DeleteOutlined, LoadingOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
+import { router, usePage } from '@inertiajs/react';
+import { Avatar, Button, message, Space, theme, Upload } from 'antd';
+import type { RcFile, UploadProps } from 'antd/es/upload';
+import { useState } from 'react';
 
 export default function AvatarUpload() {
     const { auth } = usePage<SharedData>().props;
@@ -92,12 +92,7 @@ export default function AvatarUpload() {
                 style={{ backgroundColor: !auth.user.avatar_url ? token.colorPrimary : undefined }}
             />
             <Space>
-                <Upload
-                    showUploadList={false}
-                    beforeUpload={beforeUpload}
-                    customRequest={customRequest}
-                    accept="image/jpeg,image/png,image/webp"
-                >
+                <Upload showUploadList={false} beforeUpload={beforeUpload} customRequest={customRequest} accept="image/jpeg,image/png,image/webp">
                     <Button icon={uploading ? <LoadingOutlined /> : <UploadOutlined />} loading={uploading}>
                         {auth.user.avatar_url ? 'Change' : 'Upload'}
                     </Button>

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Select } from 'antd';
 import useDropdown from '@/hooks/use-dropdown';
+import { Select } from 'antd';
+import React from 'react';
 
 type AdvancedSelectProps = {
     type: string;
@@ -12,13 +12,7 @@ const AdvancedSelect: React.FC<AdvancedSelectProps> = ({ type, params, id, ...pr
     const { options, loading, fetchOptions } = useDropdown(type, params ?? {}, id ?? null);
 
     return (
-        <Select
-            showSearch
-            filterOption={false}
-            onSearch={fetchOptions}
-            loading={loading}
-            {...props}
-        >
+        <Select showSearch filterOption={false} onSearch={fetchOptions} loading={loading} {...props}>
             {options.map((option) => (
                 <Select.Option key={option.id} value={option.id}>
                     {option.name}

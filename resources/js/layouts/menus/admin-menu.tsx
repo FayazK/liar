@@ -1,14 +1,16 @@
-import { type NavItem } from '@/types';
 import { dashboard } from '@/routes';
+import { index as libraryIndex } from '@/routes/library';
+import { type NavItem } from '@/types';
 import {
-    DashboardOutlined,
-    UsergroupAddOutlined,
-    SettingOutlined,
     BarChartOutlined,
+    BookOutlined,
+    DashboardOutlined,
     DatabaseOutlined,
-    SecurityScanOutlined,
+    FolderOutlined,
     GithubOutlined,
-    BookOutlined
+    SecurityScanOutlined,
+    SettingOutlined,
+    UsergroupAddOutlined,
 } from '@ant-design/icons';
 
 export const adminMainNavItems: NavItem[] = [
@@ -16,6 +18,11 @@ export const adminMainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: DashboardOutlined,
+    },
+    {
+        title: 'Library',
+        href: libraryIndex(),
+        icon: FolderOutlined,
     },
     {
         title: 'User Management',

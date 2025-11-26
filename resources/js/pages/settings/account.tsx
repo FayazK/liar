@@ -1,11 +1,11 @@
-import { Head } from '@inertiajs/react';
-import { Tabs, Typography, Space, theme } from 'antd';
-import { UserOutlined, LockOutlined, BgColorsOutlined } from '@ant-design/icons';
-import { useState, useEffect } from 'react';
-import AppLayout from '@/layouts/app-layout';
-import ProfileForm from '@/components/settings/profile-form';
-import PasswordForm from '@/components/settings/password-form';
 import AppearanceForm from '@/components/settings/appearance-form';
+import PasswordForm from '@/components/settings/password-form';
+import ProfileForm from '@/components/settings/profile-form';
+import AppLayout from '@/layouts/app-layout';
+import { BgColorsOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
+import { Head } from '@inertiajs/react';
+import { Space, Tabs, theme, Typography } from 'antd';
+import { useEffect, useState } from 'react';
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
@@ -79,18 +79,10 @@ export default function Account({ mustVerifyEmail, status }: AccountProps) {
                     <Title level={3} style={{ marginBottom: token.marginXS }}>
                         Account Settings
                     </Title>
-                    <Text type="secondary">
-                        Manage your account settings, update your profile, and customize your preferences.
-                    </Text>
+                    <Text type="secondary">Manage your account settings, update your profile, and customize your preferences.</Text>
                 </div>
 
-                <Tabs
-                    activeKey={activeTab}
-                    onChange={handleTabChange}
-                    items={tabItems}
-                    destroyInactiveTabPane={false}
-                    size="large"
-                />
+                <Tabs activeKey={activeTab} onChange={handleTabChange} items={tabItems} destroyInactiveTabPane={false} size="large" />
             </Space>
         </AppLayout>
     );

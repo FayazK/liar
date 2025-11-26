@@ -1,30 +1,18 @@
 import { dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
-import { 
-    Layout, 
-    Typography, 
-    Button, 
-    Space, 
-    Row, 
-    Col, 
-    Card, 
-    theme,
-    Divider,
-    List,
-    Tag
-} from 'antd';
 import {
-    LoginOutlined,
-    UserAddOutlined,
+    ApiOutlined,
+    CodeOutlined,
     DashboardOutlined,
+    GlobalOutlined,
+    LoginOutlined,
     RocketOutlined,
     SafetyOutlined,
     ThunderboltOutlined,
-    GlobalOutlined,
-    CodeOutlined,
-    ApiOutlined
+    UserAddOutlined,
 } from '@ant-design/icons';
+import { Head, usePage } from '@inertiajs/react';
+import { Button, Card, Col, Divider, Layout, List, Row, Space, Tag, theme, Typography } from 'antd';
 
 const { Header, Content, Footer } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -71,45 +59,36 @@ export default function Welcome() {
             <Head title="Welcome">
                 <meta name="description" content="Welcome to our modern Laravel React application" />
             </Head>
-            
+
             <Layout style={{ minHeight: '100vh' }}>
-                <Header style={{
-                    background: token.colorBgContainer,
-                    borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                    padding: '0 24px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                }}>
+                <Header
+                    style={{
+                        background: token.colorBgContainer,
+                        borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                        padding: '0 24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                    }}
+                >
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <CodeOutlined style={{ fontSize: '24px', color: token.colorPrimary, marginRight: '12px' }} />
                         <Title level={3} style={{ margin: 0, color: token.colorPrimary }}>
                             Liar
                         </Title>
                     </div>
-                    
+
                     <Space>
                         {auth.user ? (
-                            <Button
-                                type="primary"
-                                icon={<DashboardOutlined />}
-                                onClick={() => window.location.href = dashboard().url}
-                            >
+                            <Button type="primary" icon={<DashboardOutlined />} onClick={() => (window.location.href = dashboard().url)}>
                                 Dashboard
                             </Button>
                         ) : (
                             <>
-                                <Button
-                                    icon={<LoginOutlined />}
-                                    onClick={() => window.location.href = login().url}
-                                >
+                                <Button icon={<LoginOutlined />} onClick={() => (window.location.href = login().url)}>
                                     Log in
                                 </Button>
-                                <Button
-                                    type="primary"
-                                    icon={<UserAddOutlined />}
-                                    onClick={() => window.location.href = register().url}
-                                >
+                                <Button type="primary" icon={<UserAddOutlined />} onClick={() => (window.location.href = register().url)}>
                                     Register
                                 </Button>
                             </>
@@ -127,26 +106,22 @@ export default function Welcome() {
                                             Welcome to <span style={{ color: token.colorPrimary }}>Liar</span>
                                         </Title>
                                         <Paragraph style={{ fontSize: '18px', color: token.colorTextSecondary }}>
-                                            A modern, professional Laravel React application built with the latest technologies 
-                                            and best practices for rapid development and deployment.
+                                            A modern, professional Laravel React application built with the latest technologies and best practices for
+                                            rapid development and deployment.
                                         </Paragraph>
                                     </div>
-                                    
+
                                     {!auth.user && (
                                         <Space size="middle">
                                             <Button
                                                 type="primary"
                                                 size="large"
                                                 icon={<UserAddOutlined />}
-                                                onClick={() => window.location.href = register().url}
+                                                onClick={() => (window.location.href = register().url)}
                                             >
                                                 Get Started
                                             </Button>
-                                            <Button
-                                                size="large"
-                                                icon={<LoginOutlined />}
-                                                onClick={() => window.location.href = login().url}
-                                            >
+                                            <Button size="large" icon={<LoginOutlined />} onClick={() => (window.location.href = login().url)}>
                                                 Sign In
                                             </Button>
                                         </Space>
@@ -178,47 +153,36 @@ export default function Welcome() {
                                         dataSource={technologies}
                                         renderItem={(item) => (
                                             <List.Item>
-                                                <List.Item.Meta
-                                                    title={item.name}
-                                                    description={
-                                                        <Tag color="blue">{item.type}</Tag>
-                                                    }
-                                                />
+                                                <List.Item.Meta title={item.name} description={<Tag color="blue">{item.type}</Tag>} />
                                             </List.Item>
                                         )}
                                     />
                                 </Card>
                             </Col>
-                            
+
                             <Col xs={24} lg={12}>
                                 <Card title="Getting Started">
                                     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                                         <div>
                                             <Title level={5}>1. Create an Account</Title>
-                                            <Text type="secondary">
-                                                Sign up for a new account to get started with the platform.
-                                            </Text>
+                                            <Text type="secondary">Sign up for a new account to get started with the platform.</Text>
                                         </div>
                                         <div>
                                             <Title level={5}>2. Explore the Dashboard</Title>
-                                            <Text type="secondary">
-                                                Access your personalized dashboard with real-time analytics.
-                                            </Text>
+                                            <Text type="secondary">Access your personalized dashboard with real-time analytics.</Text>
                                         </div>
                                         <div>
                                             <Title level={5}>3. Customize Settings</Title>
-                                            <Text type="secondary">
-                                                Configure your profile, appearance, and security preferences.
-                                            </Text>
+                                            <Text type="secondary">Configure your profile, appearance, and security preferences.</Text>
                                         </div>
-                                        
+
                                         {!auth.user && (
                                             <Button
                                                 type="primary"
                                                 block
                                                 size="large"
                                                 icon={<UserAddOutlined />}
-                                                onClick={() => window.location.href = register().url}
+                                                onClick={() => (window.location.href = register().url)}
                                                 style={{ marginTop: '16px' }}
                                             >
                                                 Start Your Journey
@@ -231,11 +195,13 @@ export default function Welcome() {
                     </div>
                 </Content>
 
-                <Footer style={{ 
-                    textAlign: 'center', 
-                    background: token.colorBgLayout,
-                    borderTop: `1px solid ${token.colorBorderSecondary}`
-                }}>
+                <Footer
+                    style={{
+                        textAlign: 'center',
+                        background: token.colorBgLayout,
+                        borderTop: `1px solid ${token.colorBorderSecondary}`,
+                    }}
+                >
                     <Space split={<Divider type="vertical" />}>
                         <Text type="secondary">© 2024 Liar. All rights reserved.</Text>
                         <Text type="secondary">Built with Laravel & React</Text>

@@ -1,32 +1,14 @@
-import { type NavGroup, type NavItem, type SharedData } from '@/types';
-import { Link, router, usePage } from '@inertiajs/react';
-import {
-    Layout,
-    Menu,
-    Dropdown,
-    Avatar,
-    Button,
-    Flex,
-    Typography,
-    Drawer,
-    theme,
-} from 'antd';
-import {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-    MenuOutlined,
-    UserOutlined,
-    LogoutOutlined,
-    SettingOutlined,
-    SearchOutlined,
-} from '@ant-design/icons';
-import { type ReactNode } from 'react';
-import { dashboard } from '@/routes';
-import logo from '../../images/logo.svg';
-import { useSidebarState } from '@/hooks/use-sidebar-state';
-import { useIsMobile } from '@/hooks/use-mobile';
 import GlobalSearch, { useGlobalSearch } from '@/components/global-search';
 import NotificationsCenter from '@/components/notifications-center';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useSidebarState } from '@/hooks/use-sidebar-state';
+import { dashboard } from '@/routes';
+import { type NavGroup, type NavItem, type SharedData } from '@/types';
+import { LogoutOutlined, MenuFoldOutlined, MenuOutlined, MenuUnfoldOutlined, SearchOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { Link, router, usePage } from '@inertiajs/react';
+import { Avatar, Button, Drawer, Dropdown, Flex, Layout, Menu, theme, Typography } from 'antd';
+import { type ReactNode } from 'react';
+import logo from '../../images/logo.svg';
 
 const { Header, Sider, Content } = Layout;
 const { Text, Title } = Typography;
@@ -41,14 +23,7 @@ interface MasterLayoutProps {
     footerNavItems?: NavItem[];
 }
 
-export default function MasterLayout({
-    children,
-    pageTitle,
-    actions,
-    mainNavItems,
-    navGroups = [],
-    footerNavItems = [],
-}: MasterLayoutProps) {
+export default function MasterLayout({ children, pageTitle, actions, mainNavItems, navGroups = [], footerNavItems = [] }: MasterLayoutProps) {
     const { collapsed, toggleCollapsed } = useSidebarState();
     const isMobile = useIsMobile();
     const { auth } = usePage<SharedData>().props;
@@ -85,39 +60,31 @@ export default function MasterLayout({
     ];
 
     const menuItems = [
-        ...mainNavItems.map(item => ({
+        ...mainNavItems.map((item) => ({
             key: typeof item.href === 'string' ? item.href : item.href.url,
             icon: item.icon ? <item.icon /> : null,
             label: (
-                <Link
-                    href={item.href}
-                    prefetch
-                    onClick={isMobile ? closeMobileMenu : undefined}
-                >
+                <Link href={item.href} prefetch onClick={isMobile ? closeMobileMenu : undefined}>
                     {item.title}
                 </Link>
             ),
         })),
-        ...navGroups.map(group => ({
+        ...navGroups.map((group) => ({
             key: `group-${group.title.toLowerCase().replace(/\s+/g, '-')}`,
             label: group.title,
             type: 'group' as const,
-            children: group.items.map(item => ({
+            children: group.items.map((item) => ({
                 key: typeof item.href === 'string' ? item.href : item.href.url,
                 icon: item.icon ? <item.icon /> : null,
                 label: (
-                    <Link
-                        href={item.href}
-                        prefetch
-                        onClick={isMobile ? closeMobileMenu : undefined}
-                    >
+                    <Link href={item.href} prefetch onClick={isMobile ? closeMobileMenu : undefined}>
                         {item.title}
                     </Link>
                 ),
             })),
         })),
         ...(footerNavItems.length > 0 ? [{ type: 'divider' as const }] : []),
-        ...footerNavItems.map(item => ({
+        ...footerNavItems.map((item) => ({
             key: typeof item.href === 'string' ? item.href : item.href.url,
             icon: item.icon ? <item.icon /> : null,
             label: (
@@ -162,10 +129,7 @@ export default function MasterLayout({
                                         width: '32px',
                                     }}
                                 />
-                                <Text
-                                    strong
-                                    style={{ fontSize: '24px', color: token.colorPrimary }}
-                                >
+                                <Text strong style={{ fontSize: '24px', color: token.colorPrimary }}>
                                     Liar
                                 </Text>
                             </Flex>
@@ -203,10 +167,7 @@ export default function MasterLayout({
                 align="center"
                 justify="center"
                 style={{
-                    padding:
-                        collapsed && !isMobile
-                            ? `${token.paddingMD}px ${token.paddingXS}px`
-                            : `${token.paddingMD}px`,
+                    padding: collapsed && !isMobile ? `${token.paddingMD}px ${token.paddingXS}px` : `${token.paddingMD}px`,
                     borderTop: `1px solid ${token.colorBorderSecondary}`,
                     minHeight: '56px',
                     flexShrink: 0,
@@ -253,11 +214,11 @@ export default function MasterLayout({
                     textDecoration: 'none',
                     borderRadius: token.borderRadius,
                 }}
-                onFocus={e => {
+                onFocus={(e) => {
                     e.currentTarget.style.left = '16px';
                     e.currentTarget.style.top = '16px';
                 }}
-                onBlur={e => {
+                onBlur={(e) => {
                     e.currentTarget.style.left = '-9999px';
                 }}
             >
@@ -286,7 +247,9 @@ export default function MasterLayout({
                             bottom: 0,
                         }}
                     >
-                        <nav aria-label="Main navigation" style={{ height: '100%' }}>{sidebarContent}</nav>
+                        <nav aria-label="Main navigation" style={{ height: '100%' }}>
+                            {sidebarContent}
+                        </nav>
                     </Sider>
                 )}
 
@@ -302,7 +265,9 @@ export default function MasterLayout({
                             body: { padding: 0, height: '100%' },
                         }}
                     >
-                        <nav aria-label="Main navigation" style={{ height: '100%' }}>{sidebarContent}</nav>
+                        <nav aria-label="Main navigation" style={{ height: '100%' }}>
+                            {sidebarContent}
+                        </nav>
                     </Drawer>
                 )}
 
@@ -327,33 +292,15 @@ export default function MasterLayout({
                             height: '56px',
                         }}
                     >
-                        <Flex
-                            justify="space-between"
-                            align="center"
-                            style={{ height: '100%' }}
-                        >
+                        <Flex justify="space-between" align="center" style={{ height: '100%' }}>
                             {/* Left Section: Collapse/Menu Button and Title */}
                             <Flex align="center" gap="middle" flex={1}>
                                 <Button
                                     type="text"
-                                    icon={
-                                        isMobile ? (
-                                            <MenuOutlined />
-                                        ) : collapsed ? (
-                                            <MenuUnfoldOutlined />
-                                        ) : (
-                                            <MenuFoldOutlined />
-                                        )
-                                    }
+                                    icon={isMobile ? <MenuOutlined /> : collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                                     onClick={toggleCollapsed}
                                     style={{ fontSize: '16px' }}
-                                    aria-label={
-                                        isMobile
-                                            ? 'Toggle navigation menu'
-                                            : collapsed
-                                              ? 'Expand sidebar'
-                                              : 'Collapse sidebar'
-                                    }
+                                    aria-label={isMobile ? 'Toggle navigation menu' : collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                                 />
                                 {pageTitle && (
                                     <Title
@@ -375,9 +322,7 @@ export default function MasterLayout({
                                 {!isMobile && (
                                     <Button
                                         type="text"
-                                        icon={
-                                            <SearchOutlined style={{ fontSize: '18px' }} />
-                                        }
+                                        icon={<SearchOutlined style={{ fontSize: '18px' }} />}
                                         onClick={openSearch}
                                         style={{
                                             display: 'flex',

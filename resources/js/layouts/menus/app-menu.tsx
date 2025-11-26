@@ -1,10 +1,6 @@
-import { type NavItem } from '@/types';
 import { dashboard } from '@/routes';
-import {
-    DashboardOutlined,
-    GithubOutlined,
-    BookOutlined,
-} from '@ant-design/icons';
+import { type NavItem } from '@/types';
+import { BookOutlined, DashboardOutlined, GithubOutlined } from '@ant-design/icons';
 
 export const appMainNavItems: NavItem[] = [
     {

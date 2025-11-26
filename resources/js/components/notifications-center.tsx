@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Badge, Button, Dropdown, List, Empty, Typography, Flex, theme } from 'antd';
 import { BellOutlined, CheckOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Badge, Button, Dropdown, Empty, Flex, List, theme, Typography } from 'antd';
+import { useState } from 'react';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -38,20 +38,18 @@ export default function NotificationsCenter() {
     const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
     const { token } = useToken();
 
-    const unreadCount = notifications.filter(n => !n.read).length;
+    const unreadCount = notifications.filter((n) => !n.read).length;
 
     const markAsRead = (id: string) => {
-        setNotifications(prev =>
-            prev.map(n => (n.id === id ? { ...n, read: true } : n)),
-        );
+        setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
     };
 
     const markAllAsRead = () => {
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+        setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     };
 
     const deleteNotification = (id: string) => {
-        setNotifications(prev => prev.filter(n => n.id !== id));
+        setNotifications((prev) => prev.filter((n) => n.id !== id));
     };
 
     const getTypeColor = (type: Notification['type']) => {
@@ -90,12 +88,7 @@ export default function NotificationsCenter() {
                     Notifications
                 </Text>
                 {unreadCount > 0 && (
-                    <Button
-                        type="text"
-                        size="small"
-                        onClick={markAllAsRead}
-                        style={{ fontSize: '12px' }}
-                    >
+                    <Button type="text" size="small" onClick={markAllAsRead} style={{ fontSize: '12px' }}>
                         Mark all as read
                     </Button>
                 )}
@@ -109,38 +102,27 @@ export default function NotificationsCenter() {
                 }}
             >
                 {notifications.length === 0 ? (
-                    <Empty
-                        image={Empty.PRESENTED_IMAGE_SIMPLE}
-                        description="No notifications"
-                        style={{ padding: '32px' }}
-                    />
+                    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No notifications" style={{ padding: '32px' }} />
                 ) : (
                     <List
                         dataSource={notifications}
-                        renderItem={item => (
+                        renderItem={(item) => (
                             <List.Item
                                 key={item.id}
                                 style={{
                                     padding: '12px 16px',
-                                    backgroundColor: item.read
-                                        ? 'transparent'
-                                        : token.colorPrimaryBg,
-                                    borderLeft: `3px solid ${
-                                        item.read ? 'transparent' : getTypeColor(item.type)
-                                    }`,
+                                    backgroundColor: item.read ? 'transparent' : token.colorPrimaryBg,
+                                    borderLeft: `3px solid ${item.read ? 'transparent' : getTypeColor(item.type)}`,
                                     cursor: 'pointer',
                                     transition: 'background-color 0.2s',
                                 }}
-                                onMouseEnter={e => {
+                                onMouseEnter={(e) => {
                                     if (!item.read) {
-                                        e.currentTarget.style.backgroundColor =
-                                            token.colorBgTextHover;
+                                        e.currentTarget.style.backgroundColor = token.colorBgTextHover;
                                     }
                                 }}
-                                onMouseLeave={e => {
-                                    e.currentTarget.style.backgroundColor = item.read
-                                        ? 'transparent'
-                                        : token.colorPrimaryBg;
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = item.read ? 'transparent' : token.colorPrimaryBg;
                                 }}
                             >
                                 <Flex vertical style={{ flex: 1 }} gap="small">
@@ -232,11 +214,7 @@ export default function NotificationsCenter() {
     );
 
     return (
-        <Dropdown
-            dropdownRender={() => dropdownContent}
-            trigger={['click']}
-            placement="bottomRight"
-        >
+        <Dropdown dropdownRender={() => dropdownContent} trigger={['click']} placement="bottomRight">
             <Badge count={unreadCount} size="small" offset={[-4, 4]}>
                 <Button
                     type="text"
