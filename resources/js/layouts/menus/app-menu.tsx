@@ -1,6 +1,7 @@
 import { dashboard } from '@/routes';
+import { index as libraryIndex } from '@/routes/library';
 import { type NavItem } from '@/types';
-import { BookOutlined, DashboardOutlined, GithubOutlined } from '@ant-design/icons';
+import { DashboardOutlined, FolderOutlined } from '@ant-design/icons';
 
 export const appMainNavItems: NavItem[] = [
     {
@@ -8,17 +9,11 @@ export const appMainNavItems: NavItem[] = [
         href: dashboard(),
         icon: DashboardOutlined,
     },
+    {
+        title: 'Library',
+        href: libraryIndex(),
+        icon: FolderOutlined,
+    },
 ];
 
-export const appFooterNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: GithubOutlined,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOutlined,
-    },
-];
+export const appFooterNavItems: NavItem[] = [];

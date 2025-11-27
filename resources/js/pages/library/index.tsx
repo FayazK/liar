@@ -1,7 +1,7 @@
 import CreateFolderModal from '@/components/library/CreateFolderModal';
 import LibraryGrid from '@/components/library/LibraryGrid';
 import UploadFilesModal from '@/components/library/UploadFilesModal';
-import AdminLayout from '@/layouts/admin-layout';
+import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/library';
 import type { BreadcrumbItem, Library, LibraryPageProps } from '@/types/library';
 import { FolderAddOutlined, HomeOutlined, UploadOutlined } from '@ant-design/icons';
@@ -40,7 +40,7 @@ export default function LibraryIndex({ currentFolder, breadcrumbs }: LibraryPage
     ];
 
     return (
-        <AdminLayout
+        <AppLayout
             pageTitle="Library"
             actions={
                 <Space>
@@ -72,8 +72,6 @@ export default function LibraryIndex({ currentFolder, breadcrumbs }: LibraryPage
                 libraryId={currentFolder.id}
                 onUploadComplete={() => setRefreshKey((prev) => prev + 1)}
             />
-        </AdminLayout>
+        </AppLayout>
     );
 }
-
-LibraryIndex.layout = (page: React.ReactNode) => page;

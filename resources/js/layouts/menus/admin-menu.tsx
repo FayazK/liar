@@ -3,11 +3,9 @@ import { index as libraryIndex } from '@/routes/library';
 import { type NavItem } from '@/types';
 import {
     BarChartOutlined,
-    BookOutlined,
     DashboardOutlined,
     DatabaseOutlined,
     FolderOutlined,
-    GithubOutlined,
     SecurityScanOutlined,
     SettingOutlined,
     UsergroupAddOutlined,
@@ -51,15 +49,4 @@ export const adminMainNavItems: NavItem[] = [
     },
 ];
 
-export const adminFooterNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: GithubOutlined,
-    },
-    {
-        title: 'Admin Docs',
-        href: 'https://laravel.com/docs/admin',
-        icon: BookOutlined,
-    },
-];
+export const adminFooterNavItems: NavItem[] = [];
