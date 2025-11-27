@@ -24,6 +24,7 @@ export interface LibraryFile {
     size_human: string;
     created_at: string;
     url?: string;
+    thumbnail_url?: string | null;
 }
 
 export interface BreadcrumbItem {

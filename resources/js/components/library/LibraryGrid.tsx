@@ -20,6 +20,7 @@ interface GridItem {
     file_name?: string;
     mime_type?: string;
     size_human?: string;
+    thumbnail_url?: string | null;
     created_at: string;
     updated_at?: string;
 }
@@ -57,6 +58,7 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
                     file_name: customEvent.detail.file.file_name,
                     mime_type: customEvent.detail.file.mime_type,
                     size_human: customEvent.detail.file.size_human,
+                    thumbnail_url: customEvent.detail.file.thumbnail_url,
                     created_at: customEvent.detail.file.created_at,
                 };
 
@@ -231,7 +233,7 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
                     <div
                         style={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
                             gap: token.marginMD,
                         }}
                     >
@@ -268,6 +270,7 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
                                     fileName={item.file_name || ''}
                                     mimeType={item.mime_type || ''}
                                     size={item.size_human || ''}
+                                    thumbnailUrl={item.thumbnail_url}
                                     menuItems={fileMenuItems}
                                 />
                             );

@@ -53,11 +53,9 @@ export default function LibraryIndex({ currentFolder, breadcrumbs }: LibraryPage
                 </Space>
             }
         >
-            {breadcrumbs.length > 0 && (
-                <div style={{ marginBottom: token.margin }}>
-                    <Breadcrumb items={breadcrumbItems} />
-                </div>
-            )}
+            <div style={{ marginBottom: token.margin }}>
+                <Breadcrumb items={breadcrumbItems} />
+            </div>
 
             <LibraryGrid key={refreshKey} parentId={currentFolder.id} onFolderClick={handleFolderClick} />
 

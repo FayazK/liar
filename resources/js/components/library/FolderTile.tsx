@@ -1,12 +1,12 @@
 import { FolderOutlined, MoreOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Dropdown, theme, Typography } from 'antd';
+import { useState } from 'react';
 
 const { Text } = Typography;
 const { useToken } = theme;
 
 interface FolderTileProps {
-    id: number;
     name: string;
     itemCount: number;
     color?: string;
@@ -16,6 +16,9 @@ interface FolderTileProps {
 
 export default function FolderTile({ name, itemCount, color, onFolderClick, menuItems }: FolderTileProps) {
     const { token } = useToken();
+    const [isHovered, setIsHovered] = useState(false);
+
+    const accentColor = color || token.colorPrimary;
 
     return (
         <div
@@ -25,62 +28,91 @@ export default function FolderTile({ name, itemCount, color, onFolderClick, menu
                 gap: token.marginMD,
                 padding: token.paddingMD,
                 backgroundColor: token.colorBgContainer,
-                border: `1px solid ${token.colorBorder}`,
-                borderRadius: token.borderRadius,
-                borderLeftWidth: '4px',
-                borderLeftColor: color || token.colorPrimary,
-                minHeight: '60px',
+                borderTop: `1px solid ${isHovered ? token.colorPrimary : token.colorBorder}`,
+                borderRight: `1px solid ${isHovered ? token.colorPrimary : token.colorBorder}`,
+                borderBottom: `1px solid ${isHovered ? token.colorPrimary : token.colorBorder}`,
+                borderLeft: `4px solid ${accentColor}`,
+                borderRadius: token.borderRadiusLG,
+                minHeight: 64,
                 cursor: 'pointer',
-                transition: 'all 0.2s',
+                transition: 'all 0.2s ease',
+                transform: isHovered ? 'translateY(-2px)' : 'none',
             }}
             onClick={onFolderClick}
-            onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = token.colorPrimary;
-            }}
-            onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = token.colorBorder;
-                e.currentTarget.style.borderLeftColor = color || token.colorPrimary;
-            }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
-            {/* Icon: LEFT */}
-            <div style={{ flexShrink: 0 }}>
+            {/* Icon */}
+            <div
+                style={{
+                    flexShrink: 0,
+                    width: 40,
+                    height: 40,
+                    borderRadius: token.borderRadiusSM,
+                    backgroundColor: token.colorFillQuaternary,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
                 <FolderOutlined
                     style={{
-                        fontSize: '24px',
-                        color: color || token.colorPrimary,
+                        fontSize: 22,
+                        color: accentColor,
                     }}
                 />
             </div>
 
-            {/* Content: MIDDLE */}
+            {/* Content */}
             <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                     style={{
                         fontWeight: 500,
-                        marginBottom: token.marginXS,
+                        fontSize: 14,
+                        marginBottom: 2,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
                     }}
+                    title={name}
                 >
                     {name}
                 </div>
-                <Text type="secondary" style={{ fontSize: '12px' }}>
+                <Text type="secondary" style={{ fontSize: 12 }}>
                     {itemCount} {itemCount === 1 ? 'item' : 'items'}
                 </Text>
             </div>
 
-            {/* Menu: RIGHT */}
-            <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
-                <MoreOutlined
+            {/* Menu */}
+            <Dropdown
+                menu={{ items: menuItems }}
+                trigger={['click']}
+                placement="bottomRight"
+                dropdownRender={(menu) => (
+                    <div
+                        style={{
+                            border: `1px solid ${token.colorBorder}`,
+                            borderRadius: token.borderRadiusLG,
+                            overflow: 'hidden',
+                        }}
+                    >
+                        {menu}
+                    </div>
+                )}
+            >
+                <div
                     style={{
-                        fontSize: '16px',
-                        padding: token.paddingXS,
+                        padding: 8,
+                        borderRadius: token.borderRadiusSM,
                         cursor: 'pointer',
+                        opacity: isHovered ? 1 : 0.5,
+                        transition: 'opacity 0.2s',
                         flexShrink: 0,
                     }}
                     onClick={(e) => e.stopPropagation()}
-                />
+                >
+                    <MoreOutlined style={{ fontSize: 16 }} />
+                </div>
             </Dropdown>
         </div>
     );

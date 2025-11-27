@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Library extends Model implements HasMedia
 {
@@ -109,7 +110,20 @@ class Library extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('files')
-            ->useDisk('local');
+            ->useDisk('public');
+    }
+
+    /**
+     * Register media conversions for thumbnails.
+     */
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(400)
+            ->height(300)
+            ->sharpen(10)
+            ->nonQueued()
+            ->performOnCollections('files');
     }
 
     /**

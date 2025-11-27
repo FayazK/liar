@@ -216,6 +216,7 @@ class LibraryController extends Controller
             'mime_type' => $media->mime_type,
             'size_human' => $this->formatBytes($media->size),
             'created_at' => $media->created_at->toISOString(),
+            'thumbnail_url' => $this->getThumbnailUrl($media),
         ]);
 
         return response()->json([
@@ -238,5 +239,22 @@ class LibraryController extends Controller
         $power = min($power, count($units) - 1);
 
         return round($bytes / (1024 ** $power), 2).' '.$units[(int) $power];
+    }
+
+    /**
+     * Get thumbnail URL for a media item if it's an image.
+     */
+    private function getThumbnailUrl(Media $media): ?string
+    {
+        if (! str_starts_with($media->mime_type, 'image/')) {
+            return null;
+        }
+
+        if ($media->hasGeneratedConversion('thumb')) {
+            return $media->getUrl('thumb');
+        }
+
+        // Fallback to original URL for images without conversion
+        return $media->getUrl();
     }
 }

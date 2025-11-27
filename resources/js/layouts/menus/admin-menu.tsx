@@ -1,4 +1,4 @@
-import { dashboard } from '@/routes';
+import { dashboard as adminDashboard } from '@/routes/admin';
 import { index as libraryIndex } from '@/routes/library';
 import { type NavItem } from '@/types';
 import {
@@ -16,7 +16,7 @@ import {
 export const adminMainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: dashboard(),
+        href: adminDashboard(),
         icon: DashboardOutlined,
     },
     {
