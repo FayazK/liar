@@ -154,7 +154,7 @@ class LibraryService
         }
 
         // Prevent moving a library into itself or its descendants
-        if ($newParentId && $this->isDescendant($newParentId, $libraryId)) {
+        if ($newParentId && $this->repository->isDescendantOf($newParentId, $libraryId)) {
             throw new \RuntimeException('Cannot move a library into its own descendant');
         }
 
@@ -167,22 +167,5 @@ class LibraryService
     public function getBreadcrumbs(int $libraryId): array
     {
         return $this->repository->getBreadcrumbs($libraryId);
-    }
-
-    /**
-     * Check if a library is a descendant of another.
-     */
-    private function isDescendant(int $potentialDescendantId, int $ancestorId): bool
-    {
-        $current = $this->repository->find($potentialDescendantId);
-
-        while ($current && $current->parent_id) {
-            if ($current->parent_id === $ancestorId) {
-                return true;
-            }
-            $current = $current->parent;
-        }
-
-        return false;
     }
 }

@@ -13,7 +13,8 @@ class UserDataTableQueryService extends DataTableQueryService
      * @var array<int, string>
      */
     protected array $searchableColumns = [
-        'full_name',
+        'first_name',
+        'last_name',
         'email',
         'phone',
     ];

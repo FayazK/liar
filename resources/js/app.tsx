@@ -2,6 +2,7 @@ import '@ant-design/v5-patch-for-react-19';
 import { createInertiaApp } from '@inertiajs/react';
 import { App as AntApp, ConfigProvider, theme } from 'antd';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import type { ComponentType } from 'react';
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../css/app.css';
@@ -9,7 +10,14 @@ import { initializeTheme } from './hooks/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-function ThemedApp({ App, props }: { App: React.ComponentType<unknown>; props: unknown }) {
+interface ThemedAppProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    App: ComponentType<any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    props: Record<string, any>;
+}
+
+function ThemedApp({ App, props }: ThemedAppProps) {
     const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
 
     useEffect(() => {

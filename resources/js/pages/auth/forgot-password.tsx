@@ -2,6 +2,7 @@ import { Icon } from '@/components/ui/Icon';
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
 import { login } from '@/routes';
+import { handleFormError } from '@/utils/form-errors';
 import { Head } from '@inertiajs/react';
 import { Alert, Button, Form, Input, Space, Typography, message, theme } from 'antd';
 import { useState } from 'react';
@@ -26,19 +27,8 @@ export default function ForgotPassword({ status }: { status?: string }) {
             setEmailSent(true);
             message.success('Password reset link sent to your email!');
             form.resetFields();
-        } catch (error: any) {
-            if (error.response?.status === 422) {
-                // Validation errors
-                const errors = error.response.data.errors;
-                form.setFields(
-                    Object.keys(errors).map((field) => ({
-                        name: field,
-                        errors: errors[field],
-                    })),
-                );
-            } else {
-                message.error('Failed to send reset link. Please try again.');
-            }
+        } catch (error: unknown) {
+            handleFormError(error, form, 'Failed to send reset link. Please try again.');
         } finally {
             setLoading(false);
         }

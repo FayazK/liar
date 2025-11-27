@@ -1,6 +1,7 @@
 import { Icon } from '@/components/ui/Icon';
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
+import { handleFormError } from '@/utils/form-errors';
 import { Head, router } from '@inertiajs/react';
 import { Button, Form, Input, Space, Typography, message, theme } from 'antd';
 import { useState } from 'react';
@@ -35,19 +36,8 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
             message.success('Password reset successfully!');
             // Redirect to login page
             router.visit('/login');
-        } catch (error: any) {
-            if (error.response?.status === 422) {
-                // Validation errors
-                const errors = error.response.data.errors;
-                form.setFields(
-                    Object.keys(errors).map((field) => ({
-                        name: field,
-                        errors: errors[field],
-                    })),
-                );
-            } else {
-                message.error('Failed to reset password. Please try again.');
-            }
+        } catch (error: unknown) {
+            handleFormError(error, form, 'Failed to reset password. Please try again.');
         } finally {
             setLoading(false);
         }

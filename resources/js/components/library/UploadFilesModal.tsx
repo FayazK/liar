@@ -1,5 +1,6 @@
 import { Icon } from '@/components/ui/Icon';
 import axios from '@/lib/axios';
+import { getErrorMessage } from '@/utils/errors';
 import { message, Modal, Progress, theme, Upload } from 'antd';
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload';
 import { useState } from 'react';
@@ -100,12 +101,12 @@ export default function UploadFilesModal({ open, onClose, libraryId, onUploadCom
                     detail: { libraryId, file: response.data.data },
                 }),
             );
-        } catch (error: any) {
-            const errorMsg = error.response?.data?.message || 'Upload failed';
+        } catch (error: unknown) {
+            const errorMsg = getErrorMessage(error, 'Upload failed');
 
             setFileList((prev) => prev.map((f) => (f.uid === (file as RcFile).uid ? { ...f, status: 'error' as const, error: errorMsg } : f)));
 
-            onError?.(error);
+            onError?.(error as Error);
             message.error(`${(file as RcFile).name}: ${errorMsg}`);
         }
     };

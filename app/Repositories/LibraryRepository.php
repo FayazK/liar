@@ -80,22 +80,89 @@ class LibraryRepository
 
     /**
      * Get breadcrumbs for navigation.
+     * Fetches all ancestors efficiently with a limit to prevent infinite loops.
      */
     public function getBreadcrumbs(int $libraryId): array
     {
-        $breadcrumbs = [];
-        $current = $this->find($libraryId);
+        $library = Library::select('id', 'name', 'parent_id', 'slug')
+            ->where('id', $libraryId)
+            ->first();
 
-        while ($current && $current->slug !== Library::ROOT_SLUG) {
-            array_unshift($breadcrumbs, [
-                'id' => $current->id,
-                'name' => $current->name,
-                'parent_id' => $current->parent_id,
-            ]);
-            $current = $current->parent;
+        if (! $library || $library->slug === Library::ROOT_SLUG) {
+            return [];
+        }
+
+        // First collect all parent IDs by traversing the tree (using only IDs)
+        $ancestorIds = [];
+        $currentId = $libraryId;
+        $maxDepth = 50; // Safety limit to prevent infinite loops
+
+        // Get parent chain IDs efficiently
+        while ($currentId && $maxDepth-- > 0) {
+            $parent = Library::select('id', 'parent_id', 'slug')
+                ->where('id', $currentId)
+                ->first();
+
+            if (! $parent || $parent->slug === Library::ROOT_SLUG) {
+                break;
+            }
+
+            $ancestorIds[] = $currentId;
+            $currentId = $parent->parent_id;
+        }
+
+        if (empty($ancestorIds)) {
+            return [];
+        }
+
+        // Fetch all ancestors in a single query
+        $ancestors = Library::select('id', 'name', 'parent_id')
+            ->whereIn('id', $ancestorIds)
+            ->get()
+            ->keyBy('id');
+
+        // Build breadcrumbs in correct order (from root to current)
+        $breadcrumbs = [];
+        foreach (array_reverse($ancestorIds) as $id) {
+            $ancestor = $ancestors->get($id);
+            if ($ancestor) {
+                $breadcrumbs[] = [
+                    'id' => $ancestor->id,
+                    'name' => $ancestor->name,
+                    'parent_id' => $ancestor->parent_id,
+                ];
+            }
         }
 
         return $breadcrumbs;
+    }
+
+    /**
+     * Check if a library is a descendant of another library.
+     * Used for preventing circular references when moving folders.
+     */
+    public function isDescendantOf(int $potentialDescendantId, int $ancestorId): bool
+    {
+        $currentId = $potentialDescendantId;
+        $maxDepth = 50; // Safety limit
+
+        while ($currentId && $maxDepth-- > 0) {
+            $library = Library::select('parent_id')
+                ->where('id', $currentId)
+                ->first();
+
+            if (! $library || ! $library->parent_id) {
+                return false;
+            }
+
+            if ($library->parent_id === $ancestorId) {
+                return true;
+            }
+
+            $currentId = $library->parent_id;
+        }
+
+        return false;
     }
 
     /**

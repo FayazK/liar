@@ -10,6 +10,7 @@ use App\Http\Requests\Library\LibraryStoreRequest;
 use App\Http\Requests\Library\LibraryUpdateRequest;
 use App\Models\Library;
 use App\Services\LibraryService;
+use App\Support\Formatters;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -214,7 +215,7 @@ class LibraryController extends Controller
             'name' => $media->name,
             'file_name' => $media->file_name,
             'mime_type' => $media->mime_type,
-            'size_human' => $this->formatBytes($media->size),
+            'size_human' => Formatters::bytes($media->size),
             'created_at' => $media->created_at->toISOString(),
             'thumbnail_url' => $this->getThumbnailUrl($media),
         ]);
@@ -223,22 +224,6 @@ class LibraryController extends Controller
             'folders' => $folders,
             'files' => $files,
         ]);
-    }
-
-    /**
-     * Format bytes to human-readable format.
-     */
-    private function formatBytes(int $bytes): string
-    {
-        if ($bytes === 0) {
-            return '0 B';
-        }
-
-        $units = ['B', 'KB', 'MB', 'GB'];
-        $power = floor(log($bytes, 1024));
-        $power = min($power, count($units) - 1);
-
-        return round($bytes / (1024 ** $power), 2).' '.$units[(int) $power];
     }
 
     /**

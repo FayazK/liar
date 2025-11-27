@@ -14,7 +14,6 @@ export const Icon = forwardRef<TablerIconRef, IconProps>(({ name, style, classNa
     const TablerIcon = iconMap[name];
 
     if (!TablerIcon) {
-        console.warn(`Icon "${name}" not found in icon map`);
         return null;
     }
 

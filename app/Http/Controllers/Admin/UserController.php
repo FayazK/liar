@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -10,6 +12,7 @@ use App\Http\Resources\Admin\UserCollection;
 use App\Http\Resources\UserDetailResource;
 use App\Models\User;
 use App\Queries\UserDataTableQueryService;
+use App\Repositories\UserRepository;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
@@ -18,7 +21,8 @@ use Inertia\Response;
 class UserController extends Controller
 {
     public function __construct(
-        private readonly UserService $userService
+        private readonly UserService $userService,
+        private readonly UserRepository $userRepository
     ) {}
 
     public function index(): Response
@@ -41,7 +45,7 @@ class UserController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $user = $this->userService->findUser($id);
+        $user = $this->userRepository->find($id);
 
         if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
@@ -79,13 +83,13 @@ class UserController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
-        $user = $this->userService->findUser($id);
+        $user = $this->userRepository->find($id);
 
         if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        $this->userService->deleteUser($id);
+        $this->userRepository->delete($id);
 
         return response()->json([
             'message' => 'User deleted successfully',

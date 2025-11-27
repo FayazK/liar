@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Library;
 
+use App\Repositories\LibraryRepository;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -14,7 +15,7 @@ class LibraryMoveRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user() !== null;
     }
 
     /**
@@ -43,8 +44,9 @@ class LibraryMoveRequest extends FormRequest
                             return;
                         }
 
-                        // Prevent moving into descendants
-                        if ($this->isDescendant((int) $value, (int) $itemId)) {
+                        // Prevent moving into descendants using centralized repository method
+                        $repository = app(LibraryRepository::class);
+                        if ($repository->isDescendantOf((int) $value, (int) $itemId)) {
                             $fail('Cannot move a folder into its own descendant.');
                         }
                     }
@@ -58,22 +60,5 @@ class LibraryMoveRequest extends FormRequest
                 },
             ],
         ];
-    }
-
-    /**
-     * Check if a library is a descendant of another.
-     */
-    private function isDescendant(int $potentialDescendantId, int $ancestorId): bool
-    {
-        $current = \App\Models\Library::find($potentialDescendantId);
-
-        while ($current && $current->parent_id) {
-            if ($current->parent_id === $ancestorId) {
-                return true;
-            }
-            $current = $current->parent;
-        }
-
-        return false;
     }
 }

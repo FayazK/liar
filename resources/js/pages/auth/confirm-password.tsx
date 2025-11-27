@@ -1,6 +1,7 @@
 import { Icon } from '@/components/ui/Icon';
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
+import { handleFormError } from '@/utils/form-errors';
 import { Head } from '@inertiajs/react';
 import { Alert, Button, Form, Input, Space, Typography, message, theme } from 'antd';
 import { useState } from 'react';
@@ -24,19 +25,8 @@ export default function ConfirmPassword() {
             message.success('Password confirmed successfully!');
             // Redirect back to the intended page
             window.history.back();
-        } catch (error: any) {
-            if (error.response?.status === 422) {
-                // Validation errors
-                const errors = error.response.data.errors;
-                form.setFields(
-                    Object.keys(errors).map((field) => ({
-                        name: field,
-                        errors: errors[field],
-                    })),
-                );
-            } else {
-                message.error('Password confirmation failed. Please try again.');
-            }
+        } catch (error: unknown) {
+            handleFormError(error, form, 'Password confirmation failed. Please try again.');
         } finally {
             setLoading(false);
         }

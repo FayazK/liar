@@ -1,8 +1,13 @@
 import axios from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+interface DropdownOption {
+    id: number;
+    name: string;
+}
+
 const useDropdown = (type: string, params: object = {}, id: number | null = null) => {
-    const [options, setOptions] = useState([]);
+    const [options, setOptions] = useState<DropdownOption[]>([]);
     const [loading, setLoading] = useState(false);
 
     // Stabilize params in dependencies to avoid infinite re-renders
@@ -21,8 +26,9 @@ const useDropdown = (type: string, params: object = {}, id: number | null = null
                     },
                 });
                 setOptions(response.data);
-            } catch (error) {
-                console.error('Failed to fetch dropdown options', error);
+            } catch {
+                // Silently fail - user will see empty dropdown
+                setOptions([]);
             }
             setLoading(false);
         },

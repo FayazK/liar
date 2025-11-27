@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Admin;
 
 use App\Models\User;
@@ -12,7 +14,9 @@ class UserUpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        // Admin routes are protected by auth middleware
+        // Add role-based authorization when role system is implemented
+        return $this->user() !== null;
     }
 
     /**

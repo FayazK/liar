@@ -1,6 +1,8 @@
 import { Icon } from '@/components/ui/Icon';
 import axios from '@/lib/axios';
 import type { Library } from '@/types/library';
+import { getErrorMessage } from '@/utils/errors';
+import { handleFormError } from '@/utils/form-errors';
 import { Empty, Form, Input, message, Modal, Space, Spin, theme, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import FileCard from './FileCard';
@@ -78,9 +80,8 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
             const response = await axios.get(`/library/api/${parentId}/items`);
             const allItems = [...response.data.folders, ...response.data.files];
             setItems(allItems);
-        } catch (err) {
+        } catch {
             setError('Failed to load items');
-            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -100,18 +101,8 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
             setRenameModal({ open: false, item: null });
             form.resetFields();
             fetchItems();
-        } catch (error: any) {
-            const errors = error.response?.data?.errors;
-            if (errors?.name) {
-                form.setFields([
-                    {
-                        name: 'name',
-                        errors: [errors.name[0]],
-                    },
-                ]);
-            } else {
-                message.error(error.response?.data?.message || 'Failed to rename folder');
-            }
+        } catch (error: unknown) {
+            handleFormError(error, form, 'Failed to rename folder');
         }
     };
 
@@ -136,8 +127,8 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
                         message.success('File deleted successfully!');
                         setItems((prev) => prev.filter((i) => !(i.type === 'file' && i.id === item.id)));
                     }
-                } catch (error: any) {
-                    message.error(error.response?.data?.message || `Failed to delete ${item.type}`);
+                } catch (error: unknown) {
+                    message.error(getErrorMessage(error, `Failed to delete ${item.type}`));
                 }
             },
         });

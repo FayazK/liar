@@ -7,15 +7,14 @@ namespace App\Services;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
     public function __construct(
-        private UserRepository $userRepository,
-        private MediaService $mediaService
+        private readonly UserRepository $userRepository,
+        private readonly MediaService $mediaService
     ) {}
 
     public function createUser(array $data): User
@@ -57,52 +56,6 @@ class UserService
         }
 
         return $this->userRepository->update($userId, $updateData);
-    }
-
-    public function deleteUser(int $userId): bool
-    {
-        return $this->userRepository->delete($userId);
-    }
-
-    public function findUser(int $id): ?User
-    {
-        return $this->userRepository->find($id);
-    }
-
-    public function findUserByEmail(string $email): ?User
-    {
-        return $this->userRepository->findByEmail($email);
-    }
-
-    public function updateLastLogin(int $userId): User
-    {
-        return $this->userRepository->updateLastLogin($userId);
-    }
-
-    public function getActiveUsers()
-    {
-        return $this->userRepository->getActiveUsers();
-    }
-
-    public function getPaginatedUsers(
-        int $perPage = 15,
-        ?string $search = null,
-        ?array $filters = null,
-        ?string $sortBy = 'created_at',
-        string $sortDirection = 'desc'
-    ): LengthAwarePaginator {
-        return $this->userRepository->paginateUsers(
-            $perPage,
-            $search,
-            $filters,
-            $sortBy,
-            $sortDirection
-        );
-    }
-
-    public function isEmailTaken(string $email): bool
-    {
-        return $this->userRepository->existsByEmail($email);
     }
 
     /**

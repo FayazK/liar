@@ -1,4 +1,5 @@
 import axios from '@/lib/axios';
+import { handleFormError } from '@/utils/form-errors';
 import { Form, Input, message, Modal } from 'antd';
 import { useState } from 'react';
 
@@ -26,18 +27,8 @@ export default function CreateFolderModal({ open, onClose, parentId, onSuccess }
             form.resetFields();
             onClose();
             onSuccess?.();
-        } catch (error: any) {
-            const errors = error.response?.data?.errors;
-            if (errors?.name) {
-                form.setFields([
-                    {
-                        name: 'name',
-                        errors: [errors.name[0]],
-                    },
-                ]);
-            } else {
-                message.error(error.response?.data?.message || 'Failed to create folder');
-            }
+        } catch (error: unknown) {
+            handleFormError(error, form, 'Failed to create folder');
         } finally {
             setLoading(false);
         }

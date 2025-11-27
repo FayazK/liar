@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\AvatarUpdateRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Repositories\UserRepository;
 use App\Services\UserService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\JsonResponse;
@@ -19,7 +20,8 @@ use Inertia\Response;
 class ProfileController extends Controller
 {
     public function __construct(
-        private readonly UserService $userService
+        private readonly UserService $userService,
+        private readonly UserRepository $userRepository
     ) {}
 
     /**
@@ -56,7 +58,7 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        $this->userService->deleteUser($userId);
+        $this->userRepository->delete($userId);
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

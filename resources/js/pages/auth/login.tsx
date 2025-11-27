@@ -3,6 +3,7 @@ import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
 import { register } from '@/routes';
 import { request } from '@/routes/password';
+import { handleFormError } from '@/utils/form-errors';
 import { Head, router } from '@inertiajs/react';
 import { Alert, Button, Checkbox, Flex, Form, Input, Typography, message, theme } from 'antd';
 import { useState } from 'react';
@@ -33,19 +34,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             message.success('Sign in successful');
             // Redirect to intended page or dashboard
             router.visit('/dashboard');
-        } catch (error: any) {
-            if (error.response?.status === 422) {
-                // Validation errors
-                const errors = error.response.data.errors;
-                form.setFields(
-                    Object.keys(errors).map((field) => ({
-                        name: field,
-                        errors: errors[field],
-                    })),
-                );
-            } else {
-                message.error('Sign in failed. Please check your email and password.');
-            }
+        } catch (error: unknown) {
+            handleFormError(error, form, 'Sign in failed. Please check your email and password.');
         } finally {
             setLoading(false);
         }

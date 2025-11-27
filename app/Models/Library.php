@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Support\Formatters;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -149,17 +150,7 @@ class Library extends Model implements HasMedia
      */
     public function getTotalSizeHumanAttribute(): string
     {
-        $bytes = $this->total_size;
-
-        if ($bytes === 0) {
-            return '0 B';
-        }
-
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $power = floor(log($bytes, 1024));
-        $power = min($power, count($units) - 1);
-
-        return round($bytes / (1024 ** $power), 2).' '.$units[(int) $power];
+        return Formatters::bytes($this->total_size);
     }
 
     /**

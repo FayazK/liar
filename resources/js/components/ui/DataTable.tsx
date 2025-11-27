@@ -10,7 +10,6 @@ import { FilterRenderer } from './data-table/filters';
 import type {
     DataTableProps,
     DataTableFilters,
-    FilterConfig,
     DataTableError,
 } from '@/types/datatable';
 import type { LaravelPaginatedResponse } from '@/types';
