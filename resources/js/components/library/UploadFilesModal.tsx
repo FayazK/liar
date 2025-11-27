@@ -1,5 +1,5 @@
+import { Icon } from '@/components/ui/Icon';
 import axios from '@/lib/axios';
-import { InboxOutlined } from '@ant-design/icons';
 import { message, Modal, Progress, theme, Upload } from 'antd';
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload';
 import { useState } from 'react';
@@ -164,7 +164,7 @@ export default function UploadFilesModal({ open, onClose, libraryId, onUploadCom
                 }}
             >
                 <p style={{ marginBottom: token.marginMD }}>
-                    <InboxOutlined style={{ fontSize: '48px', color: token.colorPrimary }} />
+                    <Icon name="inbox" size={48} color={token.colorPrimary} />
                 </p>
                 <p style={{ fontSize: '16px', marginBottom: token.marginXS }}>Click or drag files to upload</p>
                 <p style={{ color: token.colorTextSecondary, fontSize: '14px' }}>Max 10MB per file. Files upload automatically.</p>

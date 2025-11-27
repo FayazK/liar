@@ -1,7 +1,7 @@
+import { Icon } from '@/components/ui/Icon';
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
 import { login } from '@/routes';
-import { LoadingOutlined } from '@ant-design/icons';
 import { Head } from '@inertiajs/react';
 import { Alert, Button, Form, Input, Space, Typography, message, theme } from 'antd';
 import { useState } from 'react';
@@ -75,7 +75,14 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         </Form.Item>
 
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" size="large" block loading={loading} icon={loading ? <LoadingOutlined /> : null}>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                size="large"
+                                block
+                                loading={loading}
+                                icon={loading ? <Icon name="loader" spin size={16} /> : null}
+                            >
                                 Email password reset link
                             </Button>
                         </Form.Item>

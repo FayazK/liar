@@ -1,5 +1,5 @@
+import { Icon } from '@/components/ui/Icon';
 import { Empty, Button, Flex, Typography, theme } from 'antd';
-import { SearchOutlined, InboxOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 
 const { useToken } = theme;
 const { Text, Paragraph } = Typography;
@@ -40,12 +40,11 @@ export function EmptyState({
                     minHeight: 200,
                 }}
             >
-                <ExclamationCircleOutlined
-                    style={{
-                        fontSize: 48,
-                        color: token.colorError,
-                        marginBottom: token.marginMD,
-                    }}
+                <Icon
+                    name="alert-circle"
+                    size={48}
+                    color={token.colorError}
+                    style={{ marginBottom: token.marginMD }}
                     aria-hidden="true"
                 />
                 <Text strong style={{ fontSize: 16, marginBottom: token.marginXS }}>
@@ -81,12 +80,11 @@ export function EmptyState({
                     minHeight: 200,
                 }}
             >
-                <SearchOutlined
-                    style={{
-                        fontSize: 48,
-                        color: token.colorTextQuaternary,
-                        marginBottom: token.marginMD,
-                    }}
+                <Icon
+                    name="search"
+                    size={48}
+                    color={token.colorTextQuaternary}
+                    style={{ marginBottom: token.marginMD }}
                     aria-hidden="true"
                 />
                 <Text strong style={{ fontSize: 16, marginBottom: token.marginXS }}>
@@ -115,7 +113,7 @@ export function EmptyState({
     // Default: no-data
     return (
         <Empty
-            image={<InboxOutlined style={{ fontSize: 48, color: token.colorTextQuaternary }} />}
+            image={<Icon name="inbox" size={48} color={token.colorTextQuaternary} />}
             description={
                 <Flex vertical align="center" gap={token.marginXS}>
                     <Text strong style={{ fontSize: 16 }}>

@@ -1,6 +1,6 @@
+import { Icon } from '@/components/ui/Icon';
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
-import { LoadingOutlined, SafetyOutlined } from '@ant-design/icons';
 import { Head } from '@inertiajs/react';
 import { Alert, Button, Form, Input, Space, Typography, message, theme } from 'antd';
 import { useState } from 'react';
@@ -55,7 +55,7 @@ export default function ConfirmPassword() {
                     description="For your security, please confirm your current password to continue accessing this protected area."
                     type="info"
                     showIcon
-                    icon={<SafetyOutlined />}
+                    icon={<Icon name="shield" size={18} />}
                 />
 
                 <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
@@ -75,7 +75,7 @@ export default function ConfirmPassword() {
                                 size="large"
                                 block
                                 loading={loading}
-                                icon={loading ? <LoadingOutlined /> : <SafetyOutlined />}
+                                icon={loading ? <Icon name="loader" spin size={16} /> : <Icon name="shield" size={16} />}
                             >
                                 Confirm password
                             </Button>

@@ -1,18 +1,17 @@
 import { dashboard } from '@/routes';
 import { index as libraryIndex } from '@/routes/library';
 import { type NavItem } from '@/types';
-import { DashboardOutlined, FolderOutlined } from '@ant-design/icons';
 
 export const appMainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
-        icon: DashboardOutlined,
+        icon: 'dashboard',
     },
     {
         title: 'Library',
         href: libraryIndex(),
-        icon: FolderOutlined,
+        icon: 'folder',
     },
 ];
 

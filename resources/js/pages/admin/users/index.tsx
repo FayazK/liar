@@ -1,8 +1,8 @@
 import DataTable from '@/components/ui/DataTable';
+import { Icon } from '@/components/ui/Icon';
 import AdminLayout from '@/layouts/admin-layout';
 import { create, data, edit, show } from '@/routes/admin/users';
 import type { FilterConfig, User } from '@/types';
-import { DeleteOutlined, EditOutlined, EyeOutlined, MoreOutlined, UserOutlined } from '@ant-design/icons';
 import { Link } from '@inertiajs/react';
 import { Avatar, Button, Dropdown, Space, Tag, theme } from 'antd';
 import React from 'react';
@@ -37,7 +37,7 @@ export default function UsersIndex() {
             sorter: true,
             render: (_: unknown, record: User) => (
                 <Space>
-                    <Avatar src={record.avatar} icon={<UserOutlined />} size={32}>
+                    <Avatar src={record.avatar} icon={<Icon name="user" size={16} />} size={32}>
                         {record.initials}
                     </Avatar>
                     <div>
@@ -92,7 +92,7 @@ export default function UsersIndex() {
                         label: (
                             <Link href={show.url(record.id)}>
                                 <Space>
-                                    <EyeOutlined />
+                                    <Icon name="eye" size={16} />
                                     View
                                 </Space>
                             </Link>
@@ -103,7 +103,7 @@ export default function UsersIndex() {
                         label: (
                             <Link href={edit({ user: record.id }).url}>
                                 <Space>
-                                    <EditOutlined />
+                                    <Icon name="edit" size={16} />
                                     Edit
                                 </Space>
                             </Link>
@@ -116,7 +116,7 @@ export default function UsersIndex() {
                         key: 'delete',
                         label: (
                             <Space>
-                                <DeleteOutlined />
+                                <Icon name="trash" size={16} />
                                 Delete
                             </Space>
                         ),
@@ -129,7 +129,7 @@ export default function UsersIndex() {
 
                 return (
                     <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
-                        <Button type="text" icon={<MoreOutlined />} />
+                        <Button type="text" icon={<Icon name="dots" size={16} />} />
                     </Dropdown>
                 );
             },
@@ -141,7 +141,7 @@ export default function UsersIndex() {
             pageTitle="Users"
             actions={
                 <Link href={create.url()}>
-                    <Button type="primary" icon={<UserOutlined />}>
+                    <Button type="primary" icon={<Icon name="user-plus" size={16} />}>
                         Add User
                     </Button>
                 </Link>

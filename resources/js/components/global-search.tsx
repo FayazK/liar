@@ -1,5 +1,5 @@
+import { Icon, type IconName } from '@/components/ui/Icon';
 import { dashboard } from '@/routes';
-import { DashboardOutlined, SearchOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { router } from '@inertiajs/react';
 import { Empty, Flex, Input, List, Modal, Typography, theme } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
@@ -12,7 +12,7 @@ interface SearchResult {
     title: string;
     description: string;
     url: string;
-    icon: React.ReactNode;
+    icon: IconName;
     category: 'pages' | 'settings' | 'actions';
 }
 
@@ -23,7 +23,7 @@ const searchableItems: SearchResult[] = [
         title: 'Dashboard',
         description: 'View your dashboard',
         url: dashboard().url,
-        icon: <DashboardOutlined />,
+        icon: 'dashboard',
         category: 'pages',
     },
     {
@@ -31,7 +31,7 @@ const searchableItems: SearchResult[] = [
         title: 'Account',
         description: 'Manage your account settings',
         url: '/settings/account',
-        icon: <SettingOutlined />,
+        icon: 'settings',
         category: 'settings',
     },
     {
@@ -39,7 +39,7 @@ const searchableItems: SearchResult[] = [
         title: 'Profile',
         description: 'Edit your profile information',
         url: '/settings/account#profile',
-        icon: <UserOutlined />,
+        icon: 'user',
         category: 'settings',
     },
     {
@@ -47,7 +47,7 @@ const searchableItems: SearchResult[] = [
         title: 'Password',
         description: 'Change your password',
         url: '/settings/account#password',
-        icon: <SettingOutlined />,
+        icon: 'lock',
         category: 'settings',
     },
     {
@@ -55,7 +55,7 @@ const searchableItems: SearchResult[] = [
         title: 'Appearance',
         description: 'Customize theme and appearance',
         url: '/settings/account#appearance',
-        icon: <SettingOutlined />,
+        icon: 'palette',
         category: 'settings',
     },
 ];
@@ -161,7 +161,7 @@ export default function GlobalSearch({ open, onClose }: GlobalSearchProps) {
                         autoFocus
                         size="large"
                         placeholder="Search pages, settings, and actions..."
-                        prefix={<SearchOutlined />}
+                        prefix={<Icon name="search" size={16} />}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={handleKeyDown}
@@ -197,11 +197,10 @@ export default function GlobalSearch({ open, onClose }: GlobalSearchProps) {
                                     <Flex align="center" gap="middle" style={{ width: '100%' }}>
                                         <div
                                             style={{
-                                                fontSize: '20px',
                                                 color: token.colorPrimary,
                                             }}
                                         >
-                                            {item.icon}
+                                            <Icon name={item.icon} size={20} />
                                         </div>
                                         <Flex vertical style={{ flex: 1 }}>
                                             <Text strong>{item.title}</Text>

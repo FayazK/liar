@@ -1,5 +1,5 @@
+import { Icon } from '@/components/ui/Icon';
 import type { SharedData } from '@/types';
-import { DeleteOutlined, LoadingOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
 import { router, usePage } from '@inertiajs/react';
 import { Avatar, Button, message, Space, theme, Upload } from 'antd';
 import type { RcFile, UploadProps } from 'antd/es/upload';
@@ -84,21 +84,21 @@ export default function AvatarUpload() {
     };
 
     return (
-        <Space direction="vertical" align="center" size="middle">
+        <Space align="center" size="middle">
             <Avatar
-                size={100}
+                size={64}
                 src={auth.user.avatar_thumb_url || auth.user.avatar_url}
-                icon={!auth.user.avatar_url && <UserOutlined />}
+                icon={!auth.user.avatar_url && <Icon name="user" size={28} />}
                 style={{ backgroundColor: !auth.user.avatar_url ? token.colorPrimary : undefined }}
             />
-            <Space>
+            <Space size="small">
                 <Upload showUploadList={false} beforeUpload={beforeUpload} customRequest={customRequest} accept="image/jpeg,image/png,image/webp">
-                    <Button icon={uploading ? <LoadingOutlined /> : <UploadOutlined />} loading={uploading}>
+                    <Button size="small" loading={uploading}>
                         {auth.user.avatar_url ? 'Change' : 'Upload'}
                     </Button>
                 </Upload>
                 {auth.user.avatar_url && (
-                    <Button danger icon={<DeleteOutlined />} onClick={handleDelete} loading={uploading}>
+                    <Button size="small" type="text" danger onClick={handleDelete} loading={uploading}>
                         Remove
                     </Button>
                 )}

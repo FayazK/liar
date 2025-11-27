@@ -1,6 +1,6 @@
+import { Icon } from '@/components/ui/Icon';
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
-import { LoadingOutlined } from '@ant-design/icons';
 import { Head, router } from '@inertiajs/react';
 import { Button, Form, Input, Space, Typography, message, theme } from 'antd';
 import { useState } from 'react';
@@ -102,7 +102,14 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                     </Form.Item>
 
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" size="large" block loading={loading} icon={loading ? <LoadingOutlined /> : null}>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            size="large"
+                            block
+                            loading={loading}
+                            icon={loading ? <Icon name="loader" spin size={16} /> : null}
+                        >
                             Reset password
                         </Button>
                     </Form.Item>

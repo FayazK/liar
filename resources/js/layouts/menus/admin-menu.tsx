@@ -1,51 +1,42 @@
 import { dashboard as adminDashboard } from '@/routes/admin';
 import { index as libraryIndex } from '@/routes/library';
 import { type NavItem } from '@/types';
-import {
-    BarChartOutlined,
-    DashboardOutlined,
-    DatabaseOutlined,
-    FolderOutlined,
-    SecurityScanOutlined,
-    SettingOutlined,
-    UsergroupAddOutlined,
-} from '@ant-design/icons';
 
 export const adminMainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: adminDashboard(),
-        icon: DashboardOutlined,
+        icon: 'dashboard',
     },
     {
         title: 'Library',
         href: libraryIndex(),
-        icon: FolderOutlined,
+        icon: 'folder',
     },
     {
         title: 'User Management',
         href: '/admin/users',
-        icon: UsergroupAddOutlined,
+        icon: 'users',
     },
     {
         title: 'Analytics',
         href: '/admin/analytics',
-        icon: BarChartOutlined,
+        icon: 'chart-bar',
     },
     {
         title: 'Database',
         href: '/admin/database',
-        icon: DatabaseOutlined,
+        icon: 'database',
     },
     {
         title: 'Security',
         href: '/admin/security',
-        icon: SecurityScanOutlined,
+        icon: 'shield-check',
     },
     {
         title: 'System Settings',
         href: '/admin/settings',
-        icon: SettingOutlined,
+        icon: 'settings',
     },
 ];
 

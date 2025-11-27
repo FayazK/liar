@@ -1,13 +1,12 @@
 import AppearanceForm from '@/components/settings/appearance-form';
 import PasswordForm from '@/components/settings/password-form';
 import ProfileForm from '@/components/settings/profile-form';
+import { Icon } from '@/components/ui/Icon';
 import AppLayout from '@/layouts/app-layout';
-import { BgColorsOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Head } from '@inertiajs/react';
-import { Space, Tabs, theme, Typography } from 'antd';
+import { Menu, theme } from 'antd';
 import { useEffect, useState } from 'react';
 
-const { Title, Text } = Typography;
 const { useToken } = theme;
 
 interface AccountProps {
@@ -17,10 +16,10 @@ interface AccountProps {
 
 type TabKey = 'profile' | 'password' | 'appearance';
 
-const tabConfig: { key: TabKey; label: string; icon: React.ReactNode }[] = [
-    { key: 'profile', label: 'Profile', icon: <UserOutlined /> },
-    { key: 'password', label: 'Password', icon: <LockOutlined /> },
-    { key: 'appearance', label: 'Appearance', icon: <BgColorsOutlined /> },
+const menuItems = [
+    { key: 'profile', label: 'Profile', icon: <Icon name="user" size={18} /> },
+    { key: 'password', label: 'Password', icon: <Icon name="lock" size={18} /> },
+    { key: 'appearance', label: 'Appearance', icon: <Icon name="palette" size={18} /> },
 ];
 
 function getTabFromHash(): TabKey {
@@ -47,43 +46,43 @@ export default function Account({ mustVerifyEmail, status }: AccountProps) {
         return () => window.removeEventListener('hashchange', handleHashChange);
     }, []);
 
-    const handleTabChange = (key: string) => {
+    const handleMenuClick = (key: string) => {
         const tabKey = key as TabKey;
         setActiveTab(tabKey);
         window.history.replaceState(null, '', `#${tabKey}`);
     };
 
-    const tabItems = tabConfig.map(({ key, label, icon }) => ({
-        key,
-        label: (
-            <span>
-                {icon}
-                <span style={{ marginLeft: 8 }}>{label}</span>
-            </span>
-        ),
-        children: (
-            <div style={{ paddingTop: token.paddingMD }}>
-                {key === 'profile' && <ProfileForm mustVerifyEmail={mustVerifyEmail} status={status} />}
-                {key === 'password' && <PasswordForm />}
-                {key === 'appearance' && <AppearanceForm />}
-            </div>
-        ),
-    }));
-
     return (
-        <AppLayout pageTitle="Account">
-            <Head title="Account settings" />
+        <AppLayout pageTitle="Settings">
+            <Head title="Settings" />
 
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                <div>
-                    <Title level={3} style={{ marginBottom: token.marginXS }}>
-                        Account Settings
-                    </Title>
-                    <Text type="secondary">Manage your account settings, update your profile, and customize your preferences.</Text>
+            <div style={{ display: 'flex', gap: token.marginLG, minHeight: 'calc(100vh - 200px)' }}>
+                <div
+                    style={{
+                        width: 220,
+                        flexShrink: 0,
+                        borderRight: `1px solid ${token.colorBorderSecondary}`,
+                        paddingRight: token.paddingMD,
+                    }}
+                >
+                    <Menu
+                        mode="vertical"
+                        selectedKeys={[activeTab]}
+                        onClick={({ key }) => handleMenuClick(key)}
+                        items={menuItems}
+                        style={{
+                            border: 'none',
+                            background: 'transparent',
+                        }}
+                    />
                 </div>
 
-                <Tabs activeKey={activeTab} onChange={handleTabChange} items={tabItems} destroyInactiveTabPane={false} size="large" />
-            </Space>
+                <div style={{ flex: 1, maxWidth: 720 }}>
+                    {activeTab === 'profile' && <ProfileForm mustVerifyEmail={mustVerifyEmail} status={status} />}
+                    {activeTab === 'password' && <PasswordForm />}
+                    {activeTab === 'appearance' && <AppearanceForm />}
+                </div>
+            </div>
         </AppLayout>
     );
 }

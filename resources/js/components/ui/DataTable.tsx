@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Table, Input, Space, Typography, Button, notification, theme } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { Icon } from '@/components/ui/Icon';
 import type { TableProps, TableColumnType, InputRef } from 'antd';
 import type { Dayjs } from 'dayjs';
 import axios from '@/lib/axios';
@@ -323,7 +323,7 @@ function DataTable<T extends Record<string, unknown>>({
                         <Input
                             ref={searchInputRef}
                             placeholder={searchPlaceholder}
-                            prefix={<SearchOutlined aria-hidden="true" />}
+                            prefix={<Icon name="search" size={16} aria-hidden="true" />}
                             value={search}
                             onChange={(e) => handleSearch(e.target.value)}
                             style={{ width: 300 }}

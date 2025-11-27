@@ -1,6 +1,5 @@
-import { AntdIconProps } from '@ant-design/icons/lib/components/AntdIcon';
+import type { IconName } from '@/components/ui/Icon';
 import { InertiaLinkProps } from '@inertiajs/react';
-import { ForwardRefExoticComponent, RefAttributes } from 'react';
 
 export interface Auth {
     user: User;
@@ -19,7 +18,7 @@ export interface NavGroup {
 export interface NavItem {
     title: string;
     href: NonNullable<InertiaLinkProps['href']>;
-    icon?: ForwardRefExoticComponent<Omit<AntdIconProps, 'ref'> & RefAttributes<HTMLSpanElement>> | null;
+    icon?: IconName | null;
     isActive?: boolean;
 }
 

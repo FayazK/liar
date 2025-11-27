@@ -1,18 +1,6 @@
-import {
-    FileExcelOutlined,
-    FileImageOutlined,
-    FileOutlined,
-    FilePdfOutlined,
-    FilePptOutlined,
-    FileTextOutlined,
-    FileWordOutlined,
-    FileZipOutlined,
-    MoreOutlined,
-    PlayCircleOutlined,
-} from '@ant-design/icons';
+import { Icon, type IconName } from '@/components/ui/Icon';
 import type { MenuProps } from 'antd';
 import { Dropdown, theme, Typography } from 'antd';
-import type { CSSProperties, ReactNode } from 'react';
 import { useState } from 'react';
 
 const { Text } = Typography;
@@ -27,32 +15,32 @@ interface FileCardProps {
     menuItems: MenuProps['items'];
 }
 
-function getFileIcon(mimeType: string, iconStyle: CSSProperties, primaryColor: string): ReactNode {
+function getFileIconConfig(mimeType: string, primaryColor: string): { name: IconName; color: string } {
     if (mimeType.startsWith('image/')) {
-        return <FileImageOutlined style={{ ...iconStyle, color: primaryColor }} />;
+        return { name: 'file-image', color: primaryColor };
     }
     if (mimeType.startsWith('video/')) {
-        return <PlayCircleOutlined style={{ ...iconStyle, color: '#eb2f96' }} />;
+        return { name: 'video', color: '#eb2f96' };
     }
     if (mimeType === 'application/pdf') {
-        return <FilePdfOutlined style={{ ...iconStyle, color: '#cf1322' }} />;
+        return { name: 'file-pdf', color: '#cf1322' };
     }
     if (mimeType.includes('word') || mimeType.includes('document')) {
-        return <FileWordOutlined style={{ ...iconStyle, color: '#2f54eb' }} />;
+        return { name: 'file-word', color: '#2f54eb' };
     }
     if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) {
-        return <FileExcelOutlined style={{ ...iconStyle, color: '#52c41a' }} />;
+        return { name: 'file-excel', color: '#52c41a' };
     }
     if (mimeType.includes('powerpoint') || mimeType.includes('presentation')) {
-        return <FilePptOutlined style={{ ...iconStyle, color: '#fa8c16' }} />;
+        return { name: 'file-ppt', color: '#fa8c16' };
     }
     if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive')) {
-        return <FileZipOutlined style={{ ...iconStyle, color: '#faad14' }} />;
+        return { name: 'file-zip', color: '#faad14' };
     }
     if (mimeType.startsWith('text/')) {
-        return <FileTextOutlined style={iconStyle} />;
+        return { name: 'file-text', color: '' };
     }
-    return <FileOutlined style={iconStyle} />;
+    return { name: 'file', color: '' };
 }
 
 export default function FileCard({ name, mimeType, size, thumbnailUrl, menuItems }: FileCardProps) {
@@ -60,7 +48,7 @@ export default function FileCard({ name, mimeType, size, thumbnailUrl, menuItems
     const [isHovered, setIsHovered] = useState(false);
 
     const isImage = mimeType.startsWith('image/');
-    const iconStyle: CSSProperties = { fontSize: 48, color: token.colorTextSecondary };
+    const iconConfig = getFileIconConfig(mimeType, token.colorPrimary);
 
     return (
         <div
@@ -99,7 +87,7 @@ export default function FileCard({ name, mimeType, size, thumbnailUrl, menuItems
                         }}
                     />
                 ) : (
-                    getFileIcon(mimeType, iconStyle, token.colorPrimary)
+                    <Icon name={iconConfig.name} size={48} color={iconConfig.color || token.colorTextSecondary} />
                 )}
             </div>
 
@@ -167,7 +155,7 @@ export default function FileCard({ name, mimeType, size, thumbnailUrl, menuItems
                             }}
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <MoreOutlined style={{ fontSize: 16 }} />
+                            <Icon name="dots" size={16} />
                         </div>
                     </Dropdown>
                 </div>

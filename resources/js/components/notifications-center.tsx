@@ -1,4 +1,4 @@
-import { BellOutlined, CheckOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Icon } from '@/components/ui/Icon';
 import { Badge, Button, Dropdown, Empty, Flex, List, theme, Typography } from 'antd';
 import { useState } from 'react';
 
@@ -141,7 +141,7 @@ export default function NotificationsCenter() {
                                                 <Button
                                                     type="text"
                                                     size="small"
-                                                    icon={<CheckOutlined />}
+                                                    icon={<Icon name="check" size={14} />}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         markAsRead(item.id);
@@ -158,7 +158,7 @@ export default function NotificationsCenter() {
                                                 type="text"
                                                 size="small"
                                                 danger
-                                                icon={<DeleteOutlined />}
+                                                icon={<Icon name="trash" size={14} />}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     deleteNotification(item.id);
@@ -218,7 +218,7 @@ export default function NotificationsCenter() {
             <Badge count={unreadCount} size="small" offset={[-4, 4]}>
                 <Button
                     type="text"
-                    icon={<BellOutlined style={{ fontSize: '18px' }} />}
+                    icon={<Icon name="bell" size={18} />}
                     style={{
                         display: 'flex',
                         alignItems: 'center',

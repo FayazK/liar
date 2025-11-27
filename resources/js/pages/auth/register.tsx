@@ -1,7 +1,7 @@
+import { Icon } from '@/components/ui/Icon';
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
 import { login } from '@/routes';
-import { LoadingOutlined } from '@ant-design/icons';
 import { Head, router } from '@inertiajs/react';
 import { Button, Flex, Form, Input, Typography, message, theme } from 'antd';
 import { useState } from 'react';
@@ -121,7 +121,14 @@ export default function Register() {
                 </Form.Item>
 
                 <Form.Item style={{ marginBottom: 0 }}>
-                    <Button type="primary" htmlType="submit" size="large" block loading={loading} icon={loading ? <LoadingOutlined /> : null}>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        size="large"
+                        block
+                        loading={loading}
+                        icon={loading ? <Icon name="loader" spin size={16} /> : null}
+                    >
                         Create account
                     </Button>
                 </Form.Item>

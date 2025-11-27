@@ -1,11 +1,10 @@
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
-import { LoadingOutlined, LockOutlined } from '@ant-design/icons';
 import { Form } from '@inertiajs/react';
 import type { InputRef } from 'antd';
-import { Alert, Button, Card, Input, message, Space, theme, Typography } from 'antd';
+import { Button, Input, message, Space, theme, Typography } from 'antd';
 import { useRef } from 'react';
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
 const { Password: PasswordInput } = Input;
 const { useToken } = theme;
 
@@ -15,13 +14,18 @@ export default function PasswordForm() {
     const { token } = useToken();
 
     return (
-        <Card title="Change Password" style={{ width: '100%' }}>
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <div>
+                <Title level={4} style={{ marginBottom: token.marginXS }}>
+                    Password
+                </Title>
+                <Text type="secondary">Update your password to keep your account secure</Text>
+            </div>
+
             <Form
                 method="put"
                 action={PasswordController.update.url()}
-                options={{
-                    preserveScroll: true,
-                }}
+                options={{ preserveScroll: true }}
                 resetOnError={['password', 'password_confirmation', 'current_password']}
                 resetOnSuccess
                 onError={(errors) => {
@@ -32,77 +36,65 @@ export default function PasswordForm() {
                         currentPasswordInput.current?.focus();
                     }
                 }}
-                onSuccess={() => {
-                    message.success('Password updated successfully!');
-                }}
+                onSuccess={() => message.success('Password updated successfully!')}
             >
                 {({ errors, processing }) => (
-                    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                         <div>
-                            <Text strong style={{ display: 'block', marginBottom: token.marginXS }}>
+                            <Text type="secondary" style={{ display: 'block', marginBottom: 4, fontSize: 13 }}>
                                 Current Password
                             </Text>
                             <PasswordInput
                                 ref={currentPasswordInput}
                                 name="current_password"
-                                placeholder="Enter your current password"
+                                placeholder="Enter current password"
                                 autoComplete="current-password"
-                                size="large"
-                                prefix={<LockOutlined />}
                                 status={errors.current_password ? 'error' : undefined}
                             />
                             {errors.current_password && (
-                                <Alert message={errors.current_password} type="error" showIcon style={{ marginTop: token.marginXS }} />
+                                <Text type="danger" style={{ fontSize: 12 }}>{errors.current_password}</Text>
                             )}
                         </div>
 
                         <div>
-                            <Text strong style={{ display: 'block', marginBottom: token.marginXS }}>
+                            <Text type="secondary" style={{ display: 'block', marginBottom: 4, fontSize: 13 }}>
                                 New Password
                             </Text>
                             <PasswordInput
                                 ref={passwordInput}
                                 name="password"
-                                placeholder="Enter your new password"
+                                placeholder="Enter new password"
                                 autoComplete="new-password"
-                                size="large"
-                                prefix={<LockOutlined />}
                                 status={errors.password ? 'error' : undefined}
                             />
-                            {errors.password && <Alert message={errors.password} type="error" showIcon style={{ marginTop: token.marginXS }} />}
+                            {errors.password && (
+                                <Text type="danger" style={{ fontSize: 12 }}>{errors.password}</Text>
+                            )}
                         </div>
 
                         <div>
-                            <Text strong style={{ display: 'block', marginBottom: token.marginXS }}>
+                            <Text type="secondary" style={{ display: 'block', marginBottom: 4, fontSize: 13 }}>
                                 Confirm New Password
                             </Text>
                             <PasswordInput
                                 name="password_confirmation"
-                                placeholder="Confirm your new password"
+                                placeholder="Confirm new password"
                                 autoComplete="new-password"
-                                size="large"
-                                prefix={<LockOutlined />}
                                 status={errors.password_confirmation ? 'error' : undefined}
                             />
                             {errors.password_confirmation && (
-                                <Alert message={errors.password_confirmation} type="error" showIcon style={{ marginTop: token.marginXS }} />
+                                <Text type="danger" style={{ fontSize: 12 }}>{errors.password_confirmation}</Text>
                             )}
                         </div>
 
-                        <div style={{ paddingTop: token.paddingMD }}>
-                            <Button
-                                type="primary"
-                                htmlType="submit"
-                                loading={processing}
-                                icon={processing ? <LoadingOutlined /> : <LockOutlined />}
-                                size="large"
-                            >
+                        <div style={{ paddingTop: token.paddingSM }}>
+                            <Button type="primary" htmlType="submit" loading={processing}>
                                 Update Password
                             </Button>
                         </div>
                     </Space>
                 )}
             </Form>
-        </Card>
+        </Space>
     );
 }

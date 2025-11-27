@@ -1,10 +1,10 @@
 import CreateFolderModal from '@/components/library/CreateFolderModal';
 import LibraryGrid from '@/components/library/LibraryGrid';
 import UploadFilesModal from '@/components/library/UploadFilesModal';
+import { Icon } from '@/components/ui/Icon';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/library';
 import type { BreadcrumbItem, Library, LibraryPageProps } from '@/types/library';
-import { FolderAddOutlined, HomeOutlined, UploadOutlined } from '@ant-design/icons';
 import { router } from '@inertiajs/react';
 import { Breadcrumb, Button, Space, theme } from 'antd';
 import { useState } from 'react';
@@ -25,7 +25,7 @@ export default function LibraryIndex({ currentFolder, breadcrumbs }: LibraryPage
         {
             title: (
                 <Space style={{ cursor: 'pointer' }} onClick={() => router.visit(index.url())}>
-                    <HomeOutlined />
+                    <Icon name="home" size={14} />
                     Library
                 </Space>
             ),
@@ -44,10 +44,10 @@ export default function LibraryIndex({ currentFolder, breadcrumbs }: LibraryPage
             pageTitle="Library"
             actions={
                 <Space>
-                    <Button icon={<FolderAddOutlined />} onClick={() => setShowCreateFolder(true)}>
+                    <Button icon={<Icon name="folder-plus" size={16} />} onClick={() => setShowCreateFolder(true)}>
                         New Folder
                     </Button>
-                    <Button type="primary" icon={<UploadOutlined />} onClick={() => setShowUploadFiles(true)}>
+                    <Button type="primary" icon={<Icon name="upload" size={16} />} onClick={() => setShowUploadFiles(true)}>
                         Upload Files
                     </Button>
                 </Space>

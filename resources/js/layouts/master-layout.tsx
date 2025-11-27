@@ -1,10 +1,10 @@
 import GlobalSearch, { useGlobalSearch } from '@/components/global-search';
 import NotificationsCenter from '@/components/notifications-center';
+import { Icon } from '@/components/ui/Icon';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSidebarState } from '@/hooks/use-sidebar-state';
 import { dashboard } from '@/routes';
 import { type NavGroup, type NavItem, type SharedData } from '@/types';
-import { LogoutOutlined, MenuFoldOutlined, MenuOutlined, MenuUnfoldOutlined, SearchOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Avatar, Button, Drawer, Dropdown, Flex, Layout, Menu, theme, Typography } from 'antd';
 import { type ReactNode } from 'react';
@@ -45,7 +45,7 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
     const userMenuItems = [
         {
             key: 'account',
-            icon: <SettingOutlined />,
+            icon: <Icon name="settings" size={16} />,
             label: <Link href="/settings/account">Account</Link>,
         },
         {
@@ -53,7 +53,7 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
         },
         {
             key: 'logout',
-            icon: <LogoutOutlined />,
+            icon: <Icon name="logout" size={16} />,
             label: 'Sign Out',
             onClick: handleLogout,
         },
@@ -62,7 +62,7 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
     const menuItems = [
         ...mainNavItems.map((item) => ({
             key: typeof item.href === 'string' ? item.href : item.href.url,
-            icon: item.icon ? <item.icon /> : null,
+            icon: item.icon ? <Icon name={item.icon} size={18} /> : null,
             label: (
                 <Link href={item.href} prefetch onClick={isMobile ? closeMobileMenu : undefined}>
                     {item.title}
@@ -75,7 +75,7 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
             type: 'group' as const,
             children: group.items.map((item) => ({
                 key: typeof item.href === 'string' ? item.href : item.href.url,
-                icon: item.icon ? <item.icon /> : null,
+                icon: item.icon ? <Icon name={item.icon} size={18} /> : null,
                 label: (
                     <Link href={item.href} prefetch onClick={isMobile ? closeMobileMenu : undefined}>
                         {item.title}
@@ -86,7 +86,7 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
         ...(footerNavItems.length > 0 ? [{ type: 'divider' as const }] : []),
         ...footerNavItems.map((item) => ({
             key: typeof item.href === 'string' ? item.href : item.href.url,
-            icon: item.icon ? <item.icon /> : null,
+            icon: item.icon ? <Icon name={item.icon} size={18} /> : null,
             label: (
                 <a
                     href={typeof item.href === 'string' ? item.href : item.href.url}
@@ -183,7 +183,7 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
                             justifyContent: collapsed && !isMobile ? 'center' : 'flex-start',
                         }}
                     >
-                        <Avatar src={auth.user.avatar} icon={<UserOutlined />} />
+                        <Avatar src={auth.user.avatar} icon={<Icon name="user" size={16} />} />
                         {(!collapsed || isMobile) && (
                             <div style={{ lineHeight: '1.2' }}>
                                 <Text strong>{auth.user.full_name}</Text>
@@ -297,7 +297,15 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
                             <Flex align="center" gap="middle" flex={1}>
                                 <Button
                                     type="text"
-                                    icon={isMobile ? <MenuOutlined /> : collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                                    icon={
+                                        isMobile ? (
+                                            <Icon name="menu" size={18} />
+                                        ) : collapsed ? (
+                                            <Icon name="menu-unfold" size={18} />
+                                        ) : (
+                                            <Icon name="menu-fold" size={18} />
+                                        )
+                                    }
                                     onClick={toggleCollapsed}
                                     style={{ fontSize: '16px' }}
                                     aria-label={isMobile ? 'Toggle navigation menu' : collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -322,7 +330,7 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
                                 {!isMobile && (
                                     <Button
                                         type="text"
-                                        icon={<SearchOutlined style={{ fontSize: '18px' }} />}
+                                        icon={<Icon name="search" size={18} />}
                                         onClick={openSearch}
                                         style={{
                                             display: 'flex',

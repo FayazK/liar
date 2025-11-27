@@ -1,16 +1,6 @@
+import { Icon } from '@/components/ui/Icon';
 import { dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
-import {
-    ApiOutlined,
-    CodeOutlined,
-    DashboardOutlined,
-    GlobalOutlined,
-    LoginOutlined,
-    RocketOutlined,
-    SafetyOutlined,
-    ThunderboltOutlined,
-    UserAddOutlined,
-} from '@ant-design/icons';
 import { Head, usePage } from '@inertiajs/react';
 import { Button, Card, Col, Divider, Layout, List, Row, Space, Tag, theme, Typography } from 'antd';
 
@@ -24,22 +14,22 @@ export default function Welcome() {
 
     const features = [
         {
-            icon: <RocketOutlined style={{ fontSize: '24px', color: token.colorPrimary }} />,
+            icon: <Icon name="rocket" size={24} color={token.colorPrimary} />,
             title: 'Fast Development',
             description: 'Built with Laravel and React for rapid development and deployment.',
         },
         {
-            icon: <SafetyOutlined style={{ fontSize: '24px', color: token.colorSuccess }} />,
+            icon: <Icon name="shield" size={24} color={token.colorSuccess} />,
             title: 'Secure by Default',
             description: 'Industry-standard security practices built into every component.',
         },
         {
-            icon: <ThunderboltOutlined style={{ fontSize: '24px', color: token.colorWarning }} />,
+            icon: <Icon name="bolt" size={24} color={token.colorWarning} />,
             title: 'High Performance',
             description: 'Optimized for speed with efficient rendering and caching strategies.',
         },
         {
-            icon: <GlobalOutlined style={{ fontSize: '24px', color: token.colorInfo }} />,
+            icon: <Icon name="world" size={24} color={token.colorInfo} />,
             title: 'Modern Stack',
             description: 'Using the latest technologies: Laravel 12, React 19, Inertia.js.',
         },
@@ -72,7 +62,7 @@ export default function Welcome() {
                     }}
                 >
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <CodeOutlined style={{ fontSize: '24px', color: token.colorPrimary, marginRight: '12px' }} />
+                        <Icon name="code" size={24} color={token.colorPrimary} style={{ marginRight: '12px' }} />
                         <Title level={3} style={{ margin: 0, color: token.colorPrimary }}>
                             Liar
                         </Title>
@@ -80,15 +70,15 @@ export default function Welcome() {
 
                     <Space>
                         {auth.user ? (
-                            <Button type="primary" icon={<DashboardOutlined />} onClick={() => (window.location.href = dashboard().url)}>
+                            <Button type="primary" icon={<Icon name="dashboard" size={16} />} onClick={() => (window.location.href = dashboard().url)}>
                                 Dashboard
                             </Button>
                         ) : (
                             <>
-                                <Button icon={<LoginOutlined />} onClick={() => (window.location.href = login().url)}>
+                                <Button icon={<Icon name="login" size={16} />} onClick={() => (window.location.href = login().url)}>
                                     Log in
                                 </Button>
-                                <Button type="primary" icon={<UserAddOutlined />} onClick={() => (window.location.href = register().url)}>
+                                <Button type="primary" icon={<Icon name="user-plus" size={16} />} onClick={() => (window.location.href = register().url)}>
                                     Register
                                 </Button>
                             </>
@@ -116,12 +106,12 @@ export default function Welcome() {
                                             <Button
                                                 type="primary"
                                                 size="large"
-                                                icon={<UserAddOutlined />}
+                                                icon={<Icon name="user-plus" size={16} />}
                                                 onClick={() => (window.location.href = register().url)}
                                             >
                                                 Get Started
                                             </Button>
-                                            <Button size="large" icon={<LoginOutlined />} onClick={() => (window.location.href = login().url)}>
+                                            <Button size="large" icon={<Icon name="login" size={16} />} onClick={() => (window.location.href = login().url)}>
                                                 Sign In
                                             </Button>
                                         </Space>
@@ -148,7 +138,7 @@ export default function Welcome() {
 
                         <Row gutter={[24, 24]}>
                             <Col xs={24} lg={12}>
-                                <Card title="Technology Stack" extra={<ApiOutlined />}>
+                                <Card title="Technology Stack" extra={<Icon name="api" size={18} />}>
                                     <List
                                         dataSource={technologies}
                                         renderItem={(item) => (
@@ -181,7 +171,7 @@ export default function Welcome() {
                                                 type="primary"
                                                 block
                                                 size="large"
-                                                icon={<UserAddOutlined />}
+                                                icon={<Icon name="user-plus" size={16} />}
                                                 onClick={() => (window.location.href = register().url)}
                                                 style={{ marginTop: '16px' }}
                                             >

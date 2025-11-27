@@ -1,8 +1,8 @@
+import { Icon } from '@/components/ui/Icon';
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
 import { register } from '@/routes';
 import { request } from '@/routes/password';
-import { LoadingOutlined } from '@ant-design/icons';
 import { Head, router } from '@inertiajs/react';
 import { Alert, Button, Checkbox, Flex, Form, Input, Typography, message, theme } from 'antd';
 import { useState } from 'react';
@@ -100,7 +100,14 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 </Flex>
 
                 <Form.Item style={{ marginBottom: 0 }}>
-                    <Button type="primary" htmlType="submit" size="large" block loading={loading} icon={loading ? <LoadingOutlined /> : null}>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        size="large"
+                        block
+                        loading={loading}
+                        icon={loading ? <Icon name="loader" spin size={16} /> : null}
+                    >
                         Sign in
                     </Button>
                 </Form.Item>

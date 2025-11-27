@@ -1,7 +1,6 @@
+import { Icon } from '@/components/ui/Icon';
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
-// import { logout } from '@/routes'; // Unused for now
-import { LoadingOutlined, LogoutOutlined, MailOutlined } from '@ant-design/icons';
 import { Head, router } from '@inertiajs/react';
 import { Alert, Button, Space, Typography, message, theme } from 'antd';
 import { useState } from 'react';
@@ -47,7 +46,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     description="Before continuing, please check your email for a verification link. If you didn't receive the email, we can send you another one."
                     type="warning"
                     showIcon
-                    icon={<MailOutlined />}
+                    icon={<Icon name="mail" size={18} />}
                 />
 
                 {emailSent && (
@@ -66,7 +65,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                             size="large"
                             onClick={handleResendEmail}
                             loading={loading}
-                            icon={loading ? <LoadingOutlined /> : <MailOutlined />}
+                            icon={loading ? <Icon name="loader" spin size={16} /> : <Icon name="mail" size={16} />}
                             style={{
                                 borderColor: token.colorPrimary,
                                 color: token.colorPrimary,
@@ -86,7 +85,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                                 gap: '4px',
                             }}
                         >
-                            <LogoutOutlined />
+                            <Icon name="logout" size={14} />
                             Log out
                         </Link>
                     </Space>

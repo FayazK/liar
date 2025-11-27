@@ -1,5 +1,5 @@
+import { Icon } from '@/components/ui/Icon';
 import { type BreadcrumbItem } from '@/types';
-import { HomeOutlined } from '@ant-design/icons';
 import { Link } from '@inertiajs/react';
 import { Breadcrumb as AntBreadcrumb, theme } from 'antd';
 
@@ -23,7 +23,7 @@ export default function Breadcrumb({ items, showHome = true }: BreadcrumbProps) 
                   {
                       title: (
                           <Link href="/">
-                              <HomeOutlined style={{ fontSize: '14px' }} />
+                              <Icon name="home" size={14} />
                           </Link>
                       ),
                   },

@@ -1,4 +1,4 @@
-import { FolderOutlined, MoreOutlined } from '@ant-design/icons';
+import { Icon } from '@/components/ui/Icon';
 import type { MenuProps } from 'antd';
 import { Dropdown, theme, Typography } from 'antd';
 import { useState } from 'react';
@@ -55,12 +55,7 @@ export default function FolderTile({ name, itemCount, color, onFolderClick, menu
                     justifyContent: 'center',
                 }}
             >
-                <FolderOutlined
-                    style={{
-                        fontSize: 22,
-                        color: accentColor,
-                    }}
-                />
+                <Icon name="folder" size={22} color={accentColor} />
             </div>
 
             {/* Content */}
@@ -111,7 +106,7 @@ export default function FolderTile({ name, itemCount, color, onFolderClick, menu
                     }}
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <MoreOutlined style={{ fontSize: 16 }} />
+                    <Icon name="dots" size={16} />
                 </div>
             </Dropdown>
         </div>

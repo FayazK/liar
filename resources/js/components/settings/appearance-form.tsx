@@ -1,49 +1,110 @@
+import { Icon, type IconName } from '@/components/ui/Icon';
 import { useAppearance, type Appearance } from '@/hooks/use-appearance';
-import { BulbFilled, BulbOutlined, DesktopOutlined } from '@ant-design/icons';
-import { Card, Segmented, Space, Typography } from 'antd';
+import { Space, theme, Typography } from 'antd';
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
+const { useToken } = theme;
+
+interface ThemeOptionProps {
+    value: Appearance;
+    label: string;
+    icon: IconName;
+    description: string;
+    isSelected: boolean;
+    onClick: () => void;
+}
+
+function ThemeOption({ label, icon, description, isSelected, onClick }: ThemeOptionProps) {
+    const { token } = useToken();
+
+    return (
+        <div
+            onClick={onClick}
+            style={{
+                flex: 1,
+                padding: token.paddingMD,
+                borderRadius: token.borderRadiusLG,
+                border: `2px solid ${isSelected ? token.colorPrimary : token.colorBorderSecondary}`,
+                background: isSelected ? token.colorPrimaryBg : token.colorBgContainer,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                textAlign: 'center',
+            }}
+        >
+            <div
+                style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: token.borderRadius,
+                    background: isSelected ? token.colorPrimary : token.colorFillSecondary,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto',
+                    marginBottom: token.marginSM,
+                }}
+            >
+                <Icon name={icon} size={24} color={isSelected ? '#fff' : token.colorTextSecondary} />
+            </div>
+            <Text strong style={{ display: 'block', marginBottom: 4 }}>
+                {label}
+            </Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+                {description}
+            </Text>
+        </div>
+    );
+}
 
 export default function AppearanceForm() {
+    const { token } = useToken();
     const { appearance: currentAppearance, updateAppearance } = useAppearance();
 
-    const appearanceOptions = [
+    const themeOptions: { value: Appearance; label: string; icon: IconName; description: string }[] = [
         {
+            value: 'light',
             label: 'Light',
-            value: 'light' as Appearance,
-            icon: <BulbOutlined />,
+            icon: 'sun',
+            description: 'Bright and clean',
         },
         {
+            value: 'dark',
             label: 'Dark',
-            value: 'dark' as Appearance,
-            icon: <BulbFilled />,
+            icon: 'moon',
+            description: 'Easy on the eyes',
         },
         {
+            value: 'system',
             label: 'System',
-            value: 'system' as Appearance,
-            icon: <DesktopOutlined />,
+            icon: 'device-desktop',
+            description: 'Match your device',
         },
     ];
 
     return (
-        <Card title="Theme Preference" style={{ width: '100%' }}>
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                <Text>Choose your preferred theme for the interface:</Text>
-                <Segmented
-                    options={appearanceOptions}
-                    value={currentAppearance}
-                    onChange={(value) => updateAppearance(value as Appearance)}
-                    size="large"
-                    style={{ display: 'flex' }}
-                />
-                <Text type="secondary" style={{ fontSize: '14px' }}>
-                    {currentAppearance === 'system'
-                        ? 'Theme will automatically adjust based on your system preferences.'
-                        : currentAppearance === 'light'
-                          ? 'Interface will use a light color scheme.'
-                          : 'Interface will use a dark color scheme.'}
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <div>
+                <Title level={4} style={{ marginBottom: token.marginXS }}>
+                    Appearance
+                </Title>
+                <Text type="secondary">Customize how the app looks</Text>
+            </div>
+
+            <div>
+                <Text type="secondary" style={{ display: 'block', marginBottom: token.marginSM, fontSize: 13 }}>
+                    Theme
                 </Text>
-            </Space>
-        </Card>
+                <div style={{ display: 'flex', gap: token.marginMD }}>
+                    {themeOptions.map((option) => (
+                        <ThemeOption
+                            key={option.value}
+                            {...option}
+                            isSelected={currentAppearance === option.value}
+                            onClick={() => updateAppearance(option.value)}
+                        />
+                    ))}
+                </div>
+            </div>
+        </Space>
     );
 }

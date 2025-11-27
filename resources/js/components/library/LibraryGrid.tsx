@@ -1,6 +1,6 @@
+import { Icon } from '@/components/ui/Icon';
 import axios from '@/lib/axios';
 import type { Library } from '@/types/library';
-import { DeleteOutlined, DownloadOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Empty, Form, Input, message, Modal, Space, Spin, theme, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import FileCard from './FileCard';
@@ -118,7 +118,7 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
     const handleDelete = (item: GridItem) => {
         confirm({
             title: `Delete ${item.type === 'folder' ? 'Folder' : 'File'}?`,
-            icon: <ExclamationCircleOutlined />,
+            icon: <Icon name="alert-circle" size={22} color="#faad14" />,
             content:
                 item.type === 'folder'
                     ? `Are you sure you want to delete "${item.name}"? All contents will be deleted.`
@@ -189,7 +189,7 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
                                     key: 'rename',
                                     label: (
                                         <Space>
-                                            <EditOutlined />
+                                            <Icon name="edit" size={16} />
                                             Rename
                                         </Space>
                                     ),
@@ -200,7 +200,7 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
                                     key: 'delete',
                                     label: (
                                         <Space>
-                                            <DeleteOutlined />
+                                            <Icon name="trash" size={16} />
                                             Delete
                                         </Space>
                                     ),
@@ -243,7 +243,7 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
                                     key: 'download',
                                     label: (
                                         <Space>
-                                            <DownloadOutlined />
+                                            <Icon name="download" size={16} />
                                             Download
                                         </Space>
                                     ),
@@ -254,7 +254,7 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
                                     key: 'delete',
                                     label: (
                                         <Space>
-                                            <DeleteOutlined />
+                                            <Icon name="trash" size={16} />
                                             Delete
                                         </Space>
                                     ),
