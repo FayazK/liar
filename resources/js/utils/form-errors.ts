@@ -9,11 +9,7 @@ import { isApiError } from './errors';
  * @param form - The Ant Design form instance
  * @param defaultMessage - Default message to show if no specific error is found
  */
-export function handleFormError(
-    error: unknown,
-    form: FormInstance,
-    defaultMessage = 'An error occurred',
-): void {
+export function handleFormError(error: unknown, form: FormInstance, defaultMessage = 'An error occurred'): void {
     if (isApiError(error)) {
         const errors = error.response?.data?.errors;
 

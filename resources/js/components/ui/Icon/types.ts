@@ -72,7 +72,10 @@ export type IconName =
     // Additional
     | 'inbox'
     | 'bell'
-    | 'check';
+    | 'check'
+    // Chevrons
+    | 'chevron-right'
+    | 'chevron-down';
 
 /**
  * Props for the Icon wrapper component

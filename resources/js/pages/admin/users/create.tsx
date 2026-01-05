@@ -1,13 +1,13 @@
+import PageCard from '@/components/ui/PageCard';
 import AdminLayout from '@/layouts/admin-layout';
-import { Card } from 'antd';
 import UserForm from './partials/user-form';
 
 export default function CreateUser() {
     return (
-        <AdminLayout pageTitle="Create New User">
-            <Card>
+        <AdminLayout>
+            <PageCard header={{ title: 'Create New User' }}>
                 <UserForm />
-            </Card>
+            </PageCard>
         </AdminLayout>
     );
 }

@@ -2,6 +2,7 @@ import AppearanceForm from '@/components/settings/appearance-form';
 import PasswordForm from '@/components/settings/password-form';
 import ProfileForm from '@/components/settings/profile-form';
 import { Icon } from '@/components/ui/Icon';
+import PageCard from '@/components/ui/PageCard';
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
 import { Menu, theme } from 'antd';
@@ -53,36 +54,38 @@ export default function Account({ mustVerifyEmail, status }: AccountProps) {
     };
 
     return (
-        <AppLayout pageTitle="Settings">
+        <AppLayout>
             <Head title="Settings" />
 
-            <div style={{ display: 'flex', gap: token.marginLG, minHeight: 'calc(100vh - 200px)' }}>
-                <div
-                    style={{
-                        width: 220,
-                        flexShrink: 0,
-                        borderRight: `1px solid ${token.colorBorderSecondary}`,
-                        paddingRight: token.paddingMD,
-                    }}
-                >
-                    <Menu
-                        mode="vertical"
-                        selectedKeys={[activeTab]}
-                        onClick={({ key }) => handleMenuClick(key)}
-                        items={menuItems}
+            <PageCard header={{ title: 'Settings' }}>
+                <div style={{ display: 'flex', gap: token.marginLG, minHeight: 'calc(100vh - 280px)' }}>
+                    <div
                         style={{
-                            border: 'none',
-                            background: 'transparent',
+                            width: 220,
+                            flexShrink: 0,
+                            borderRight: `1px solid ${token.colorBorderSecondary}`,
+                            paddingRight: token.paddingMD,
                         }}
-                    />
-                </div>
+                    >
+                        <Menu
+                            mode="vertical"
+                            selectedKeys={[activeTab]}
+                            onClick={({ key }) => handleMenuClick(key)}
+                            items={menuItems}
+                            style={{
+                                border: 'none',
+                                background: 'transparent',
+                            }}
+                        />
+                    </div>
 
-                <div style={{ flex: 1, maxWidth: 720 }}>
-                    {activeTab === 'profile' && <ProfileForm mustVerifyEmail={mustVerifyEmail} status={status} />}
-                    {activeTab === 'password' && <PasswordForm />}
-                    {activeTab === 'appearance' && <AppearanceForm />}
+                    <div style={{ flex: 1, maxWidth: 720 }}>
+                        {activeTab === 'profile' && <ProfileForm mustVerifyEmail={mustVerifyEmail} status={status} />}
+                        {activeTab === 'password' && <PasswordForm />}
+                        {activeTab === 'appearance' && <AppearanceForm />}
+                    </div>
                 </div>
-            </div>
+            </PageCard>
         </AppLayout>
     );
 }

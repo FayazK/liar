@@ -5,6 +5,8 @@ import {
     IconBolt,
     IconChartBar,
     IconCheck,
+    IconChevronDown,
+    IconChevronRight,
     IconClock,
     IconCode,
     IconCurrencyDollar,
@@ -143,4 +145,8 @@ export const iconMap: Record<IconName, TablerIconComponent> = {
     inbox: IconInbox,
     bell: IconBell,
     check: IconCheck,
+
+    // Chevrons
+    'chevron-right': IconChevronRight,
+    'chevron-down': IconChevronDown,
 };

@@ -37,6 +37,7 @@ function ThemedApp({ App, props }: ThemedAppProps) {
             theme={{
                 algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
                 token: {
+                    borderRadius: 8,
                     boxShadow: 'none',
                     boxShadowSecondary: 'none',
                     boxShadowTertiary: 'none',

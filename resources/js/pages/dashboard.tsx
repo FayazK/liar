@@ -1,4 +1,5 @@
 import { Icon } from '@/components/ui/Icon';
+import PageCard from '@/components/ui/PageCard';
 import AppLayout from '@/layouts/app-layout';
 import { type SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
@@ -119,97 +120,109 @@ export default function Dashboard() {
     );
 
     return (
-        <AppLayout pageTitle="Dashboard" actions={headerActions}>
+        <AppLayout>
             <Head title="Dashboard" />
 
-            <Space orientation="vertical" size="large" style={{ width: '100%' }}>
-                <div>
-                    <Title level={2} style={{ marginBottom: token.marginXS }}>
-                        Welcome back, {auth.user.full_name}!
-                    </Title>
-                    <Paragraph type="secondary">Here's what's happening with your account today.</Paragraph>
-                </div>
+            <PageCard
+                header={{
+                    title: 'Dashboard',
+                    actions: headerActions,
+                }}
+            >
+                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                    <div>
+                        <Title level={2} style={{ marginBottom: token.marginXS }}>
+                            Welcome back, {auth.user.full_name}!
+                        </Title>
+                        <Paragraph type="secondary">Here's what's happening with your account today.</Paragraph>
+                    </div>
 
-                <Row gutter={[16, 16]}>
-                    {statsData.map((stat, index) => (
-                        <Col xs={24} sm={12} lg={8} key={index}>
-                            <Card>
-                                <Statistic
-                                    title={stat.title}
-                                    value={stat.value}
-                                    precision={stat.precision}
-                                    prefix={stat.prefix}
-                                    suffix={stat.suffix}
-                                />
+                    <Row gutter={[16, 16]}>
+                        {statsData.map((stat, index) => (
+                            <Col xs={24} sm={12} lg={8} key={index}>
+                                <Card>
+                                    <Statistic
+                                        title={stat.title}
+                                        value={stat.value}
+                                        precision={stat.precision}
+                                        prefix={stat.prefix}
+                                        suffix={stat.suffix}
+                                    />
+                                </Card>
+                            </Col>
+                        ))}
+                    </Row>
+
+                    <Row gutter={[16, 16]}>
+                        <Col xs={24} lg={16}>
+                            <Card title="Recent Activity" style={{ height: '400px' }}>
+                                <Flex vertical gap="middle">
+                                    {recentActivity.map((item, index) => (
+                                        <Flex
+                                            key={index}
+                                            align="center"
+                                            gap="middle"
+                                            style={{ paddingBottom: '12px', borderBottom: `1px solid ${token.colorBorderSecondary}` }}
+                                        >
+                                            {item.avatar}
+                                            <Flex vertical style={{ flex: 1 }}>
+                                                <Space>
+                                                    <Text strong>{item.title}</Text>
+                                                    <Tag color="blue">{item.tag}</Tag>
+                                                </Space>
+                                                <Text type="secondary">{item.description}</Text>
+                                            </Flex>
+                                            <Text type="secondary">{item.time}</Text>
+                                        </Flex>
+                                    ))}
+                                </Flex>
                             </Card>
                         </Col>
-                    ))}
-                </Row>
 
-                <Row gutter={[16, 16]}>
-                    <Col xs={24} lg={16}>
-                        <Card title="Recent Activity" style={{ height: '400px' }}>
-                            <Flex vertical gap="middle">
-                                {recentActivity.map((item, index) => (
-                                    <Flex key={index} align="center" gap="middle" style={{ paddingBottom: '12px', borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
-                                        {item.avatar}
-                                        <Flex vertical style={{ flex: 1 }}>
-                                            <Space>
-                                                <Text strong>{item.title}</Text>
-                                                <Tag color="blue">{item.tag}</Tag>
-                                            </Space>
-                                            <Text type="secondary">{item.description}</Text>
-                                        </Flex>
-                                        <Text type="secondary">{item.time}</Text>
-                                    </Flex>
-                                ))}
-                            </Flex>
-                        </Card>
-                    </Col>
+                        <Col xs={24} lg={8}>
+                            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                                <Card title="Performance">
+                                    <Space direction="vertical" style={{ width: '100%' }}>
+                                        <div>
+                                            <Text>CPU Usage</Text>
+                                            <Progress percent={65} strokeColor={token.colorSuccess} />
+                                        </div>
+                                        <div>
+                                            <Text>Memory Usage</Text>
+                                            <Progress percent={78} strokeColor={token.colorWarning} />
+                                        </div>
+                                        <div>
+                                            <Text>Storage</Text>
+                                            <Progress percent={45} strokeColor={token.colorInfo} />
+                                        </div>
+                                    </Space>
+                                </Card>
 
-                    <Col xs={24} lg={8}>
-                        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
-                            <Card title="Performance">
-                                <Space orientation="vertical" style={{ width: '100%' }}>
-                                    <div>
-                                        <Text>CPU Usage</Text>
-                                        <Progress percent={65} strokeColor={token.colorSuccess} />
-                                    </div>
-                                    <div>
-                                        <Text>Memory Usage</Text>
-                                        <Progress percent={78} strokeColor={token.colorWarning} />
-                                    </div>
-                                    <div>
-                                        <Text>Storage</Text>
-                                        <Progress percent={45} strokeColor={token.colorInfo} />
-                                    </div>
-                                </Space>
-                            </Card>
-
-                            <Card title="Quick Stats">
-                                <Space orientation="vertical" style={{ width: '100%' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <Text>Active Sessions</Text>
-                                        <Text strong>24</Text>
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <Text>Online Users</Text>
-                                        <Text strong>156</Text>
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <Text>Server Load</Text>
-                                        <Text strong>Low</Text>
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <Text>Response Time</Text>
-                                        <Text strong>45ms</Text>
-                                    </div>
-                                </Space>
-                            </Card>
-                        </Space>
-                    </Col>
-                </Row>
-            </Space>
+                                <Card title="Quick Stats">
+                                    <Space direction="vertical" style={{ width: '100%' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <Text>Active Sessions</Text>
+                                            <Text strong>24</Text>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <Text>Online Users</Text>
+                                            <Text strong>156</Text>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <Text>Server Load</Text>
+                                            <Text strong>Low</Text>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <Text>Response Time</Text>
+                                            <Text strong>45ms</Text>
+                                        </div>
+                                    </Space>
+                                </Card>
+                            </Space>
+                        </Col>
+                    </Row>
+                </Space>
+            </PageCard>
         </AppLayout>
     );
 }

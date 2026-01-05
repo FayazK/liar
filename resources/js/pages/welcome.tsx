@@ -70,7 +70,11 @@ export default function Welcome() {
 
                     <Space>
                         {auth.user ? (
-                            <Button type="primary" icon={<Icon name="dashboard" size={16} />} onClick={() => (window.location.href = dashboard().url)}>
+                            <Button
+                                type="primary"
+                                icon={<Icon name="dashboard" size={16} />}
+                                onClick={() => (window.location.href = dashboard().url)}
+                            >
                                 Dashboard
                             </Button>
                         ) : (
@@ -78,7 +82,11 @@ export default function Welcome() {
                                 <Button icon={<Icon name="login" size={16} />} onClick={() => (window.location.href = login().url)}>
                                     Log in
                                 </Button>
-                                <Button type="primary" icon={<Icon name="user-plus" size={16} />} onClick={() => (window.location.href = register().url)}>
+                                <Button
+                                    type="primary"
+                                    icon={<Icon name="user-plus" size={16} />}
+                                    onClick={() => (window.location.href = register().url)}
+                                >
                                     Register
                                 </Button>
                             </>
@@ -111,7 +119,11 @@ export default function Welcome() {
                                             >
                                                 Get Started
                                             </Button>
-                                            <Button size="large" icon={<Icon name="login" size={16} />} onClick={() => (window.location.href = login().url)}>
+                                            <Button
+                                                size="large"
+                                                icon={<Icon name="login" size={16} />}
+                                                onClick={() => (window.location.href = login().url)}
+                                            >
                                                 Sign In
                                             </Button>
                                         </Space>

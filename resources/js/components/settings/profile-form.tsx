@@ -31,9 +31,7 @@ export default function ProfileForm({ mustVerifyEmail, status }: ProfileFormProp
             icon: <Icon name="alert-circle" size={22} color={token.colorError} />,
             content: (
                 <div>
-                    <Text type="secondary">
-                        This action is permanent. All your data will be deleted and cannot be recovered.
-                    </Text>
+                    <Text type="secondary">This action is permanent. All your data will be deleted and cannot be recovered.</Text>
                     <Input.Password
                         ref={passwordInput}
                         placeholder="Enter your password to confirm"
@@ -83,7 +81,9 @@ export default function ProfileForm({ mustVerifyEmail, status }: ProfileFormProp
                                     status={errors.first_name ? 'error' : undefined}
                                 />
                                 {errors.first_name && (
-                                    <Text type="danger" style={{ fontSize: 12 }}>{errors.first_name}</Text>
+                                    <Text type="danger" style={{ fontSize: 12 }}>
+                                        {errors.first_name}
+                                    </Text>
                                 )}
                             </div>
                             <div style={{ flex: 1 }}>
@@ -99,7 +99,9 @@ export default function ProfileForm({ mustVerifyEmail, status }: ProfileFormProp
                                     status={errors.last_name ? 'error' : undefined}
                                 />
                                 {errors.last_name && (
-                                    <Text type="danger" style={{ fontSize: 12 }}>{errors.last_name}</Text>
+                                    <Text type="danger" style={{ fontSize: 12 }}>
+                                        {errors.last_name}
+                                    </Text>
                                 )}
                             </div>
                         </div>
@@ -118,7 +120,9 @@ export default function ProfileForm({ mustVerifyEmail, status }: ProfileFormProp
                                 status={errors.email ? 'error' : undefined}
                             />
                             {errors.email && (
-                                <Text type="danger" style={{ fontSize: 12 }}>{errors.email}</Text>
+                                <Text type="danger" style={{ fontSize: 12 }}>
+                                    {errors.email}
+                                </Text>
                             )}
                         </div>
 
@@ -132,9 +136,7 @@ export default function ProfileForm({ mustVerifyEmail, status }: ProfileFormProp
                                                 Resend verification
                                             </Button>
                                         </Link>
-                                        {status === 'verification-link-sent' && (
-                                            <Text type="success"> - Sent!</Text>
-                                        )}
+                                        {status === 'verification-link-sent' && <Text type="success"> - Sent!</Text>}
                                     </span>
                                 }
                                 type="warning"

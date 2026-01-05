@@ -20,6 +20,8 @@ export interface NavItem {
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: IconName | null;
     isActive?: boolean;
+    badge?: number | string;
+    children?: NavItem[];
 }
 
 export interface SharedData {

@@ -1,5 +1,6 @@
 import DataTable from '@/components/ui/DataTable';
 import { Icon } from '@/components/ui/Icon';
+import PageCard from '@/components/ui/PageCard';
 import AdminLayout from '@/layouts/admin-layout';
 import { create, data, edit, show } from '@/routes/admin/users';
 import type { FilterConfig, User } from '@/types';
@@ -136,26 +137,33 @@ export default function UsersIndex() {
         },
     ];
 
+    const headerActions = (
+        <Link href={create.url()}>
+            <Button type="primary" icon={<Icon name="user-plus" size={16} />}>
+                Add User
+            </Button>
+        </Link>
+    );
+
     return (
-        <AdminLayout
-            pageTitle="Users"
-            actions={
-                <Link href={create.url()}>
-                    <Button type="primary" icon={<Icon name="user-plus" size={16} />}>
-                        Add User
-                    </Button>
-                </Link>
-            }
-        >
-            <DataTable<User>
-                fetchUrl={data.url()}
-                columns={columns}
-                filters={filters}
-                searchPlaceholder="Search users by name or email..."
-                defaultPageSize={15}
-                emptyMessage="No users have been created yet."
-                emptyFilterMessage="No users match your search criteria."
-            />
+        <AdminLayout>
+            <PageCard
+                header={{
+                    title: 'Users',
+                    actions: headerActions,
+                }}
+                bodyPadding="none"
+            >
+                <DataTable<User>
+                    fetchUrl={data.url()}
+                    columns={columns}
+                    filters={filters}
+                    searchPlaceholder="Search users by name or email..."
+                    defaultPageSize={15}
+                    emptyMessage="No users have been created yet."
+                    emptyFilterMessage="No users match your search criteria."
+                />
+            </PageCard>
         </AdminLayout>
     );
 }

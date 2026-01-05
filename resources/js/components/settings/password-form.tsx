@@ -53,7 +53,9 @@ export default function PasswordForm() {
                                 status={errors.current_password ? 'error' : undefined}
                             />
                             {errors.current_password && (
-                                <Text type="danger" style={{ fontSize: 12 }}>{errors.current_password}</Text>
+                                <Text type="danger" style={{ fontSize: 12 }}>
+                                    {errors.current_password}
+                                </Text>
                             )}
                         </div>
 
@@ -69,7 +71,9 @@ export default function PasswordForm() {
                                 status={errors.password ? 'error' : undefined}
                             />
                             {errors.password && (
-                                <Text type="danger" style={{ fontSize: 12 }}>{errors.password}</Text>
+                                <Text type="danger" style={{ fontSize: 12 }}>
+                                    {errors.password}
+                                </Text>
                             )}
                         </div>
 
@@ -84,7 +88,9 @@ export default function PasswordForm() {
                                 status={errors.password_confirmation ? 'error' : undefined}
                             />
                             {errors.password_confirmation && (
-                                <Text type="danger" style={{ fontSize: 12 }}>{errors.password_confirmation}</Text>
+                                <Text type="danger" style={{ fontSize: 12 }}>
+                                    {errors.password_confirmation}
+                                </Text>
                             )}
                         </div>
 

@@ -1,3 +1,4 @@
+import PageCard from '@/components/ui/PageCard';
 import AdminLayout from '@/layouts/admin-layout';
 import type { User } from '@/types';
 import UserForm from './partials/user-form';
@@ -8,8 +9,10 @@ interface EditUserProps {
 
 export default function EditUser({ user }: EditUserProps) {
     return (
-        <AdminLayout pageTitle={user ? `Edit User: ${user.full_name}` : 'Edit User'}>
-            <UserForm user={user} isEdit />
+        <AdminLayout>
+            <PageCard header={{ title: `Edit User: ${user.full_name}` }}>
+                <UserForm user={user} isEdit />
+            </PageCard>
         </AdminLayout>
     );
 }

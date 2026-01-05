@@ -6,24 +6,67 @@ import { useSidebarState } from '@/hooks/use-sidebar-state';
 import { dashboard } from '@/routes';
 import { type NavGroup, type NavItem, type SharedData } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import { Avatar, Button, Drawer, Dropdown, Flex, Layout, Menu, theme, Typography } from 'antd';
+import type { MenuProps } from 'antd';
+import { Avatar, Badge, Button, Drawer, Dropdown, Flex, Input, Layout, Menu, theme, Typography } from 'antd';
 import { type ReactNode } from 'react';
 import logo from '../../images/logo.svg';
 
 const { Header, Sider, Content } = Layout;
-const { Text, Title } = Typography;
+const { Text } = Typography;
 const { useToken } = theme;
 
 interface MasterLayoutProps {
     children: ReactNode;
-    pageTitle?: string;
     actions?: ReactNode;
     mainNavItems: NavItem[];
     navGroups?: NavGroup[];
     footerNavItems?: NavItem[];
 }
 
-export default function MasterLayout({ children, pageTitle, actions, mainNavItems, navGroups = [], footerNavItems = [] }: MasterLayoutProps) {
+/**
+ * Builds menu items with badge and submenu support
+ */
+function buildMenuItems(items: NavItem[], onNavigate?: () => void): MenuProps['items'] {
+    return items.map((item) => {
+        const key = typeof item.href === 'string' ? item.href : item.href.url;
+        const hasChildren = item.children && item.children.length > 0;
+
+        // If has children, create submenu (no link wrapper - clicking expands submenu)
+        if (hasChildren) {
+            const parentLabel = (
+                <Flex align="center" justify="space-between" style={{ width: '100%' }}>
+                    <span>{item.title}</span>
+                    {item.badge !== undefined && <Badge count={item.badge} size="small" style={{ marginLeft: 8 }} />}
+                </Flex>
+            );
+
+            return {
+                key,
+                icon: item.icon ? <Icon name={item.icon} size={18} /> : null,
+                label: parentLabel,
+                children: buildMenuItems(item.children!, onNavigate),
+            };
+        }
+
+        // Leaf items with link and optional badge
+        const labelContent = (
+            <Flex align="center" justify="space-between" style={{ width: '100%' }}>
+                <Link href={item.href} prefetch onClick={onNavigate}>
+                    {item.title}
+                </Link>
+                {item.badge !== undefined && <Badge count={item.badge} size="small" style={{ marginLeft: 8 }} />}
+            </Flex>
+        );
+
+        return {
+            key,
+            icon: item.icon ? <Icon name={item.icon} size={18} /> : null,
+            label: labelContent,
+        };
+    });
+}
+
+export default function MasterLayout({ children, actions, mainNavItems, navGroups = [], footerNavItems = [] }: MasterLayoutProps) {
     const { collapsed, toggleCollapsed } = useSidebarState();
     const isMobile = useIsMobile();
     const { auth } = usePage<SharedData>().props;
@@ -42,6 +85,7 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
         router.post('/logout');
     };
 
+    // User dropdown menu items (now in header)
     const userMenuItems = [
         {
             key: 'account',
@@ -59,29 +103,14 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
         },
     ];
 
-    const menuItems = [
-        ...mainNavItems.map((item) => ({
-            key: typeof item.href === 'string' ? item.href : item.href.url,
-            icon: item.icon ? <Icon name={item.icon} size={18} /> : null,
-            label: (
-                <Link href={item.href} prefetch onClick={isMobile ? closeMobileMenu : undefined}>
-                    {item.title}
-                </Link>
-            ),
-        })),
+    // Build menu items with badge support
+    const menuItems: MenuProps['items'] = [
+        ...(buildMenuItems(mainNavItems, isMobile ? closeMobileMenu : undefined) ?? []),
         ...navGroups.map((group) => ({
             key: `group-${group.title.toLowerCase().replace(/\s+/g, '-')}`,
             label: group.title,
             type: 'group' as const,
-            children: group.items.map((item) => ({
-                key: typeof item.href === 'string' ? item.href : item.href.url,
-                icon: item.icon ? <Icon name={item.icon} size={18} /> : null,
-                label: (
-                    <Link href={item.href} prefetch onClick={isMobile ? closeMobileMenu : undefined}>
-                        {item.title}
-                    </Link>
-                ),
-            })),
+            children: buildMenuItems(group.items, isMobile ? closeMobileMenu : undefined),
         })),
         ...(footerNavItems.length > 0 ? [{ type: 'divider' as const }] : []),
         ...footerNavItems.map((item) => ({
@@ -100,57 +129,42 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
         })),
     ];
 
-    // Sidebar content (shared between fixed sidebar and mobile drawer)
+    // Sidebar content with logo header and menu
     const sidebarContent = (
-        <Flex vertical justify="space-between" style={{ height: '100%' }}>
-            {/* Top Section - Logo and Menu */}
-            <Flex vertical style={{ overflow: 'auto', minHeight: 0 }}>
-                {/* Logo Section - Reduced from 64px to 56px */}
-                <Flex
-                    align="center"
-                    justify={collapsed && !isMobile ? 'center' : 'flex-start'}
-                    style={{
-                        height: '56px',
-                        padding: collapsed && !isMobile ? '0' : `0 ${token.paddingMD}px`,
-                        borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                        flexShrink: 0,
-                    }}
-                >
-                    {!collapsed || isMobile ? (
-                        <Link href={dashboard()} prefetch onClick={isMobile ? closeMobileMenu : undefined}>
-                            <Flex align="center" gap="small">
-                                <img
-                                    src={logo}
-                                    alt="Liar Logo"
-                                    width="32"
-                                    height="32"
-                                    style={{
-                                        height: '32px',
-                                        width: '32px',
-                                    }}
-                                />
-                                <Text strong style={{ fontSize: '24px', color: token.colorPrimary }}>
-                                    Liar
-                                </Text>
-                            </Flex>
-                        </Link>
-                    ) : (
-                        <Link href={dashboard()} prefetch>
-                            <img
-                                src={logo}
-                                alt="Liar Logo"
-                                width="28"
-                                height="28"
-                                style={{
-                                    height: '28px',
-                                    width: '28px',
-                                }}
-                            />
-                        </Link>
-                    )}
-                </Flex>
+        <Flex vertical style={{ height: '100%' }}>
+            {/* Logo Section */}
+            <Flex
+                align="center"
+                justify={collapsed ? 'center' : 'flex-start'}
+                style={{
+                    height: '56px',
+                    padding: collapsed ? 0 : `0 ${token.paddingMD}px`,
+                    flexShrink: 0,
+                }}
+            >
+                <Link href={dashboard()} prefetch>
+                    <Flex align="center" gap="small">
+                        <img
+                            src={logo}
+                            alt="Liar Logo"
+                            width="32"
+                            height="32"
+                            style={{
+                                height: '32px',
+                                width: '32px',
+                            }}
+                        />
+                        {!collapsed && (
+                            <Text strong style={{ fontSize: '20px', color: token.colorText }}>
+                                Liar
+                            </Text>
+                        )}
+                    </Flex>
+                </Link>
+            </Flex>
 
-                {/* Menu Section */}
+            {/* Menu Section */}
+            <Flex vertical style={{ flex: 1, overflow: 'auto', paddingTop: token.paddingMD }}>
                 <Menu
                     mode="inline"
                     items={menuItems}
@@ -161,40 +175,51 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
                     }}
                 />
             </Flex>
+        </Flex>
+    );
 
-            {/* Avatar Section - Reduced from 64px to 56px min-height */}
+    // Mobile drawer content (includes logo at top)
+    const mobileDrawerContent = (
+        <Flex vertical style={{ height: '100%' }}>
+            {/* Logo Section for mobile */}
             <Flex
                 align="center"
-                justify="center"
                 style={{
-                    padding: collapsed && !isMobile ? `${token.paddingMD}px ${token.paddingXS}px` : `${token.paddingMD}px`,
-                    borderTop: `1px solid ${token.colorBorderSecondary}`,
-                    minHeight: '56px',
+                    height: '56px',
+                    padding: `0 ${token.paddingMD}px`,
                     flexShrink: 0,
                 }}
             >
-                <Dropdown menu={{ items: userMenuItems }} placement="top" arrow>
-                    <Flex
-                        align="center"
-                        gap="small"
-                        style={{
-                            cursor: 'pointer',
-                            width: collapsed && !isMobile ? 'auto' : '100%',
-                            justifyContent: collapsed && !isMobile ? 'center' : 'flex-start',
-                        }}
-                    >
-                        <Avatar src={auth.user.avatar} icon={<Icon name="user" size={16} />} />
-                        {(!collapsed || isMobile) && (
-                            <div style={{ lineHeight: '1.2' }}>
-                                <Text strong>{auth.user.full_name}</Text>
-                                <br />
-                                <Text type="secondary" style={{ fontSize: '12px' }}>
-                                    {auth.user.email}
-                                </Text>
-                            </div>
-                        )}
+                <Link href={dashboard()} prefetch onClick={closeMobileMenu}>
+                    <Flex align="center" gap="small">
+                        <img
+                            src={logo}
+                            alt="Liar Logo"
+                            width="32"
+                            height="32"
+                            style={{
+                                height: '32px',
+                                width: '32px',
+                            }}
+                        />
+                        <Text strong style={{ fontSize: '24px', color: token.colorPrimary }}>
+                            Liar
+                        </Text>
                     </Flex>
-                </Dropdown>
+                </Link>
+            </Flex>
+
+            {/* Menu Section */}
+            <Flex vertical style={{ flex: 1, overflow: 'auto', paddingTop: token.paddingMD }}>
+                <Menu
+                    mode="inline"
+                    items={menuItems}
+                    style={{
+                        width: '100%',
+                        borderRight: 0,
+                        background: 'transparent',
+                    }}
+                />
             </Flex>
         </Flex>
     );
@@ -229,7 +254,7 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
             <GlobalSearch open={isSearchOpen} onClose={closeSearch} />
 
             <Layout style={{ minHeight: '100vh' }}>
-                {/* Desktop Sidebar */}
+                {/* Desktop Sidebar - full height from top */}
                 {!isMobile && (
                     <Sider
                         trigger={null}
@@ -238,13 +263,13 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
                         width={200}
                         collapsedWidth={80}
                         style={{
-                            background: token.colorBgContainer,
-                            borderRight: `1px solid ${token.colorBorderSecondary}`,
+                            background: 'transparent',
                             height: '100vh',
                             position: 'fixed',
                             left: 0,
                             top: 0,
                             bottom: 0,
+                            zIndex: 11,
                         }}
                     >
                         <nav aria-label="Main navigation" style={{ height: '100%' }}>
@@ -266,7 +291,7 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
                         }}
                     >
                         <nav aria-label="Main navigation" style={{ height: '100%' }}>
-                            {sidebarContent}
+                            {mobileDrawerContent}
                         </nav>
                     </Drawer>
                 )}
@@ -275,26 +300,27 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
                     style={{
                         marginLeft: isMobile ? 0 : collapsed ? 80 : 200,
                         transition: 'margin-left 0.2s',
+                        background: token.colorBgLayout,
                     }}
                 >
-                    {/* Header - Reduced from 64px to 56px */}
+                    {/* Header - spans content area only */}
                     <Header
                         style={{
-                            padding: `${token.paddingSM}px ${token.paddingMD}px`,
-                            background: token.colorBgContainer,
-                            borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                            padding: `0 ${token.paddingMD}px`,
+                            background: 'transparent',
                             position: 'fixed',
                             top: 0,
                             right: 0,
                             left: isMobile ? 0 : collapsed ? 80 : 200,
                             zIndex: 10,
-                            transition: 'left 0.2s',
                             height: '56px',
+                            transition: 'left 0.2s',
                         }}
                     >
                         <Flex justify="space-between" align="center" style={{ height: '100%' }}>
-                            {/* Left Section: Collapse/Menu Button and Title */}
-                            <Flex align="center" gap="middle" flex={1}>
+                            {/* Left Section: Toggle + Search */}
+                            <Flex align="center" gap="middle">
+                                {/* Sidebar Toggle */}
                                 <Button
                                     type="text"
                                     icon={
@@ -307,62 +333,48 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
                                         )
                                     }
                                     onClick={toggleCollapsed}
-                                    style={{ fontSize: '16px' }}
                                     aria-label={isMobile ? 'Toggle navigation menu' : collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                                 />
-                                {pageTitle && (
-                                    <Title
-                                        level={4}
+
+                                {/* Inline Search Bar (desktop only) */}
+                                {!isMobile && (
+                                    <Input
+                                        prefix={<Icon name="search" size={16} style={{ color: token.colorTextPlaceholder }} />}
+                                        placeholder="Type to search..."
+                                        onClick={openSearch}
+                                        readOnly
                                         style={{
-                                            margin: 0,
-                                            color: token.colorText,
-                                            fontWeight: 600,
+                                            width: 200,
+                                            cursor: 'pointer',
                                         }}
-                                    >
-                                        {pageTitle}
-                                    </Title>
+                                    />
                                 )}
                             </Flex>
 
-                            {/* Right Section: Search, Notifications, Action Buttons */}
+                            {/* Right Section: Actions + Notifications + User */}
                             <Flex align="center" gap="small">
-                                {/* Search Button */}
-                                {!isMobile && (
-                                    <Button
-                                        type="text"
-                                        icon={<Icon name="search" size={18} />}
-                                        onClick={openSearch}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            height: '40px',
-                                            width: '40px',
-                                        }}
-                                        aria-label="Open search (Ctrl+K)"
-                                    />
-                                )}
+                                {/* Page-specific Actions */}
+                                {actions}
 
                                 {/* Notifications */}
                                 <NotificationsCenter />
 
-                                {/* Page-specific Actions */}
-                                {actions}
+                                {/* User Avatar Dropdown */}
+                                <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow>
+                                    <Avatar src={auth.user.avatar_thumb_url} icon={<Icon name="user" size={16} />} style={{ cursor: 'pointer' }} />
+                                </Dropdown>
                             </Flex>
                         </Flex>
                     </Header>
 
-                    {/* Main Content with max-width constraint */}
+                    {/* Main Content Area */}
                     <Content
                         id="main-content"
                         role="main"
                         style={{
-                            margin: `${56 + token.marginSM}px ${token.marginSM}px ${token.marginSM}px`,
-                            padding: token.paddingLG,
-                            background: token.colorBgContainer,
-                            borderRadius: token.borderRadiusLG,
-                            overflow: 'auto',
-                            minHeight: `calc(100vh - ${56 + token.marginSM * 2 + 16}px)`,
+                            marginTop: '56px',
+                            padding: token.paddingMD,
+                            minHeight: `calc(100vh - 56px)`,
                         }}
                     >
                         {/* Content Wrapper with max-width */}
@@ -373,7 +385,6 @@ export default function MasterLayout({ children, pageTitle, actions, mainNavItem
                                 width: '100%',
                             }}
                         >
-                            {/* Page Content */}
                             {children}
                         </div>
                     </Content>
