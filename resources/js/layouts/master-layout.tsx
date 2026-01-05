@@ -307,7 +307,7 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
                     <Header
                         style={{
                             padding: `0 ${token.paddingMD}px`,
-                            background: 'transparent',
+                            background: token.colorBgLayout,
                             position: 'fixed',
                             top: 0,
                             right: 0,
@@ -378,13 +378,7 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
                         }}
                     >
                         {/* Content Wrapper with max-width */}
-                        <div
-                            style={{
-                                maxWidth: '1400px',
-                                margin: '0 auto',
-                                width: '100%',
-                            }}
-                        >
+                        <div>
                             {children}
                         </div>
                     </Content>
