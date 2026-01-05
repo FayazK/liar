@@ -1,4 +1,3 @@
-import '@ant-design/v5-patch-for-react-19';
 import { createInertiaApp } from '@inertiajs/react';
 import { App as AntApp, ConfigProvider, theme } from 'antd';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';

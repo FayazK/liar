@@ -165,6 +165,30 @@ tests/Unit/               # Unit tests (minimal)
 ✗ Never use Ant Design without theme tokens
 
 
+=== antd-upgrade rules ===
+
+## Ant Design v6 Upgrade
+
+When upgrading Ant Design to v6 or working with v6 features:
+
+1. **Use Context7 MCP** to fetch the latest Ant Design v6 documentation:
+   - First resolve the library ID: `mcp__context7__resolve-library-id` with `libraryName: "ant-design"` and your query
+   - Then query docs: `mcp__context7__query-docs` with the resolved library ID and specific questions
+
+2. **Key v6 Changes to Check:**
+   - Component API changes and deprecations
+   - Theme token updates and new design tokens
+   - CSS-in-JS changes (cssinjs to native CSS variables)
+   - New components and removed components
+   - Breaking changes in Form, Table, and other core components
+
+3. **Upgrade Process:**
+   - Query Context7 for "Ant Design v6 migration guide" before starting
+   - Check component-specific changes: `"Button component changes v6"`
+   - Verify theme configuration: `"ConfigProvider theme v6"`
+   - Test all themed components after upgrade
+
+
 === ux rules ===
 
 ## UI/UX Design Standards
@@ -342,4 +366,61 @@ See `.ai/rules/tailwindcss.md` for Tailwind v4 rules and guidelines.
 ## Test Enforcement
 
 Every change must be tested. Run minimal tests with `php artisan test --filter=testName`.
+
+
+=== playwright-mcp rules ===
+
+## Playwright MCP Browser Testing
+
+Use Playwright MCP tools (`mcp__playwright__*`) for browser-based E2E testing of the application.
+
+**Test Credentials:**
+- Email: `info@fayazk.com`
+- Password: `@Password1`
+
+**Browser Testing Workflow:**
+
+1. **Navigate to the app:**
+   ```
+   mcp__playwright__browser_navigate with url: "http://localhost:8000"
+   ```
+
+2. **Take accessibility snapshot** (preferred over screenshots for interactions):
+   ```
+   mcp__playwright__browser_snapshot
+   ```
+
+3. **Login flow:**
+   - Navigate to login page
+   - Use `browser_type` to fill email: `info@fayazk.com`
+   - Use `browser_type` to fill password: `@Password1`
+   - Use `browser_click` to submit the form
+
+4. **Common operations:**
+   - `browser_snapshot` - Get page accessibility tree for element references
+   - `browser_click` - Click elements using ref from snapshot
+   - `browser_type` - Type text into inputs
+   - `browser_fill_form` - Fill multiple form fields at once
+   - `browser_wait_for` - Wait for text/elements to appear
+   - `browser_take_screenshot` - Visual verification
+   - `browser_console_messages` - Check for JS errors
+
+5. **Testing best practices:**
+   - Always take a snapshot before interacting with elements
+   - Use element refs from snapshots for reliable clicks
+   - Check console messages for JavaScript errors after key actions
+   - Wait for navigation/loading states to complete
+   - Close browser with `browser_close` when done
+
+**Example Test Session:**
+```
+1. browser_navigate → http://localhost:8000/login
+2. browser_snapshot → get form element refs
+3. browser_type → fill email field with info@fayazk.com
+4. browser_type → fill password field with @Password1
+5. browser_click → click submit button
+6. browser_wait_for → wait for dashboard text
+7. browser_snapshot → verify logged in state
+8. browser_console_messages → check for errors
+```
 </laravel-boost-guidelines>
