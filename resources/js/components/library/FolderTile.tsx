@@ -83,7 +83,7 @@ export default function FolderTile({ name, itemCount, color, onFolderClick, menu
                 menu={{ items: menuItems }}
                 trigger={['click']}
                 placement="bottomRight"
-                dropdownRender={(menu) => (
+                popupRender={(menu) => (
                     <div
                         style={{
                             border: `1px solid ${token.colorBorder}`,

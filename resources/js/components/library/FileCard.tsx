@@ -132,7 +132,7 @@ export default function FileCard({ name, mimeType, size, thumbnailUrl, menuItems
                         menu={{ items: menuItems }}
                         trigger={['click']}
                         placement="bottomRight"
-                        dropdownRender={(menu) => (
+                        popupRender={(menu) => (
                             <div
                                 style={{
                                     border: `1px solid ${token.colorBorder}`,
