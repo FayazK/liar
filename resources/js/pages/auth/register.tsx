@@ -4,7 +4,7 @@ import api from '@/lib/axios';
 import { login } from '@/routes';
 import { handleFormError } from '@/utils/form-errors';
 import { Head, router } from '@inertiajs/react';
-import { Button, Flex, Form, Input, Typography, message, theme } from 'antd';
+import { App, Button, Flex, Form, Input, Typography, theme } from 'antd';
 import { useState } from 'react';
 
 const { Link, Text } = Typography;
@@ -22,6 +22,7 @@ export default function Register() {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const { token } = useToken();
+    const { message } = App.useApp();
 
     const handleSubmit = async (values: RegisterFormData) => {
         setLoading(true);

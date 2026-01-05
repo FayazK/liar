@@ -5,7 +5,7 @@ import { register } from '@/routes';
 import { request } from '@/routes/password';
 import { handleFormError } from '@/utils/form-errors';
 import { Head, router } from '@inertiajs/react';
-import { Alert, Button, Checkbox, Flex, Form, Input, Typography, message, theme } from 'antd';
+import { Alert, App, Button, Checkbox, Flex, Form, Input, Typography, theme } from 'antd';
 import { useState } from 'react';
 
 const { Link, Text } = Typography;
@@ -26,6 +26,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const { token } = useToken();
+    const { message } = App.useApp();
 
     const handleSubmit = async (values: LoginFormData) => {
         setLoading(true);

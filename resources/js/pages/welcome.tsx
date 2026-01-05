@@ -2,7 +2,7 @@ import { Icon } from '@/components/ui/Icon';
 import { dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import { Button, Card, Col, Divider, Layout, List, Row, Space, Tag, theme, Typography } from 'antd';
+import { Button, Card, Col, Divider, Flex, Layout, Row, Space, Tag, theme, Typography } from 'antd';
 
 const { Header, Content, Footer } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -90,7 +90,7 @@ export default function Welcome() {
                     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
                         <Row justify="center" style={{ marginBottom: '48px' }}>
                             <Col xs={24} md={16} lg={12} style={{ textAlign: 'center' }}>
-                                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                                <Space orientation="vertical" size="large" style={{ width: '100%' }}>
                                     <div>
                                         <Title level={1} style={{ fontSize: '3rem', marginBottom: '16px' }}>
                                             Welcome to <span style={{ color: token.colorPrimary }}>Liar</span>
@@ -124,7 +124,7 @@ export default function Welcome() {
                             {features.map((feature, index) => (
                                 <Col xs={24} sm={12} lg={6} key={index}>
                                     <Card style={{ height: '100%', textAlign: 'center' }}>
-                                        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                                        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                                             {feature.icon}
                                             <Title level={4}>{feature.title}</Title>
                                             <Text type="secondary">{feature.description}</Text>
@@ -139,20 +139,20 @@ export default function Welcome() {
                         <Row gutter={[24, 24]}>
                             <Col xs={24} lg={12}>
                                 <Card title="Technology Stack" extra={<Icon name="api" size={18} />}>
-                                    <List
-                                        dataSource={technologies}
-                                        renderItem={(item) => (
-                                            <List.Item>
-                                                <List.Item.Meta title={item.name} description={<Tag color="blue">{item.type}</Tag>} />
-                                            </List.Item>
-                                        )}
-                                    />
+                                    <Flex vertical gap="middle">
+                                        {technologies.map((item) => (
+                                            <Flex key={item.name} justify="space-between" align="center">
+                                                <Text strong>{item.name}</Text>
+                                                <Tag color="blue">{item.type}</Tag>
+                                            </Flex>
+                                        ))}
+                                    </Flex>
                                 </Card>
                             </Col>
 
                             <Col xs={24} lg={12}>
                                 <Card title="Getting Started">
-                                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                                    <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                                         <div>
                                             <Title level={5}>1. Create an Account</Title>
                                             <Text type="secondary">Sign up for a new account to get started with the platform.</Text>
@@ -192,7 +192,7 @@ export default function Welcome() {
                         borderTop: `1px solid ${token.colorBorderSecondary}`,
                     }}
                 >
-                    <Space split={<Divider type="vertical" />}>
+                    <Space separator={<Divider orientation="vertical" />}>
                         <Text type="secondary">© 2024 Liar. All rights reserved.</Text>
                         <Text type="secondary">Built with Laravel & React</Text>
                         <Text type="secondary">Powered by Inertia.js</Text>

@@ -1,7 +1,7 @@
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
 import { Form } from '@inertiajs/react';
 import type { InputRef } from 'antd';
-import { Button, Input, message, Space, theme, Typography } from 'antd';
+import { App, Button, Input, Space, theme, Typography } from 'antd';
 import { useRef } from 'react';
 
 const { Text, Title } = Typography;
@@ -12,9 +12,10 @@ export default function PasswordForm() {
     const passwordInput = useRef<InputRef>(null);
     const currentPasswordInput = useRef<InputRef>(null);
     const { token } = useToken();
+    const { message } = App.useApp();
 
     return (
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="large" style={{ width: '100%' }}>
             <div>
                 <Title level={4} style={{ marginBottom: token.marginXS }}>
                     Password
@@ -39,7 +40,7 @@ export default function PasswordForm() {
                 onSuccess={() => message.success('Password updated successfully!')}
             >
                 {({ errors, processing }) => (
-                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                    <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                         <div>
                             <Text type="secondary" style={{ display: 'block', marginBottom: 4, fontSize: 13 }}>
                                 Current Password

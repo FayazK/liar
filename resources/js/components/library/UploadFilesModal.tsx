@@ -1,7 +1,7 @@
 import { Icon } from '@/components/ui/Icon';
 import axios from '@/lib/axios';
 import { getErrorMessage } from '@/utils/errors';
-import { message, Modal, Progress, theme, Upload } from 'antd';
+import { App, Modal, Progress, theme, Upload } from 'antd';
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload';
 import { useState } from 'react';
 
@@ -24,6 +24,7 @@ interface UploadFilesModalProps {
 
 export default function UploadFilesModal({ open, onClose, libraryId, onUploadComplete }: UploadFilesModalProps) {
     const { token } = useToken();
+    const { message } = App.useApp();
     const [fileList, setFileList] = useState<FileUploadStatus[]>([]);
 
     const beforeUpload = (file: RcFile): boolean => {

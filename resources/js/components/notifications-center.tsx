@@ -1,5 +1,5 @@
 import { Icon } from '@/components/ui/Icon';
-import { Badge, Button, Dropdown, Empty, Flex, List, theme, Typography } from 'antd';
+import { Badge, Button, Dropdown, Empty, Flex, theme, Typography } from 'antd';
 import { useState } from 'react';
 
 const { Text } = Typography;
@@ -104,10 +104,9 @@ export default function NotificationsCenter() {
                 {notifications.length === 0 ? (
                     <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No notifications" style={{ padding: '32px' }} />
                 ) : (
-                    <List
-                        dataSource={notifications}
-                        renderItem={(item) => (
-                            <List.Item
+                    <Flex vertical>
+                        {notifications.map((item) => (
+                            <div
                                 key={item.id}
                                 style={{
                                     padding: '12px 16px',
@@ -115,6 +114,7 @@ export default function NotificationsCenter() {
                                     borderLeft: `3px solid ${item.read ? 'transparent' : getTypeColor(item.type)}`,
                                     cursor: 'pointer',
                                     transition: 'background-color 0.2s',
+                                    borderBottom: `1px solid ${token.colorBorderSecondary}`,
                                 }}
                                 onMouseEnter={(e) => {
                                     if (!item.read) {
@@ -190,9 +190,9 @@ export default function NotificationsCenter() {
                                         {item.timestamp}
                                     </Text>
                                 </Flex>
-                            </List.Item>
-                        )}
-                    />
+                            </div>
+                        ))}
+                    </Flex>
                 )}
             </div>
 
@@ -214,7 +214,7 @@ export default function NotificationsCenter() {
     );
 
     return (
-        <Dropdown dropdownRender={() => dropdownContent} trigger={['click']} placement="bottomRight">
+        <Dropdown popupRender={() => dropdownContent} trigger={['click']} placement="bottomRight">
             <Badge count={unreadCount} size="small" offset={[-4, 4]}>
                 <Button
                     type="text"

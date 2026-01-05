@@ -3,7 +3,7 @@ import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
 import { handleFormError } from '@/utils/form-errors';
 import { Head, router } from '@inertiajs/react';
-import { Button, Form, Input, Space, Typography, message, theme } from 'antd';
+import { App, Button, Form, Input, Space, Typography, theme } from 'antd';
 import { useState } from 'react';
 
 const { Text } = Typography;
@@ -25,6 +25,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const { token: themeToken } = useToken();
+    const { message } = App.useApp();
 
     const handleSubmit = async (values: Omit<ResetPasswordFormData, 'token'>) => {
         setLoading(true);
@@ -48,7 +49,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
             <Head title="Reset password" />
 
             <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false} initialValues={{ email }}>
-                <Space direction="vertical" size="middle" className="w-full">
+                <Space orientation="vertical" size="middle" className="w-full">
                     <Form.Item name="email" label={<Text style={{ color: themeToken.colorText }}>Email</Text>}>
                         <Input
                             value={email}

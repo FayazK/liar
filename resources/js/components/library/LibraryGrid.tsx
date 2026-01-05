@@ -3,7 +3,7 @@ import axios from '@/lib/axios';
 import type { Library } from '@/types/library';
 import { getErrorMessage } from '@/utils/errors';
 import { handleFormError } from '@/utils/form-errors';
-import { Empty, Form, Input, message, Modal, Space, Spin, theme, Typography } from 'antd';
+import { App, Empty, Form, Input, Modal, Space, Spin, theme, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import FileCard from './FileCard';
 import FolderTile from './FolderTile';
@@ -34,6 +34,7 @@ interface LibraryGridProps {
 
 export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProps) {
     const { token } = useToken();
+    const { message } = App.useApp();
     const [items, setItems] = useState<GridItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

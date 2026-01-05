@@ -2,7 +2,7 @@ import { Icon } from '@/components/ui/Icon';
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
 import { Head, router } from '@inertiajs/react';
-import { Alert, Button, Space, Typography, message, theme } from 'antd';
+import { Alert, App, Button, Space, Typography, theme } from 'antd';
 import { useState } from 'react';
 
 const { Link } = Typography;
@@ -12,6 +12,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
     const [loading, setLoading] = useState(false);
     const [emailSent, setEmailSent] = useState(status === 'verification-link-sent');
     const { token } = useToken();
+    const { message } = App.useApp();
 
     const handleResendEmail = async () => {
         setLoading(true);
@@ -40,7 +41,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
         <AuthLayout title="Verify your email" description="Please verify your email address by clicking on the link we just emailed to you.">
             <Head title="Email verification" />
 
-            <Space direction="vertical" size="large" className="w-full">
+            <Space orientation="vertical" size="large" className="w-full">
                 <Alert
                     message="Email Verification Required"
                     description="Before continuing, please check your email for a verification link. If you didn't receive the email, we can send you another one."
@@ -59,7 +60,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 )}
 
                 <div style={{ textAlign: 'center' }}>
-                    <Space direction="vertical" size="middle">
+                    <Space orientation="vertical" size="middle">
                         <Button
                             type="default"
                             size="large"

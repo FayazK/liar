@@ -1,6 +1,6 @@
 import axios from '@/lib/axios';
 import { handleFormError } from '@/utils/form-errors';
-import { Form, Input, message, Modal } from 'antd';
+import { App, Form, Input, Modal } from 'antd';
 import { useState } from 'react';
 
 interface CreateFolderModalProps {
@@ -12,6 +12,7 @@ interface CreateFolderModalProps {
 
 export default function CreateFolderModal({ open, onClose, parentId, onSuccess }: CreateFolderModalProps) {
     const [form] = Form.useForm();
+    const { message } = App.useApp();
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (values: { name: string }) => {

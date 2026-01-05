@@ -4,7 +4,7 @@ import api from '@/lib/axios';
 import { login } from '@/routes';
 import { handleFormError } from '@/utils/form-errors';
 import { Head } from '@inertiajs/react';
-import { Alert, Button, Form, Input, Space, Typography, message, theme } from 'antd';
+import { Alert, App, Button, Form, Input, Space, Typography, theme } from 'antd';
 import { useState } from 'react';
 
 const { Link, Text } = Typography;
@@ -19,6 +19,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
     const [loading, setLoading] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
     const { token } = useToken();
+    const { message } = App.useApp();
 
     const handleSubmit = async (values: ForgotPasswordFormData) => {
         setLoading(true);
@@ -50,9 +51,9 @@ export default function ForgotPassword({ status }: { status?: string }) {
                 />
             )}
 
-            <Space direction="vertical" size="large" className="w-full">
+            <Space orientation="vertical" size="large" className="w-full">
                 <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
-                    <Space direction="vertical" size="middle" className="w-full">
+                    <Space orientation="vertical" size="middle" className="w-full">
                         <Form.Item
                             name="email"
                             label={<Text style={{ color: token.colorText }}>Email address</Text>}

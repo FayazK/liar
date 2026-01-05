@@ -5,7 +5,7 @@ import { send } from '@/routes/verification';
 import { type SharedData } from '@/types';
 import { Form, Link, usePage } from '@inertiajs/react';
 import type { InputRef } from 'antd';
-import { Alert, Button, Divider, Input, message, Modal, Select, Space, theme, Typography } from 'antd';
+import { Alert, App, Button, Divider, Input, Modal, Select, Space, theme, Typography } from 'antd';
 import { useRef, useState } from 'react';
 
 const { Text, Title } = Typography;
@@ -20,6 +20,7 @@ interface ProfileFormProps {
 export default function ProfileForm({ mustVerifyEmail, status }: ProfileFormProps) {
     const { auth } = usePage<SharedData>().props;
     const { token } = useToken();
+    const { message } = App.useApp();
     const passwordInput = useRef<InputRef>(null);
     const [timezone, setTimezone] = useState(auth.user.timezone || 'UTC');
     const [locale, setLocale] = useState(auth.user.locale || 'en');
@@ -52,7 +53,7 @@ export default function ProfileForm({ mustVerifyEmail, status }: ProfileFormProp
     };
 
     return (
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="large" style={{ width: '100%' }}>
             <div>
                 <Title level={4} style={{ marginBottom: token.marginXS }}>
                     Profile
@@ -67,7 +68,7 @@ export default function ProfileForm({ mustVerifyEmail, status }: ProfileFormProp
                 onSuccess={() => message.success('Profile updated successfully!')}
             >
                 {({ processing, errors }) => (
-                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                    <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                         <div style={{ display: 'flex', gap: token.marginMD }}>
                             <div style={{ flex: 1 }}>
                                 <Text type="secondary" style={{ display: 'block', marginBottom: 4, fontSize: 13 }}>

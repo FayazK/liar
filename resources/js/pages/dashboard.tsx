@@ -2,7 +2,7 @@ import { Icon } from '@/components/ui/Icon';
 import AppLayout from '@/layouts/app-layout';
 import { type SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import { Avatar, Button, Card, Col, Dropdown, List, Progress, Row, Space, Statistic, Tag, theme, Typography } from 'antd';
+import { Avatar, Button, Card, Col, Dropdown, Flex, Progress, Row, Space, Statistic, Tag, theme, Typography } from 'antd';
 
 const { Title, Text, Paragraph } = Typography;
 const { useToken } = theme;
@@ -122,7 +122,7 @@ export default function Dashboard() {
         <AppLayout pageTitle="Dashboard" actions={headerActions}>
             <Head title="Dashboard" />
 
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Space orientation="vertical" size="large" style={{ width: '100%' }}>
                 <div>
                     <Title level={2} style={{ marginBottom: token.marginXS }}>
                         Welcome back, {auth.user.full_name}!
@@ -149,31 +149,28 @@ export default function Dashboard() {
                 <Row gutter={[16, 16]}>
                     <Col xs={24} lg={16}>
                         <Card title="Recent Activity" style={{ height: '400px' }}>
-                            <List
-                                dataSource={recentActivity}
-                                renderItem={(item) => (
-                                    <List.Item>
-                                        <List.Item.Meta
-                                            avatar={item.avatar}
-                                            title={
-                                                <Space>
-                                                    {item.title}
-                                                    <Tag color="blue">{item.tag}</Tag>
-                                                </Space>
-                                            }
-                                            description={item.description}
-                                        />
+                            <Flex vertical gap="middle">
+                                {recentActivity.map((item, index) => (
+                                    <Flex key={index} align="center" gap="middle" style={{ paddingBottom: '12px', borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
+                                        {item.avatar}
+                                        <Flex vertical style={{ flex: 1 }}>
+                                            <Space>
+                                                <Text strong>{item.title}</Text>
+                                                <Tag color="blue">{item.tag}</Tag>
+                                            </Space>
+                                            <Text type="secondary">{item.description}</Text>
+                                        </Flex>
                                         <Text type="secondary">{item.time}</Text>
-                                    </List.Item>
-                                )}
-                            />
+                                    </Flex>
+                                ))}
+                            </Flex>
                         </Card>
                     </Col>
 
                     <Col xs={24} lg={8}>
-                        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                             <Card title="Performance">
-                                <Space direction="vertical" style={{ width: '100%' }}>
+                                <Space orientation="vertical" style={{ width: '100%' }}>
                                     <div>
                                         <Text>CPU Usage</Text>
                                         <Progress percent={65} strokeColor={token.colorSuccess} />
@@ -190,7 +187,7 @@ export default function Dashboard() {
                             </Card>
 
                             <Card title="Quick Stats">
-                                <Space direction="vertical" style={{ width: '100%' }}>
+                                <Space orientation="vertical" style={{ width: '100%' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                         <Text>Active Sessions</Text>
                                         <Text strong>24</Text>

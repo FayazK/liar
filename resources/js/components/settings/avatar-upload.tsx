@@ -1,13 +1,14 @@
 import { Icon } from '@/components/ui/Icon';
 import type { SharedData } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import { Avatar, Button, message, Space, theme, Upload } from 'antd';
+import { App, Avatar, Button, Space, theme, Upload } from 'antd';
 import type { RcFile, UploadProps } from 'antd/es/upload';
 import { useState } from 'react';
 
 export default function AvatarUpload() {
     const { auth } = usePage<SharedData>().props;
     const { token } = theme.useToken();
+    const { message } = App.useApp();
     const [uploading, setUploading] = useState(false);
 
     const beforeUpload = (file: RcFile): boolean => {
