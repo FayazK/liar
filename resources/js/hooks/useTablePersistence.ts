@@ -1,9 +1,11 @@
+import axios from '@/lib/axios';
 import type { CustomTab, DataTableFilters, PersistedTableState, TabColumnSettings, UseTablePersistenceReturn } from '@/types/datatable';
 import type { SortingState, VisibilityState } from '@tanstack/react-table';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const STORAGE_PREFIX = 'datatable:';
-const DEBOUNCE_MS = 500;
+const LOCAL_DEBOUNCE_MS = 500;
+const SERVER_DEBOUNCE_MS = 1000;
 
 /**
  * Default state for a new table
@@ -22,7 +24,12 @@ function getDefaultState(defaultPageSize: number): PersistedTableState {
 }
 
 /**
- * Hook for persisting DataTable state to localStorage
+ * Hook for persisting DataTable state to localStorage and server
+ *
+ * Strategy: Optimistic localStorage-first approach
+ * - On mount: Show localStorage data immediately (instant UX)
+ * - Background: Fetch from server, update state if server data exists
+ * - On change: Save to localStorage immediately, debounce sync to server
  */
 export function useTablePersistence(persistenceKey: string | undefined, defaultPageSize: number = 15): UseTablePersistenceReturn {
     const [state, setState] = useState<PersistedTableState>(() => {
@@ -30,6 +37,7 @@ export function useTablePersistence(persistenceKey: string | undefined, defaultP
             return getDefaultState(defaultPageSize);
         }
 
+        // Load from localStorage immediately for instant UX
         try {
             const stored = localStorage.getItem(`${STORAGE_PREFIX}${persistenceKey}`);
             if (stored) {
@@ -47,48 +55,110 @@ export function useTablePersistence(persistenceKey: string | undefined, defaultP
         return getDefaultState(defaultPageSize);
     });
 
-    // Debounce timer ref
-    const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    // Debounce timer refs
+    const localSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const serverSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const serverSyncInitialized = useRef(false);
 
     // Save to localStorage with debounce
-    const saveToStorage = useCallback(
+    const saveToLocalStorage = useCallback(
         (newState: PersistedTableState) => {
             if (!persistenceKey) return;
 
-            if (saveTimerRef.current) {
-                clearTimeout(saveTimerRef.current);
+            if (localSaveTimerRef.current) {
+                clearTimeout(localSaveTimerRef.current);
             }
 
-            saveTimerRef.current = setTimeout(() => {
+            localSaveTimerRef.current = setTimeout(() => {
                 try {
                     localStorage.setItem(`${STORAGE_PREFIX}${persistenceKey}`, JSON.stringify(newState));
                 } catch {
                     // localStorage full or unavailable
                 }
-            }, DEBOUNCE_MS);
+            }, LOCAL_DEBOUNCE_MS);
         },
         [persistenceKey],
     );
 
-    // Cleanup timer on unmount
+    // Save to server with debounce
+    const saveToServer = useCallback(
+        (newState: PersistedTableState) => {
+            if (!persistenceKey) return;
+
+            if (serverSaveTimerRef.current) {
+                clearTimeout(serverSaveTimerRef.current);
+            }
+
+            serverSaveTimerRef.current = setTimeout(async () => {
+                try {
+                    await axios.post(`/api/table-preferences/${persistenceKey}`, newState);
+                } catch {
+                    // Silent fail - localStorage has the data as backup
+                }
+            }, SERVER_DEBOUNCE_MS);
+        },
+        [persistenceKey],
+    );
+
+    // Load from server on mount (background sync)
+    useEffect(() => {
+        if (!persistenceKey || serverSyncInitialized.current) return;
+
+        serverSyncInitialized.current = true;
+
+        const loadFromServer = async () => {
+            try {
+                const response = await axios.get<{ data: PersistedTableState | null }>(`/api/table-preferences/${persistenceKey}`);
+                const serverData = response.data.data;
+
+                if (serverData) {
+                    // Server has data, update state and localStorage
+                    const mergedState = {
+                        ...getDefaultState(defaultPageSize),
+                        ...serverData,
+                        pageSize: serverData.pageSize ?? defaultPageSize,
+                    };
+
+                    setState(mergedState);
+
+                    // Update localStorage cache
+                    try {
+                        localStorage.setItem(`${STORAGE_PREFIX}${persistenceKey}`, JSON.stringify(mergedState));
+                    } catch {
+                        // Ignore localStorage errors
+                    }
+                }
+            } catch {
+                // Server unavailable, continue with localStorage data
+            }
+        };
+
+        loadFromServer();
+    }, [persistenceKey, defaultPageSize]);
+
+    // Cleanup timers on unmount
     useEffect(() => {
         return () => {
-            if (saveTimerRef.current) {
-                clearTimeout(saveTimerRef.current);
+            if (localSaveTimerRef.current) {
+                clearTimeout(localSaveTimerRef.current);
+            }
+            if (serverSaveTimerRef.current) {
+                clearTimeout(serverSaveTimerRef.current);
             }
         };
     }, []);
 
-    // Update helpers
+    // Update helpers - saves to both localStorage and server
     const updateState = useCallback(
         (updater: (prev: PersistedTableState) => PersistedTableState) => {
             setState((prev) => {
                 const newState = updater(prev);
-                saveToStorage(newState);
+                saveToLocalStorage(newState);
+                saveToServer(newState);
                 return newState;
             });
         },
-        [saveToStorage],
+        [saveToLocalStorage, saveToServer],
     );
 
     const setColumnVisibility = useCallback(
@@ -195,12 +265,19 @@ export function useTablePersistence(persistenceKey: string | undefined, defaultP
     const reset = useCallback(() => {
         const defaultState = getDefaultState(defaultPageSize);
         setState(defaultState);
+
         if (persistenceKey) {
+            // Clear localStorage
             try {
                 localStorage.removeItem(`${STORAGE_PREFIX}${persistenceKey}`);
             } catch {
                 // Ignore
             }
+
+            // Clear server (async, fire and forget)
+            axios.post(`/api/table-preferences/${persistenceKey}`, defaultState).catch(() => {
+                // Silent fail
+            });
         }
     }, [persistenceKey, defaultPageSize]);
 
