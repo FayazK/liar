@@ -1,13 +1,14 @@
 import GlobalSearch, { useGlobalSearch } from '@/components/global-search';
 import NotificationsCenter from '@/components/notifications-center';
 import { Icon } from '@/components/ui/Icon';
+import UserDropdown from '@/components/user-dropdown';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSidebarState } from '@/hooks/use-sidebar-state';
 import { dashboard } from '@/routes';
 import { type NavGroup, type NavItem, type SharedData } from '@/types';
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import type { MenuProps } from 'antd';
-import { Avatar, Badge, Button, Drawer, Dropdown, Flex, Input, Layout, Menu, theme, Typography } from 'antd';
+import { Badge, Button, Drawer, Flex, Input, Layout, Menu, theme, Typography } from 'antd';
 import { type ReactNode } from 'react';
 import logo from '../../images/logo.svg';
 
@@ -81,28 +82,6 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
         }
     };
 
-    const handleLogout = () => {
-        router.post('/logout');
-    };
-
-    // User dropdown menu items (now in header)
-    const userMenuItems = [
-        {
-            key: 'account',
-            icon: <Icon name="settings" size={16} />,
-            label: <Link href="/settings/account">Account</Link>,
-        },
-        {
-            type: 'divider' as const,
-        },
-        {
-            key: 'logout',
-            icon: <Icon name="logout" size={16} />,
-            label: 'Sign Out',
-            onClick: handleLogout,
-        },
-    ];
-
     // Build menu items with badge support
     const menuItems: MenuProps['items'] = [
         ...(buildMenuItems(mainNavItems, isMobile ? closeMobileMenu : undefined) ?? []),
@@ -164,9 +143,10 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
             </Flex>
 
             {/* Menu Section */}
-            <Flex vertical style={{ flex: 1, overflow: 'auto', paddingTop: token.paddingMD }}>
+            <Flex vertical style={{ flex: 1, overflow: 'auto', paddingTop: token.paddingXS }}>
                 <Menu
                     mode="inline"
+                    inlineIndent={16}
                     items={menuItems}
                     style={{
                         width: '100%',
@@ -210,9 +190,10 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
             </Flex>
 
             {/* Menu Section */}
-            <Flex vertical style={{ flex: 1, overflow: 'auto', paddingTop: token.paddingMD }}>
+            <Flex vertical style={{ flex: 1, overflow: 'auto', paddingTop: token.paddingXS }}>
                 <Menu
                     mode="inline"
+                    inlineIndent={16}
                     items={menuItems}
                     style={{
                         width: '100%',
@@ -360,9 +341,7 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
                                 <NotificationsCenter />
 
                                 {/* User Avatar Dropdown */}
-                                <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow>
-                                    <Avatar src={auth.user.avatar_thumb_url} icon={<Icon name="user" size={16} />} style={{ cursor: 'pointer' }} />
-                                </Dropdown>
+                                <UserDropdown user={auth.user} />
                             </Flex>
                         </Flex>
                     </Header>

@@ -70,6 +70,17 @@ function ThemedApp({ App, props }: ThemedAppProps) {
                         Popover: {
                             boxShadowSecondary: 'none',
                         },
+                        Menu: {
+                            itemHeight: 36,
+                            itemMarginInline: 4,
+                            itemPaddingInline: 8,
+                            groupTitleFontSize: 12,
+                            groupTitleLineHeight: 1.5,
+                            iconMarginInlineEnd: 8,
+                            subMenuItemBorderRadius: 6,
+                            itemBorderRadius: 6,
+                            collapsedIconSize: 18,
+                        },
                     },
                 }}
             >

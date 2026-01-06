@@ -24,6 +24,8 @@ export type IconName =
     // Settings & Preferences
     | 'settings'
     | 'palette'
+    // Finance
+    | 'credit-card'
     // Actions
     | 'search'
     | 'edit'

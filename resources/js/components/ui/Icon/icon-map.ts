@@ -14,6 +14,7 @@ import {
     IconChevronUp,
     IconClock,
     IconCode,
+    IconCreditCard,
     IconCurrencyDollar,
     IconDashboard,
     IconDatabase,
@@ -95,6 +96,9 @@ export const iconMap: Record<IconName, TablerIconComponent> = {
     // Settings & Preferences
     settings: IconSettings,
     palette: IconPalette,
+
+    // Finance
+    'credit-card': IconCreditCard,
 
     // Actions
     search: IconSearch,
