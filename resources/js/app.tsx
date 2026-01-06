@@ -1,4 +1,5 @@
 import { createInertiaApp } from '@inertiajs/react';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { App as AntApp, ConfigProvider, theme } from 'antd';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { ComponentType } from 'react';
@@ -6,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../css/app.css';
 import { initializeTheme } from './hooks/use-appearance';
+import { queryClient } from './lib/query-client';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -33,47 +35,49 @@ function ThemedApp({ App, props }: ThemedAppProps) {
     }, []);
 
     return (
-        <ConfigProvider
-            theme={{
-                algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
-                token: {
-                    borderRadius: 8,
-                    boxShadow: 'none',
-                    boxShadowSecondary: 'none',
-                    boxShadowTertiary: 'none',
-                },
-                components: {
-                    Button: {
-                        primaryShadow: 'none',
-                        defaultShadow: 'none',
-                        dangerShadow: 'none',
-                        controlTmpOutline: 'transparent',
-                        controlOutline: 'transparent',
-                    },
-                    Card: {
+        <QueryClientProvider client={queryClient}>
+            <ConfigProvider
+                theme={{
+                    algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+                    token: {
+                        borderRadius: 8,
                         boxShadow: 'none',
                         boxShadowSecondary: 'none',
                         boxShadowTertiary: 'none',
                     },
-                    Dropdown: {
-                        boxShadowSecondary: 'none',
+                    components: {
+                        Button: {
+                            primaryShadow: 'none',
+                            defaultShadow: 'none',
+                            dangerShadow: 'none',
+                            controlTmpOutline: 'transparent',
+                            controlOutline: 'transparent',
+                        },
+                        Card: {
+                            boxShadow: 'none',
+                            boxShadowSecondary: 'none',
+                            boxShadowTertiary: 'none',
+                        },
+                        Dropdown: {
+                            boxShadowSecondary: 'none',
+                        },
+                        Modal: {
+                            boxShadow: 'none',
+                        },
+                        Drawer: {
+                            boxShadow: 'none',
+                        },
+                        Popover: {
+                            boxShadowSecondary: 'none',
+                        },
                     },
-                    Modal: {
-                        boxShadow: 'none',
-                    },
-                    Drawer: {
-                        boxShadow: 'none',
-                    },
-                    Popover: {
-                        boxShadowSecondary: 'none',
-                    },
-                },
-            }}
-        >
-            <AntApp>
-                <App {...props} />
-            </AntApp>
-        </ConfigProvider>
+                }}
+            >
+                <AntApp>
+                    <App {...props} />
+                </AntApp>
+            </ConfigProvider>
+        </QueryClientProvider>
     );
 }
 

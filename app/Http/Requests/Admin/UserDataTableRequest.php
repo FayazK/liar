@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\DataTable\Definitions\FilterDefinition;
+use App\DataTable\Enums\FilterType;
 use App\Http\Requests\DataTableRequest;
-use Illuminate\Contracts\Validation\ValidationRule;
 
-class UserDataTableRequest extends DataTableRequest
+final class UserDataTableRequest extends DataTableRequest
 {
     /**
      * @return array<int, string>
@@ -29,14 +30,22 @@ class UserDataTableRequest extends DataTableRequest
     }
 
     /**
-     * @return array<string, ValidationRule|array|string>
+     * @return array<FilterDefinition>
      */
     #[\Override]
-    protected function getFilterRules(): array
+    protected function getFilterDefinitions(): array
     {
         return [
-            'is_active' => ['nullable'],
-            'created_at' => ['nullable'],
+            new FilterDefinition(
+                name: 'is_active',
+                type: FilterType::Boolean,
+                label: 'Status',
+            ),
+            new FilterDefinition(
+                name: 'created_at',
+                type: FilterType::DateRange,
+                label: 'Created Date',
+            ),
         ];
     }
 }

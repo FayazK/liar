@@ -4,58 +4,80 @@ declare(strict_types=1);
 
 namespace App\Queries;
 
+use App\DataTable\Definitions\FilterDefinition;
+use App\DataTable\Definitions\SearchDefinition;
+use App\DataTable\Definitions\SortDefinition;
+use App\DataTable\Filters\FilterRegistry;
+use App\DataTable\Search\SearchEngine;
+use App\DataTable\Support\RelationshipHandler;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 
+/**
+ * Abstract service for DataTable queries with filtering, searching, and sorting.
+ */
 abstract class DataTableQueryService
 {
     private const int DEFAULT_PER_PAGE = 15;
 
     private const int MAX_PER_PAGE = 100;
 
-    private const int MAX_SEARCH_LENGTH = 255;
-
-    private const string DEFAULT_SORT_COLUMN = 'created_at';
-
     private const string DEFAULT_SORT_DIRECTION = 'desc';
-
-    /**
-     * @var array<int, string>
-     */
-    private const array ALLOWED_SORT_DIRECTIONS = ['asc', 'desc'];
 
     protected Builder $query;
 
     protected Request $request;
 
-    /**
-     * Columns that can be searched globally.
-     *
-     * @var array<int, string>
-     */
-    protected array $searchableColumns = [];
+    protected FilterRegistry $filterRegistry;
 
-    /**
-     * Columns that can be filtered, with optional custom filter methods.
-     *
-     * @var array<int|string, string>
-     */
-    protected array $filterableColumns = [];
+    protected SearchEngine $searchEngine;
 
-    /**
-     * Columns that are allowed for sorting.
-     *
-     * @var array<int, string>
-     */
-    protected array $sortableColumns = [];
+    protected RelationshipHandler $relationshipHandler;
 
     public function __construct(Builder $query, Request $request)
     {
         $this->query = $query;
         $this->request = $request;
+
+        // Resolve dependencies from container
+        $this->filterRegistry = app(FilterRegistry::class);
+        $this->searchEngine = app(SearchEngine::class);
+        $this->relationshipHandler = app(RelationshipHandler::class);
     }
 
+    /**
+     * Define filter configurations for this table.
+     *
+     * @return array<FilterDefinition>
+     */
+    abstract protected function defineFilters(): array;
+
+    /**
+     * Define searchable columns for this table.
+     *
+     * @return array<SearchDefinition>
+     */
+    abstract protected function defineSearchable(): array;
+
+    /**
+     * Define sortable columns for this table.
+     *
+     * @return array<SortDefinition>
+     */
+    abstract protected function defineSortable(): array;
+
+    /**
+     * Get the default sort column.
+     */
+    protected function getDefaultSortColumn(): string
+    {
+        return 'created_at';
+    }
+
+    /**
+     * Get paginated results.
+     */
     public function getResults(): LengthAwarePaginator
     {
         $this->applySearching();
@@ -65,6 +87,9 @@ abstract class DataTableQueryService
         return $this->paginateResults();
     }
 
+    /**
+     * Apply search filters to the query.
+     */
     protected function applySearching(): void
     {
         $search = $this->request->get('search');
@@ -73,86 +98,248 @@ abstract class DataTableQueryService
             return;
         }
 
-        // Limit search string length for performance and security
-        $search = mb_substr($search, 0, self::MAX_SEARCH_LENGTH);
-
-        $this->query->where(function (Builder $q) use ($search): void {
-            foreach ($this->searchableColumns as $column) {
-                $q->orWhere($column, 'LIKE', '%'.$search.'%');
-            }
-        });
+        $this->searchEngine->apply($this->query, $search, $this->defineSearchable());
     }
 
+    /**
+     * Apply filters to the query.
+     */
     protected function applyFilters(): void
     {
-        foreach ($this->filterableColumns as $column => $method) {
-            // Handle both simple array values and associative definitions
-            $filterColumn = is_int($column) ? $method : $column;
+        $filters = $this->getFiltersFromRequest();
+        $definitions = $this->defineFilters();
 
-            if (! $this->request->has($filterColumn)) {
+        foreach ($definitions as $definition) {
+            $filterValue = $filters[$definition->name] ?? null;
+
+            if ($filterValue === null || $filterValue === '') {
                 continue;
             }
 
-            $value = $this->request->get($filterColumn);
+            $this->filterRegistry->apply($this->query, $definition, $filterValue);
+        }
+    }
 
-            // If a custom filter method is defined (e.g., 'created_at' => 'applyDateRangeFilter')
-            if (is_string($column) && method_exists($this, $method)) {
-                $this->{$method}($this->query, $value);
-            } else {
-                // Default behavior for simple filters
-                $this->applyDefaultFilter($this->query, $filterColumn, $value);
+    /**
+     * Get filters from the request.
+     *
+     * @return array<string, mixed>
+     */
+    protected function getFiltersFromRequest(): array
+    {
+        // Support both nested 'filters' object and flat params
+        $filters = $this->request->get('filters');
+
+        // Handle JSON-encoded filters string
+        if (is_string($filters)) {
+            $decoded = json_decode($filters, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
             }
         }
+
+        if (is_array($filters)) {
+            return $filters;
+        }
+
+        // Fall back to individual filter params
+        $result = [];
+        foreach ($this->defineFilters() as $definition) {
+            $value = $this->request->get($definition->name);
+            if ($value !== null) {
+                $result[$definition->name] = $value;
+            }
+        }
+
+        return $result;
     }
 
-    protected function applyDefaultFilter(Builder $query, string $column, mixed $value): void
-    {
-        if ($value === null || $value === '') {
-            return;
-        }
-
-        // Handle boolean values that might come as strings
-        if (is_string($value) && in_array(strtolower($value), ['true', 'false'], true)) {
-            $query->where($column, strtolower($value) === 'true');
-
-            return;
-        }
-
-        // Handle actual boolean values
-        if (is_bool($value)) {
-            $query->where($column, $value);
-
-            return;
-        }
-
-        $query->where($column, $value);
-    }
-
+    /**
+     * Apply sorting to the query.
+     */
     protected function applySorting(): void
     {
-        $sortBy = $this->request->get('sort_by', self::DEFAULT_SORT_COLUMN);
-        $sortDirection = $this->request->get('sort_direction', self::DEFAULT_SORT_DIRECTION);
+        $sorts = $this->getSortsFromRequest();
 
-        // Validate sort column against whitelist
-        if (! is_string($sortBy) || (! empty($this->sortableColumns) && ! in_array($sortBy, $this->sortableColumns, true))) {
-            $sortBy = self::DEFAULT_SORT_COLUMN;
+        if (empty($sorts)) {
+            // Apply default sort
+            $this->query->orderBy($this->getDefaultSortColumn(), self::DEFAULT_SORT_DIRECTION);
+
+            return;
         }
 
-        // Validate sort direction
-        if (! is_string($sortDirection) || ! in_array(strtolower($sortDirection), self::ALLOWED_SORT_DIRECTIONS, true)) {
-            $sortDirection = self::DEFAULT_SORT_DIRECTION;
-        }
+        $sortDefinitions = $this->getSortDefinitionsMap();
 
-        $this->query->orderBy($sortBy, strtolower($sortDirection));
+        foreach ($sorts as $sort) {
+            $column = $sort['column'] ?? null;
+            $direction = $this->validateSortDirection($sort['direction'] ?? 'asc');
+
+            if ($column === null || ! isset($sortDefinitions[$column])) {
+                continue;
+            }
+
+            $definition = $sortDefinitions[$column];
+            $this->applySortDefinition($definition, $direction);
+        }
     }
 
+    /**
+     * Get sort requests from the request.
+     *
+     * @return array<array{column: string, direction: string}>
+     */
+    protected function getSortsFromRequest(): array
+    {
+        // Support new 'sorts' array format
+        $sorts = $this->request->get('sorts');
+
+        if (is_array($sorts) && ! empty($sorts)) {
+            return $sorts;
+        }
+
+        // Support legacy single sort format
+        $sortBy = $this->request->get('sort_by');
+        $sortDirection = $this->request->get('sort_direction', 'asc');
+
+        if (is_string($sortBy) && $sortBy !== '') {
+            return [['column' => $sortBy, 'direction' => $sortDirection]];
+        }
+
+        return [];
+    }
+
+    /**
+     * Get sort definitions as a map keyed by name.
+     *
+     * @return array<string, SortDefinition>
+     */
+    protected function getSortDefinitionsMap(): array
+    {
+        $map = [];
+        foreach ($this->defineSortable() as $definition) {
+            $map[$definition->name] = $definition;
+        }
+
+        return $map;
+    }
+
+    /**
+     * Apply a single sort definition to the query.
+     */
+    protected function applySortDefinition(SortDefinition $definition, string $direction): void
+    {
+        // Custom sort callback
+        if ($definition->hasCustomSort()) {
+            ($definition->customSort)($this->query, $direction);
+
+            return;
+        }
+
+        // Aggregate sort
+        if ($definition->hasAggregate()) {
+            $this->applyAggregateSort($definition, $direction);
+
+            return;
+        }
+
+        // Relationship sort
+        if ($definition->hasRelationship()) {
+            $column = $this->relationshipHandler->applyJoinAndGetColumn(
+                $this->query,
+                $definition->getColumn(),
+                $definition->relationship
+            );
+            $this->query->orderBy($column, $direction);
+
+            return;
+        }
+
+        // Simple column sort
+        $this->query->orderBy($definition->getColumn(), $direction);
+    }
+
+    /**
+     * Apply aggregate sorting (count, sum, avg, etc.).
+     */
+    protected function applyAggregateSort(SortDefinition $definition, string $direction): void
+    {
+        if (! $definition->hasRelationship() || ! $definition->hasAggregate()) {
+            return;
+        }
+
+        $relationship = $definition->relationship;
+        $aggregate = $definition->aggregate;
+        $column = $definition->getColumn();
+        $alias = "{$relationship}_{$aggregate}_{$column}";
+
+        $this->query->withCount([
+            "{$relationship} as {$alias}" => function (Builder $query) use ($aggregate, $column): void {
+                if ($aggregate !== 'count') {
+                    $query->select(\DB::raw("{$aggregate}({$column})"));
+                }
+            },
+        ]);
+
+        $this->query->orderBy($alias, $direction);
+    }
+
+    /**
+     * Validate and normalize sort direction.
+     */
+    protected function validateSortDirection(string $direction): string
+    {
+        $direction = strtolower($direction);
+
+        return in_array($direction, ['asc', 'desc'], true) ? $direction : 'asc';
+    }
+
+    /**
+     * Paginate the results.
+     */
     protected function paginateResults(): LengthAwarePaginator
     {
         $perPage = (int) $this->request->get('per_page', self::DEFAULT_PER_PAGE);
-
-        // Enforce maximum per_page to prevent performance issues
         $perPage = min(max($perPage, 1), self::MAX_PER_PAGE);
 
         return $this->query->paginate($perPage);
+    }
+
+    /**
+     * Get filter metadata for frontend consumption.
+     *
+     * @return array<array<string, mixed>>
+     */
+    public function getFilterMetadata(): array
+    {
+        return array_map(
+            fn (FilterDefinition $def) => $def->toArray(),
+            $this->defineFilters()
+        );
+    }
+
+    /**
+     * Get searchable metadata for frontend consumption.
+     *
+     * @return array<array<string, mixed>>
+     */
+    public function getSearchableMetadata(): array
+    {
+        return array_map(
+            fn (SearchDefinition $def) => $def->toArray(),
+            $this->defineSearchable()
+        );
+    }
+
+    /**
+     * Get sortable metadata for frontend consumption.
+     *
+     * @return array<array<string, mixed>>
+     */
+    public function getSortableMetadata(): array
+    {
+        return array_map(
+            fn (SortDefinition $def) => $def->toArray(),
+            $this->defineSortable()
+        );
     }
 }

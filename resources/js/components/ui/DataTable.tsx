@@ -1,411 +1,288 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Table, Input, Space, Typography, Button, notification, theme } from 'antd';
-import { Icon } from '@/components/ui/Icon';
-import type { TableProps, TableColumnType, InputRef } from 'antd';
-import type { Dayjs } from 'dayjs';
-import axios from '@/lib/axios';
-import { debounce } from '@/lib/utils';
-import { EmptyState } from './data-table/EmptyState';
-import { FilterRenderer } from './data-table/filters';
+import { useDataTable } from '@/hooks/useDataTable';
 import type {
-    DataTableProps,
+    BulkActionConfig,
+    CustomTab,
     DataTableFilters,
-    DataTableError,
+    DataTableQueryFn,
+    FilterConfig,
+    TabConfig,
 } from '@/types/datatable';
-import type { LaravelPaginatedResponse } from '@/types';
+import type { ColumnDef, Row } from '@tanstack/react-table';
+import { theme } from 'antd';
+import { useState } from 'react';
+import { BulkActionsBar, ColumnManager, CustomTabModal, TableBody, TableHeader, TablePagination } from './data-table';
 
-const { Text } = Typography;
 const { useToken } = theme;
 
-interface DataTableState<T> {
-    data: T[];
-    loading: boolean;
-    error: DataTableError | null;
-    pagination: {
-        current: number;
-        pageSize: number;
-        total: number;
-        showSizeChanger: boolean;
-        showQuickJumper: boolean;
-        showTotal: (total: number, range: [number, number]) => string;
-    };
+export interface DataTableProps<TData> {
+    /** Unique key for TanStack Query caching */
+    queryKey: string[];
+    /** Function to fetch paginated data */
+    queryFn: DataTableQueryFn<TData>;
+    /** TanStack Table column definitions */
+    columns: ColumnDef<TData>[];
+    /** Predefined tabs with filters */
+    tabs?: TabConfig[];
+    /** Default active tab ID */
+    defaultTab?: string;
+    /** Allow users to create custom filter tabs (localStorage) */
+    enableCustomTabs?: boolean;
+    /** Enable row selection checkboxes */
+    enableRowSelection?: boolean | ((row: Row<TData>) => boolean);
+    /** Enable column visibility management */
+    enableColumnVisibility?: boolean;
+    /** Enable column reordering via drag-and-drop */
+    enableColumnOrdering?: boolean;
+    /** Bulk actions for selected rows */
+    bulkActions?: BulkActionConfig<TData>[];
+    /** LocalStorage key for persisting table state */
+    persistenceKey?: string;
+    /** Placeholder text for search input */
+    searchPlaceholder?: string;
+    /** Message when no data exists */
+    emptyMessage?: string;
+    /** Message when filters return no results */
+    emptyFilterMessage?: string;
+    /** Filter configurations */
+    filters?: FilterConfig[];
+    /** Default page size */
+    defaultPageSize?: number;
+    /** Callback when a row is clicked */
+    onRowClick?: (row: Row<TData>) => void;
 }
 
-function DataTable<T extends Record<string, unknown>>({
-    fetchUrl,
+export function DataTable<TData>({
+    queryKey,
+    queryFn,
     columns,
-    filters: filterConfigs = [],
+    tabs = [],
+    defaultTab,
+    enableCustomTabs = false,
+    enableRowSelection = false,
+    enableColumnVisibility = false,
+    enableColumnOrdering = false,
+    bulkActions = [],
+    persistenceKey,
     searchPlaceholder = 'Search...',
+    emptyMessage = 'No data available',
+    emptyFilterMessage = 'No results match your filters',
+    filters: filterConfigs = [],
     defaultPageSize = 15,
-    emptyMessage,
-    emptyFilterMessage,
-    params: additionalParams = {},
-}: DataTableProps<T>) {
+    onRowClick,
+}: DataTableProps<TData>) {
     const { token } = useToken();
-    const searchInputRef = useRef<InputRef>(null);
 
-    const [state, setState] = useState<DataTableState<T>>({
-        data: [],
-        loading: false,
-        error: null,
-        pagination: {
-            current: 1,
-            pageSize: defaultPageSize,
-            total: 0,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-        },
+    // Column manager modal state
+    const [columnManagerOpen, setColumnManagerOpen] = useState(false);
+
+    // Custom tab modal state
+    const [customTabModalOpen, setCustomTabModalOpen] = useState(false);
+    const [editingTab, setEditingTab] = useState<CustomTab | null>(null);
+
+    // Use the main data table hook
+    const {
+        table,
+        isLoading,
+        isFetching,
+        data,
+        totalCount,
+        pageCount,
+        currentPage,
+        pageSize,
+        searchValue,
+        setSearchValue,
+        filters,
+        setFilter,
+        clearFilters,
+        activeTabId,
+        setActiveTab,
+        customTabs,
+        createCustomTab,
+        updateCustomTab,
+        deleteCustomTab,
+        selectedRows,
+        clearSelection,
+        columnVisibility,
+        setColumnVisibility,
+        columnOrder,
+        setColumnOrder,
+        resetColumnSettings,
+    } = useDataTable({
+        queryKey,
+        queryFn,
+        columns,
+        persistenceKey,
+        defaultPageSize,
+        tabs,
+        defaultTab,
+        enableRowSelection: typeof enableRowSelection === 'function' ? enableRowSelection : enableRowSelection,
     });
 
-    const [search, setSearch] = useState<string>('');
-    const [filters, setFilters] = useState<DataTableFilters>({});
-    const [sorter, setSorter] = useState<{
-        field?: string | number;
-        order?: 'ascend' | 'descend';
-    }>({});
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(defaultPageSize);
-    const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true);
+    // Determine if we have active filters
+    const hasFilters = searchValue.length > 0 || Object.keys(filters).length > 0;
 
-    const fetchData = async (params: {
-        page?: number;
-        per_page?: number;
-        search?: string;
-        filters?: DataTableFilters;
-        sort_by?: string;
-        sort_direction?: 'asc' | 'desc';
-    } = {}): Promise<void> => {
-        setState((prev) => ({ ...prev, loading: true, error: null }));
+    // Show header section (tabs + search/filters)
+    const showHeader = tabs.length > 0 || customTabs.length > 0 || enableCustomTabs || filterConfigs.length > 0;
 
-        try {
-            const queryParams = new URLSearchParams();
-
-            if (params.page) queryParams.set('page', params.page.toString());
-            if (params.per_page) queryParams.set('per_page', params.per_page.toString());
-            if (params.search) queryParams.set('search', params.search);
-            if (params.sort_by) queryParams.set('sort_by', params.sort_by);
-            if (params.sort_direction) queryParams.set('sort_direction', params.sort_direction);
-
-            // Add filters to query params
-            if (params.filters) {
-                Object.entries(params.filters).forEach(([key, value]) => {
-                    if (value === undefined || value === null || value === '') {
-                        return;
-                    }
-                    if (Array.isArray(value)) {
-                        // Handle date range - convert Dayjs to string
-                        const dateStrings = value.map((d) =>
-                            d && typeof d === 'object' && 'format' in d
-                                ? (d as Dayjs).format('YYYY-MM-DD')
-                                : d
-                        );
-                        queryParams.set(key, JSON.stringify(dateStrings));
-                    } else {
-                        queryParams.set(key, String(value));
-                    }
-                });
-            }
-
-            // Add additional params from props
-            Object.entries(additionalParams).forEach(([key, value]) => {
-                if (value !== undefined && value !== null) {
-                    queryParams.set(key, String(value));
-                }
-            });
-
-            const url = `${fetchUrl}?${queryParams.toString()}`;
-            const response = await axios.get<LaravelPaginatedResponse<T>>(url);
-
-            setState((prev) => ({
-                ...prev,
-                data: response.data.data,
-                loading: false,
-                error: null,
-                pagination: {
-                    ...prev.pagination,
-                    current: response.data.meta.current_page,
-                    total: response.data.meta.total,
-                    pageSize: response.data.meta.per_page,
-                },
-            }));
-            setIsInitialLoad(false);
-        } catch (error) {
-            let errorMessage = 'An unexpected error occurred while loading data.';
-            if (error && typeof error === 'object' && 'response' in error) {
-                const axiosError = error as { response?: { data?: { message?: string } } };
-                errorMessage = axiosError.response?.data?.message || 'Unable to load data. Please try again.';
-            }
-
-            notification.error({
-                message: 'Failed to Load Data',
-                description: errorMessage,
-                duration: 5,
-            });
-
-            setState((prev) => ({
-                ...prev,
-                loading: false,
-                data: [],
-                error: {
-                    hasError: true,
-                    message: errorMessage,
-                    canRetry: true,
-                },
-            }));
-            setIsInitialLoad(false);
-        }
+    // Handle page change
+    const handlePageChange = (page: number) => {
+        table.setPageIndex(page - 1);
     };
 
-    const debouncedFetchData = (params: {
-        page?: number;
-        per_page?: number;
-        search?: string;
-        filters?: DataTableFilters;
-        sort_by?: string;
-        sort_direction?: 'asc' | 'desc';
-    }): void => {
-        const debouncedFn = debounce(() => {
-            fetchData(params);
-        }, 300);
-        debouncedFn();
+    // Handle page size change
+    const handlePageSizeChange = (newPageSize: number) => {
+        table.setPageSize(newPageSize);
     };
 
-    // Initial load
-    useEffect(() => {
-        fetchData({
-            page: 1,
-            per_page: defaultPageSize,
-        });
-    }, [defaultPageSize]);
+    // Handle custom tab creation
+    const handleCreateTab = () => {
+        setEditingTab(null);
+        setCustomTabModalOpen(true);
+    };
 
-    // Refetch on filter/search/sort changes
-    useEffect(() => {
-        if (isInitialLoad) return;
+    // Handle custom tab edit
+    const handleEditTab = (tab: CustomTab) => {
+        setEditingTab(tab);
+        setCustomTabModalOpen(true);
+    };
 
-        const params = {
-            page: currentPage,
-            per_page: pageSize,
-            search: search || undefined,
-            filters: Object.keys(filters).length > 0 ? filters : undefined,
-            sort_by: sorter.field ? String(sorter.field) : undefined,
-            sort_direction:
-                sorter.order === 'ascend'
-                    ? ('asc' as const)
-                    : sorter.order === 'descend'
-                      ? ('desc' as const)
-                      : undefined,
-        };
-
-        if (search) {
-            debouncedFetchData({ ...params, page: 1 });
+    // Handle custom tab save
+    const handleSaveTab = (label: string, tabFilters: DataTableFilters) => {
+        if (editingTab) {
+            updateCustomTab(editingTab.id, { label, filters: tabFilters });
         } else {
-            fetchData(params);
+            createCustomTab(label, tabFilters);
         }
-    }, [search, filters, sorter, currentPage, pageSize]);
-
-    const handleRetry = (): void => {
-        setState((prev) => ({ ...prev, error: null }));
-        fetchData({
-            page: currentPage,
-            per_page: pageSize,
-            search: search || undefined,
-            filters: Object.keys(filters).length > 0 ? filters : undefined,
-            sort_by: sorter.field ? String(sorter.field) : undefined,
-            sort_direction:
-                sorter.order === 'ascend'
-                    ? ('asc' as const)
-                    : sorter.order === 'descend'
-                      ? ('desc' as const)
-                      : undefined,
-        });
-    };
-
-    const handleTableChange: TableProps<T>['onChange'] = (pagination, _, sorterResult) => {
-        const newPage = pagination.current || 1;
-        const newPageSize = pagination.pageSize || defaultPageSize;
-
-        setCurrentPage(newPage);
-        setPageSize(newPageSize);
-
-        setState((prev) => ({
-            ...prev,
-            pagination: {
-                ...prev.pagination,
-                current: newPage,
-                pageSize: newPageSize,
-            },
-        }));
-
-        if (Array.isArray(sorterResult)) {
-            const firstSorter = sorterResult[0];
-            if (firstSorter && firstSorter.field) {
-                setSorter({
-                    field: firstSorter.field as string | number,
-                    order: firstSorter.order as 'ascend' | 'descend' | undefined
-                });
-            } else {
-                setSorter({});
-            }
-        } else if (sorterResult && sorterResult.field) {
-            setSorter({
-                field: sorterResult.field as string | number,
-                order: sorterResult.order as 'ascend' | 'descend' | undefined
-            });
-        } else {
-            setSorter({});
-        }
-    };
-
-    const handleSearch = (value: string) => {
-        setSearch(value);
-        setCurrentPage(1);
-        setState((prev) => ({
-            ...prev,
-            pagination: { ...prev.pagination, current: 1 },
-        }));
-    };
-
-    const handleFilter = (key: string, value: unknown) => {
-        setFilters((prev) => ({
-            ...prev,
-            [key]: value as DataTableFilters[string],
-        }));
-        setCurrentPage(1);
-        setState((prev) => ({
-            ...prev,
-            pagination: { ...prev.pagination, current: 1 },
-        }));
-    };
-
-    const clearFilters = () => {
-        setSearch('');
-        setFilters({});
-        setSorter({});
-        setCurrentPage(1);
-        setState((prev) => ({
-            ...prev,
-            pagination: { ...prev.pagination, current: 1 },
-        }));
-        // Return focus to search input for accessibility
-        searchInputRef.current?.focus();
-    };
-
-    // Process columns to add sorting
-    const processedColumns: TableColumnType<T>[] = columns.map((col) => ({
-        ...col,
-        sorter: col.sorter ? true : false,
-    }));
-
-    // Check if any columns are searchable or filterable
-    const hasSearchableColumns = columns.some((col) => col.searchable);
-    const hasActiveFilters = search || Object.keys(filters).length > 0;
-
-    const renderSearchAndFilters = () => {
-        if (!hasSearchableColumns && filterConfigs.length === 0) {
-            return null;
-        }
-
-        return (
-            <div
-                role="search"
-                aria-label="Table filters"
-                style={{
-                    marginBottom: token.marginMD,
-                    padding: token.paddingSM,
-                    backgroundColor: token.colorBgLayout,
-                    borderRadius: token.borderRadiusLG,
-                }}
-            >
-                <Space wrap>
-                    {hasSearchableColumns && (
-                        <Input
-                            ref={searchInputRef}
-                            placeholder={searchPlaceholder}
-                            prefix={<Icon name="search" size={16} aria-hidden="true" />}
-                            value={search}
-                            onChange={(e) => handleSearch(e.target.value)}
-                            style={{ width: 300 }}
-                            allowClear
-                            aria-label="Search table data"
-                            id="datatable-search"
-                        />
-                    )}
-
-                    {filterConfigs.map((config) => (
-                        <FilterRenderer
-                            key={config.key}
-                            config={config}
-                            value={filters[config.key]}
-                            onChange={handleFilter}
-                        />
-                    ))}
-
-                    {hasActiveFilters && (
-                        <Button
-                            type="link"
-                            onClick={clearFilters}
-                            aria-label="Clear all active filters"
-                        >
-                            Clear all filters
-                        </Button>
-                    )}
-                </Space>
-            </div>
-        );
-    };
-
-    const renderContent = () => {
-        // Error state
-        if (state.error?.hasError) {
-            return (
-                <EmptyState
-                    type="error"
-                    errorMessage={state.error.message}
-                    onRetry={handleRetry}
-                />
-            );
-        }
-
-        // Empty state (no data at all or no results from filters)
-        if (!state.loading && state.data.length === 0) {
-            return (
-                <EmptyState
-                    type={hasActiveFilters ? 'no-results' : 'no-data'}
-                    searchTerm={search}
-                    hasFilters={Object.keys(filters).length > 0}
-                    onClearFilters={clearFilters}
-                    emptyMessage={emptyMessage}
-                    emptyFilterMessage={emptyFilterMessage}
-                />
-            );
-        }
-
-        // Table with data
-        return (
-            <Table<T>
-                columns={processedColumns}
-                dataSource={state.data}
-                pagination={state.pagination}
-                loading={state.loading}
-                onChange={handleTableChange}
-                rowKey="id"
-                scroll={{ x: 'max-content' }}
-                size="middle"
-            />
-        );
     };
 
     return (
-        <>
-            {renderSearchAndFilters()}
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                backgroundColor: token.colorBgContainer,
+                borderRadius: token.borderRadiusLG,
+                border: `1px solid ${token.colorBorderSecondary}`,
+                overflow: 'hidden',
+                height: '100%',
+            }}
+        >
+            {/* Header Section (Tabs + Search/Filters combined) */}
+            {showHeader && (
+                <TableHeader
+                    tabs={tabs}
+                    customTabs={customTabs}
+                    activeTabId={activeTabId}
+                    onTabChange={setActiveTab}
+                    enableCustomTabs={enableCustomTabs}
+                    onCreateTab={handleCreateTab}
+                    onEditTab={handleEditTab}
+                    onDeleteTab={deleteCustomTab}
+                    searchValue={searchValue}
+                    onSearchChange={setSearchValue}
+                    searchPlaceholder={searchPlaceholder}
+                    filters={filterConfigs}
+                    filterValues={filters}
+                    onFilterChange={setFilter}
+                    onClearFilters={clearFilters}
+                    enableColumnVisibility={enableColumnVisibility || enableColumnOrdering}
+                    onColumnManagerOpen={() => setColumnManagerOpen(true)}
+                />
+            )}
 
-            {/* Screen reader announcement for loading/results */}
+            {/* Scrollable Table Container */}
+            <div
+                style={{
+                    position: 'relative',
+                    flex: 1,
+                    overflow: 'auto',
+                    minHeight: 0,
+                    maxHeight: 'calc(100vh - 280px)',
+                }}
+            >
+                <TableBody
+                    table={table}
+                    isLoading={isLoading}
+                    enableRowSelection={!!enableRowSelection}
+                    onRowClick={onRowClick}
+                    emptyMessage={emptyMessage}
+                    emptyFilterMessage={emptyFilterMessage}
+                    hasFilters={hasFilters}
+                />
+
+                {/* Pagination - inside scroll container for sticky bottom */}
+                {data.length > 0 && (
+                    <TablePagination
+                        currentPage={currentPage}
+                        pageSize={pageSize}
+                        totalCount={totalCount}
+                        pageCount={pageCount}
+                        onPageChange={handlePageChange}
+                        onPageSizeChange={handlePageSizeChange}
+                    />
+                )}
+
+                {/* Loading overlay for refetching */}
+                {isFetching && !isLoading && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 5,
+                        }}
+                    />
+                )}
+            </div>
+
+            {/* Bulk Actions Bar */}
+            {bulkActions.length > 0 && (
+                <BulkActionsBar
+                    selectedRows={selectedRows}
+                    actions={bulkActions}
+                    onClearSelection={clearSelection}
+                />
+            )}
+
+            {/* Column Manager Modal */}
+            {(enableColumnVisibility || enableColumnOrdering) && (
+                <ColumnManager
+                    columns={table.getAllLeafColumns()}
+                    columnVisibility={columnVisibility}
+                    columnOrder={columnOrder}
+                    onVisibilityChange={setColumnVisibility}
+                    onOrderChange={setColumnOrder}
+                    onReset={resetColumnSettings}
+                    open={columnManagerOpen}
+                    onClose={() => setColumnManagerOpen(false)}
+                />
+            )}
+
+            {/* Custom Tab Modal */}
+            {enableCustomTabs && (
+                <CustomTabModal
+                    open={customTabModalOpen}
+                    onClose={() => {
+                        setCustomTabModalOpen(false);
+                        setEditingTab(null);
+                    }}
+                    onSave={handleSaveTab}
+                    editingTab={editingTab}
+                    currentFilters={filters}
+                />
+            )}
+
+            {/* Screen reader announcement */}
             <div
                 role="status"
                 aria-live="polite"
                 aria-atomic="true"
-                className="sr-only"
                 style={{
                     position: 'absolute',
                     width: 1,
@@ -418,37 +295,9 @@ function DataTable<T extends Record<string, unknown>>({
                     border: 0,
                 }}
             >
-                {state.loading
-                    ? 'Loading data...'
-                    : `Showing ${state.data.length} of ${state.pagination.total} items`}
+                {isLoading ? 'Loading data...' : `Showing ${data.length} of ${totalCount} items`}
             </div>
-
-            {renderContent()}
-
-            {state.pagination.total > 0 && !state.error?.hasError && (
-                <div
-                    style={{
-                        marginTop: token.marginMD,
-                        paddingTop: token.paddingSM,
-                        borderTop: `1px solid ${token.colorBorderSecondary}`,
-                        textAlign: 'right',
-                    }}
-                >
-                    <Text type="secondary">
-                        Showing{' '}
-                        {state.pagination.current === 1
-                            ? 1
-                            : (state.pagination.current - 1) * state.pagination.pageSize + 1}{' '}
-                        to{' '}
-                        {Math.min(
-                            state.pagination.current * state.pagination.pageSize,
-                            state.pagination.total
-                        )}{' '}
-                        of {state.pagination.total} entries
-                    </Text>
-                </div>
-            )}
-        </>
+        </div>
     );
 }
 

@@ -116,9 +116,13 @@ describe('User DataTable API', function () {
         $activeUser = User::factory()->create(['is_active' => true]);
         User::factory()->create(['is_active' => false]);
 
+        $filters = json_encode([
+            'is_active' => ['operator' => 'eq', 'value' => true],
+        ]);
+
         $response = $this
             ->actingAs($activeUser)
-            ->getJson('/admin/users/data?is_active=true');
+            ->getJson('/admin/users/data?filters='.urlencode($filters));
 
         $response->assertOk();
         // All returned users should be active
@@ -134,26 +138,28 @@ describe('User DataTable API', function () {
 
         $startDate = now()->subMonth()->format('Y-m-d');
         $endDate = now()->addDay()->format('Y-m-d');
-        $dateRange = json_encode([$startDate, $endDate]);
+        $filters = json_encode([
+            'created_at' => ['operator' => 'between', 'value' => [$startDate, $endDate]],
+        ]);
 
         $response = $this
             ->actingAs($user)
-            ->getJson('/admin/users/data?created_at='.urlencode($dateRange));
+            ->getJson('/admin/users/data?filters='.urlencode($filters));
 
         $response->assertOk();
         // Should return only users created in the date range
         expect($response->json('meta.total'))->toBe(1);
     });
 
-    test('handles invalid JSON in date range filter gracefully', function () {
+    test('handles invalid JSON in filters gracefully', function () {
         $user = User::factory()->create();
 
         $response = $this
             ->actingAs($user)
-            ->getJson('/admin/users/data?created_at=invalid-json');
+            ->getJson('/admin/users/data?filters=invalid-json');
 
-        // Should still return results (invalid filter is ignored)
-        $response->assertOk();
+        // Should return validation error for invalid JSON
+        $response->assertStatus(422);
     });
 
     test('sorts users by specified column', function () {

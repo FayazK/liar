@@ -378,9 +378,7 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
                         }}
                     >
                         {/* Content Wrapper with max-width */}
-                        <div>
-                            {children}
-                        </div>
+                        <div>{children}</div>
                     </Content>
                 </Layout>
             </Layout>

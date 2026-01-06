@@ -1,4 +1,4 @@
-import type { Icon, IconProps as TablerIconProps } from '@tabler/icons-react';
+import type { IconProps as TablerIconProps } from '@tabler/icons-react';
 import type { CSSProperties, ForwardRefExoticComponent, RefAttributes } from 'react';
 
 /**
@@ -75,7 +75,15 @@ export type IconName =
     | 'check'
     // Chevrons
     | 'chevron-right'
-    | 'chevron-down';
+    | 'chevron-down'
+    | 'chevron-left'
+    | 'chevron-up'
+    // Arrows & Sorting
+    | 'arrow-up'
+    | 'arrow-down'
+    | 'arrows-sort'
+    // Drag & Drop
+    | 'grip-vertical';
 
 /**
  * Props for the Icon wrapper component
@@ -94,4 +102,4 @@ export interface IconProps extends Omit<TablerIconProps, 'ref'> {
 /**
  * Tabler icon component type
  */
-export type TablerIconComponent = ForwardRefExoticComponent<TablerIconProps & RefAttributes<Icon>>;
+export type TablerIconComponent = ForwardRefExoticComponent<TablerIconProps & RefAttributes<SVGSVGElement>>;

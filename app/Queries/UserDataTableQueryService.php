@@ -4,89 +4,77 @@ declare(strict_types=1);
 
 namespace App\Queries;
 
-use DateTimeImmutable;
-use Illuminate\Database\Eloquent\Builder;
+use App\DataTable\Definitions\FilterDefinition;
+use App\DataTable\Definitions\SearchDefinition;
+use App\DataTable\Definitions\SortDefinition;
+use App\DataTable\Enums\FilterType;
 
-class UserDataTableQueryService extends DataTableQueryService
+/**
+ * DataTable query service for Users.
+ */
+final class UserDataTableQueryService extends DataTableQueryService
 {
     /**
-     * @var array<int, string>
+     * Define filter configurations for the users table.
+     *
+     * @return array<FilterDefinition>
      */
-    protected array $searchableColumns = [
-        'first_name',
-        'last_name',
-        'email',
-        'phone',
-    ];
-
-    /**
-     * @var array<int|string, string>
-     */
-    protected array $filterableColumns = [
-        'is_active',
-        'created_at' => 'applyDateRangeFilter',
-    ];
-
-    /**
-     * @var array<int, string>
-     */
-    protected array $sortableColumns = [
-        'id',
-        'first_name',
-        'last_name',
-        'full_name',
-        'email',
-        'phone',
-        'is_active',
-        'created_at',
-        'last_login_at',
-    ];
-
-    /**
-     * Custom filter for a date range.
-     * The frontend sends this as a JSON-encoded array of two dates.
-     */
-    protected function applyDateRangeFilter(Builder $query, mixed $value): void
+    #[\Override]
+    protected function defineFilters(): array
     {
-        // Handle array input (from JSON request body)
-        if (is_array($value)) {
-            $dates = $value;
-        } elseif (is_string($value)) {
-            // PHP 8.3: Validate JSON before decoding
-            if (! json_validate($value)) {
-                return;
-            }
-
-            $dates = json_decode($value, true);
-        } else {
-            return;
-        }
-
-        if (! is_array($dates) || count($dates) !== 2) {
-            return;
-        }
-
-        [$startDate, $endDate] = $dates;
-
-        // Validate both dates are present and valid
-        if (! $this->isValidDate($startDate) || ! $this->isValidDate($endDate)) {
-            return;
-        }
-
-        $query->whereBetween('created_at', [$startDate, $endDate]);
+        return [
+            new FilterDefinition(
+                name: 'is_active',
+                type: FilterType::Boolean,
+                label: 'Status',
+            ),
+            new FilterDefinition(
+                name: 'created_at',
+                type: FilterType::DateRange,
+                label: 'Created Date',
+            ),
+        ];
     }
 
     /**
-     * Validate that a value is a valid date string in Y-m-d format.
+     * Define searchable columns for the users table.
+     *
+     * @return array<SearchDefinition>
      */
-    private function isValidDate(mixed $date): bool
+    #[\Override]
+    protected function defineSearchable(): array
     {
-        if (! is_string($date) || $date === '') {
-            return false;
-        }
+        return [
+            new SearchDefinition(column: 'first_name', weight: 2),
+            new SearchDefinition(column: 'last_name', weight: 2),
+            new SearchDefinition(column: 'email', weight: 3),
+            new SearchDefinition(column: 'phone', weight: 1),
+        ];
+    }
 
-        $parsed = DateTimeImmutable::createFromFormat('Y-m-d', $date);
-
-        return $parsed !== false && $parsed->format('Y-m-d') === $date;
+    /**
+     * Define sortable columns for the users table.
+     *
+     * @return array<SortDefinition>
+     */
+    #[\Override]
+    protected function defineSortable(): array
+    {
+        return [
+            new SortDefinition(name: 'id'),
+            new SortDefinition(name: 'first_name'),
+            new SortDefinition(name: 'last_name'),
+            new SortDefinition(
+                name: 'full_name',
+                customSort: fn ($query, $direction) => $query
+                    ->orderBy('first_name', $direction)
+                    ->orderBy('last_name', $direction),
+            ),
+            new SortDefinition(name: 'email'),
+            new SortDefinition(name: 'phone'),
+            new SortDefinition(name: 'is_active'),
+            new SortDefinition(name: 'created_at'),
+            new SortDefinition(name: 'last_login_at'),
+        ];
     }
 }

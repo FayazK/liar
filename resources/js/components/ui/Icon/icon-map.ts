@@ -1,12 +1,17 @@
 import {
     IconAlertCircle,
     IconApi,
+    IconArrowDown,
+    IconArrowsSort,
+    IconArrowUp,
     IconBell,
     IconBolt,
     IconChartBar,
     IconCheck,
     IconChevronDown,
+    IconChevronLeft,
     IconChevronRight,
+    IconChevronUp,
     IconClock,
     IconCode,
     IconCurrencyDollar,
@@ -27,6 +32,7 @@ import {
     IconFilter,
     IconFolder,
     IconFolderPlus,
+    IconGripVertical,
     IconHome,
     IconInbox,
     IconLayoutSidebarLeftCollapse,
@@ -149,4 +155,14 @@ export const iconMap: Record<IconName, TablerIconComponent> = {
     // Chevrons
     'chevron-right': IconChevronRight,
     'chevron-down': IconChevronDown,
+    'chevron-left': IconChevronLeft,
+    'chevron-up': IconChevronUp,
+
+    // Arrows & Sorting
+    'arrow-up': IconArrowUp,
+    'arrow-down': IconArrowDown,
+    'arrows-sort': IconArrowsSort,
+
+    // Drag & Drop
+    'grip-vertical': IconGripVertical,
 };

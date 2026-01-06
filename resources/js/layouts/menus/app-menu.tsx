@@ -30,9 +30,7 @@ export const appNavGroups: NavGroup[] = [
                 title: 'Settings',
                 href: '/settings',
                 icon: 'settings',
-                children: [
-                    { title: 'Account', href: '/settings/account', icon: null },
-                ],
+                children: [{ title: 'Account', href: '/settings/account', icon: null }],
             },
         ],
     },

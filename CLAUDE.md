@@ -382,7 +382,7 @@ Use Playwright MCP tools (`mcp__playwright__*`) for browser-based E2E testing of
 
 1. **Navigate to the app:**
    ```
-   mcp__playwright__browser_navigate with url: "http://localhost:8000"
+   mcp__playwright__browser_navigate with url: "http://liar.test"
    ```
 
 2. **Take accessibility snapshot** (preferred over screenshots for interactions):
@@ -414,7 +414,7 @@ Use Playwright MCP tools (`mcp__playwright__*`) for browser-based E2E testing of
 
 **Example Test Session:**
 ```
-1. browser_navigate → http://localhost:8000/login
+1. browser_navigate → http://liar.test/login
 2. browser_snapshot → get form element refs
 3. browser_type → fill email field with info@fayazk.com
 4. browser_type → fill password field with @Password1
