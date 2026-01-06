@@ -6,6 +6,8 @@ namespace App\Services;
 
 use App\Models\Library;
 use App\Repositories\LibraryRepository;
+use App\Repositories\MediaRepository;
+use App\Support\Formatters;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -13,6 +15,7 @@ class LibraryService
 {
     public function __construct(
         private readonly LibraryRepository $repository,
+        private readonly MediaRepository $mediaRepository,
         private readonly MediaService $mediaService
     ) {}
 
@@ -167,5 +170,238 @@ class LibraryService
     public function getBreadcrumbs(int $libraryId): array
     {
         return $this->repository->getBreadcrumbs($libraryId);
+    }
+
+    /**
+     * Get folder tree for sidebar navigation.
+     *
+     * @return array{tree: array<mixed>}
+     */
+    public function getFolderTree(int $userId): array
+    {
+        // Get root folder to use as the base parent
+        $root = $this->repository->findRoot($userId);
+        $rootId = $root?->id;
+
+        $folders = $this->repository->getFolderTree($userId);
+
+        // Build tree structure starting from root's children
+        $tree = $this->buildTreeStructure($folders, $rootId);
+
+        return ['tree' => $tree];
+    }
+
+    /**
+     * Get children of a folder for lazy loading.
+     *
+     * @return array{children: array<mixed>}
+     */
+    public function getFolderChildren(int $userId, int $folderId): array
+    {
+        $children = $this->repository->getFolderChildren($userId, $folderId);
+
+        return [
+            'children' => $children->map(fn (Library $folder) => $this->formatFolderForTree($folder))->values()->all(),
+        ];
+    }
+
+    /**
+     * Toggle favorite on a folder or file.
+     *
+     * @return array{is_favorite: bool, type: string}
+     */
+    public function toggleFavorite(string $type, int $id): array
+    {
+        if ($type === 'folder') {
+            $library = $this->repository->toggleFavorite($id);
+
+            return [
+                'type' => 'folder',
+                'is_favorite' => $library->is_favorite,
+            ];
+        }
+
+        $media = $this->mediaRepository->toggleFavorite($id);
+
+        return [
+            'type' => 'file',
+            'is_favorite' => $media->getCustomProperty('is_favorite', false),
+        ];
+    }
+
+    /**
+     * Get quick access files by category.
+     *
+     * @return array{files: array<mixed>, folders?: array<mixed>, meta: array<string, mixed>}
+     */
+    public function getQuickAccessFiles(
+        int $userId,
+        string $category,
+        string $sortBy = 'name',
+        string $sortDir = 'asc',
+        int $perPage = 50
+    ): array {
+        $result = match ($category) {
+            'recent' => $this->getRecentItems($userId, $sortBy, $sortDir, $perPage),
+            'favorites' => $this->getFavoriteItems($userId, $sortBy, $sortDir, $perPage),
+            default => $this->getCategoryFiles($userId, $category, $sortBy, $sortDir, $perPage),
+        };
+
+        return $result;
+    }
+
+    /**
+     * Get items for a folder with sorting.
+     *
+     * @return array{folders: array<mixed>, files: array<mixed>}
+     */
+    public function getItemsSorted(
+        int $libraryId,
+        int $userId,
+        string $sortBy = 'name',
+        string $sortDir = 'asc'
+    ): array {
+        $library = $this->repository->find($libraryId);
+
+        if (! $library) {
+            throw new \RuntimeException('Library not found');
+        }
+
+        // Get folders with sorting
+        $folders = $this->repository->getChildrenSorted($userId, $libraryId, $sortBy, $sortDir);
+
+        // Get files with sorting
+        $mediaQuery = $library->media();
+
+        $mediaSortColumn = match ($sortBy) {
+            'size' => 'size',
+            'type' => 'mime_type',
+            'date', 'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
+            default => 'name',
+        };
+
+        $files = $mediaQuery->orderBy($mediaSortColumn, $sortDir)->get();
+
+        return [
+            'folders' => $folders->map(fn (Library $folder) => $this->formatFolderForList($folder))->values()->all(),
+            'files' => $files->map(fn (Media $media) => $this->mediaRepository->formatMediaItem($media))->values()->all(),
+        ];
+    }
+
+    /**
+     * Build tree structure from flat folder list.
+     *
+     * @return array<mixed>
+     */
+    private function buildTreeStructure($folders, ?int $parentId): array
+    {
+        $tree = [];
+
+        foreach ($folders as $folder) {
+            if ($folder->parent_id === $parentId) {
+                $node = $this->formatFolderForTree($folder);
+                $children = $this->buildTreeStructure($folders, $folder->id);
+
+                if (! empty($children)) {
+                    $node['children'] = $children;
+                } elseif ($folder->children_count > 0) {
+                    $node['children'] = null; // Has children but not loaded
+                } else {
+                    $node['children'] = []; // No children
+                }
+
+                $tree[] = $node;
+            }
+        }
+
+        return $tree;
+    }
+
+    /**
+     * Format a folder for tree display.
+     */
+    private function formatFolderForTree(Library $folder): array
+    {
+        return [
+            'id' => $folder->id,
+            'name' => $folder->name,
+            'parent_id' => $folder->parent_id,
+            'has_children' => ($folder->children_count ?? 0) > 0,
+            'file_count' => $folder->file_count ?? 0,
+            'is_favorite' => $folder->is_favorite,
+            'color' => $folder->color,
+        ];
+    }
+
+    /**
+     * Format a folder for list display.
+     */
+    private function formatFolderForList(Library $folder): array
+    {
+        return [
+            'id' => $folder->id,
+            'type' => 'folder',
+            'name' => $folder->name,
+            'color' => $folder->color,
+            'file_count' => $folder->file_count ?? 0,
+            'total_size_human' => Formatters::bytes($folder->total_size ?? 0),
+            'is_favorite' => $folder->is_favorite,
+            'created_at' => $folder->created_at?->toIso8601String(),
+            'updated_at' => $folder->updated_at?->toIso8601String(),
+        ];
+    }
+
+    /**
+     * Get recent files and folders.
+     */
+    private function getRecentItems(int $userId, string $sortBy, string $sortDir, int $perPage): array
+    {
+        $files = $this->mediaRepository->getRecentFiles($userId, 30, $sortBy, $sortDir, $perPage);
+
+        return [
+            'files' => collect($files->items())->map(fn (Media $media) => $this->mediaRepository->formatMediaItem($media))->values()->all(),
+            'meta' => [
+                'current_page' => $files->currentPage(),
+                'per_page' => $files->perPage(),
+                'total' => $files->total(),
+            ],
+        ];
+    }
+
+    /**
+     * Get favorite files and folders.
+     */
+    private function getFavoriteItems(int $userId, string $sortBy, string $sortDir, int $perPage): array
+    {
+        $files = $this->mediaRepository->getFavoriteFiles($userId, $sortBy, $sortDir, $perPage);
+        $folders = $this->repository->getFavoriteFolders($userId, $sortBy, $sortDir);
+
+        return [
+            'files' => collect($files->items())->map(fn (Media $media) => $this->mediaRepository->formatMediaItem($media))->values()->all(),
+            'folders' => $folders->map(fn (Library $folder) => $this->formatFolderForList($folder))->values()->all(),
+            'meta' => [
+                'current_page' => $files->currentPage(),
+                'per_page' => $files->perPage(),
+                'total' => $files->total() + $folders->count(),
+            ],
+        ];
+    }
+
+    /**
+     * Get files by category (documents, images, videos, audio, archives).
+     */
+    private function getCategoryFiles(int $userId, string $category, string $sortBy, string $sortDir, int $perPage): array
+    {
+        $files = $this->mediaRepository->getFilesByCategory($userId, $category, $sortBy, $sortDir, $perPage);
+
+        return [
+            'files' => collect($files->items())->map(fn (Media $media) => $this->mediaRepository->formatMediaItem($media))->values()->all(),
+            'meta' => [
+                'current_page' => $files->currentPage(),
+                'per_page' => $files->perPage(),
+                'total' => $files->total(),
+            ],
+        ];
     }
 }

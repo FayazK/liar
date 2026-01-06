@@ -32,12 +32,17 @@ import {
     IconFileZip,
     IconFilter,
     IconFolder,
+    IconFolderOpen,
     IconFolderPlus,
     IconGripVertical,
     IconHome,
     IconInbox,
+    IconLayoutGrid,
+    IconLayoutList,
+    IconLayoutSidebar,
     IconLayoutSidebarLeftCollapse,
     IconLayoutSidebarLeftExpand,
+    IconLayoutSidebarRight,
     IconLoader2,
     IconLock,
     IconLogin,
@@ -45,6 +50,7 @@ import {
     IconMail,
     IconMenu2,
     IconMoon,
+    IconMusic,
     IconPalette,
     IconPhone,
     IconPhoto,
@@ -57,6 +63,10 @@ import {
     IconShield,
     IconShieldCheck,
     IconShoppingCart,
+    IconSortAscending,
+    IconSortDescending,
+    IconStar,
+    IconStarFilled,
     IconSun,
     IconTrash,
     IconTrendingUp,
@@ -81,6 +91,11 @@ export const iconMap: Record<IconName, TablerIconComponent> = {
     'menu-fold': IconLayoutSidebarLeftCollapse,
     'menu-unfold': IconLayoutSidebarLeftExpand,
     home: IconHome,
+    'layout-grid': IconLayoutGrid,
+    'layout-list': IconLayoutList,
+    'layout-sidebar': IconLayoutSidebar,
+    'layout-sidebar-left-collapse': IconLayoutSidebarLeftCollapse,
+    'layout-sidebar-right': IconLayoutSidebarRight,
 
     // User & Auth
     user: IconUser,
@@ -114,6 +129,7 @@ export const iconMap: Record<IconName, TablerIconComponent> = {
 
     // Files & Folders
     folder: IconFolder,
+    'folder-open': IconFolderOpen,
     'folder-plus': IconFolderPlus,
     file: IconFile,
     'file-text': IconFileText,
@@ -123,7 +139,9 @@ export const iconMap: Record<IconName, TablerIconComponent> = {
     'file-excel': IconFileTypeXls,
     'file-ppt': IconFileTypePpt,
     'file-zip': IconFileZip,
+    photo: IconPhoto,
     video: IconPlayerPlay,
+    music: IconMusic,
 
     // Status & Feedback
     loader: IconLoader2,
@@ -166,7 +184,16 @@ export const iconMap: Record<IconName, TablerIconComponent> = {
     'arrow-up': IconArrowUp,
     'arrow-down': IconArrowDown,
     'arrows-sort': IconArrowsSort,
+    'sort-ascending': IconSortAscending,
+    'sort-descending': IconSortDescending,
+
+    // Favorites
+    star: IconStar,
+    'star-filled': IconStarFilled,
 
     // Drag & Drop
     'grip-vertical': IconGripVertical,
+
+    // Misc
+    'dots-vertical': IconDotsVertical,
 };

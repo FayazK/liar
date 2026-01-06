@@ -30,6 +30,7 @@ class Library extends Model implements HasMedia
         'slug',
         'description',
         'color',
+        'is_favorite',
     ];
 
     /**
@@ -67,6 +68,7 @@ class Library extends Model implements HasMedia
     protected function casts(): array
     {
         return [
+            'is_favorite' => 'boolean',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];

@@ -13,6 +13,8 @@ interface FileCardProps {
     size: string;
     thumbnailUrl?: string | null;
     menuItems: MenuProps['items'];
+    selected?: boolean;
+    onClick?: () => void;
 }
 
 function getFileIconConfig(mimeType: string, primaryColor: string): { name: IconName; color: string } {
@@ -43,18 +45,24 @@ function getFileIconConfig(mimeType: string, primaryColor: string): { name: Icon
     return { name: 'file', color: '' };
 }
 
-export default function FileCard({ name, mimeType, size, thumbnailUrl, menuItems }: FileCardProps) {
+export default function FileCard({ name, mimeType, size, thumbnailUrl, menuItems, selected, onClick }: FileCardProps) {
     const { token } = useToken();
     const [isHovered, setIsHovered] = useState(false);
 
     const isImage = mimeType.startsWith('image/');
     const iconConfig = getFileIconConfig(mimeType, token.colorPrimary);
 
+    const getBorderColor = () => {
+        if (selected) return token.colorPrimary;
+        if (isHovered) return token.colorPrimaryBorder;
+        return token.colorBorder;
+    };
+
     return (
         <div
             style={{
-                backgroundColor: token.colorBgContainer,
-                border: `1px solid ${isHovered ? token.colorPrimary : token.colorBorder}`,
+                backgroundColor: selected ? token.colorPrimaryBg : token.colorBgContainer,
+                border: `2px solid ${getBorderColor()}`,
                 borderRadius: token.borderRadiusLG,
                 overflow: 'hidden',
                 cursor: 'pointer',
@@ -63,6 +71,7 @@ export default function FileCard({ name, mimeType, size, thumbnailUrl, menuItems
             }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onClick={onClick}
         >
             {/* Thumbnail/Icon Area */}
             <div

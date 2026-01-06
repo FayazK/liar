@@ -11,14 +11,32 @@ interface FolderTileProps {
     itemCount: number;
     color?: string;
     onFolderClick: () => void;
+    onSelect?: () => void;
+    selected?: boolean;
     menuItems: MenuProps['items'];
 }
 
-export default function FolderTile({ name, itemCount, color, onFolderClick, menuItems }: FolderTileProps) {
+export default function FolderTile({ name, itemCount, color, onFolderClick, onSelect, selected, menuItems }: FolderTileProps) {
     const { token } = useToken();
     const [isHovered, setIsHovered] = useState(false);
 
     const accentColor = color || token.colorPrimary;
+
+    const getBorderColor = () => {
+        if (selected) return token.colorPrimary;
+        if (isHovered) return token.colorPrimaryBorder;
+        return token.colorBorder;
+    };
+
+    const handleClick = () => {
+        if (onSelect) {
+            onSelect();
+        }
+    };
+
+    const handleDoubleClick = () => {
+        onFolderClick();
+    };
 
     return (
         <div
@@ -27,10 +45,10 @@ export default function FolderTile({ name, itemCount, color, onFolderClick, menu
                 alignItems: 'center',
                 gap: token.marginMD,
                 padding: token.paddingMD,
-                backgroundColor: token.colorBgContainer,
-                borderTop: `1px solid ${isHovered ? token.colorPrimary : token.colorBorder}`,
-                borderRight: `1px solid ${isHovered ? token.colorPrimary : token.colorBorder}`,
-                borderBottom: `1px solid ${isHovered ? token.colorPrimary : token.colorBorder}`,
+                backgroundColor: selected ? token.colorPrimaryBg : token.colorBgContainer,
+                borderTop: `2px solid ${getBorderColor()}`,
+                borderRight: `2px solid ${getBorderColor()}`,
+                borderBottom: `2px solid ${getBorderColor()}`,
                 borderLeft: `4px solid ${accentColor}`,
                 borderRadius: token.borderRadiusLG,
                 minHeight: 64,
@@ -38,7 +56,8 @@ export default function FolderTile({ name, itemCount, color, onFolderClick, menu
                 transition: 'all 0.2s ease',
                 transform: isHovered ? 'translateY(-2px)' : 'none',
             }}
-            onClick={onFolderClick}
+            onClick={handleClick}
+            onDoubleClick={handleDoubleClick}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >

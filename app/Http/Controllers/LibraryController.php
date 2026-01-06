@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Library\FileUploadRequest;
+use App\Http\Requests\Library\LibraryFavoriteRequest;
+use App\Http\Requests\Library\LibraryItemsRequest;
 use App\Http\Requests\Library\LibraryMoveRequest;
 use App\Http\Requests\Library\LibraryStoreRequest;
 use App\Http\Requests\Library\LibraryUpdateRequest;
 use App\Models\Library;
 use App\Services\LibraryService;
-use App\Support\Formatters;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -186,44 +187,117 @@ class LibraryController extends Controller
     }
 
     /**
-     * Get all items (folders and files) for a library.
+     * Get all items (folders and files) for a library with sorting support.
      */
-    public function getItems(int $id): JsonResponse
+    public function getItems(int $id, LibraryItemsRequest $request): JsonResponse
     {
         $library = Library::findOrFail($id);
         $this->authorize('view', $library);
 
-        // Get child folders
-        $folders = Library::where('parent_id', $id)
-            ->withMediaStats()
-            ->get()
-            ->map(fn ($folder) => [
-                'id' => $folder->id,
-                'type' => 'folder',
-                'name' => $folder->name,
-                'color' => $folder->color,
-                'file_count' => $folder->file_count,
-                'total_size_human' => $folder->total_size_human,
-                'created_at' => $folder->created_at->toISOString(),
-                'updated_at' => $folder->updated_at->toISOString(),
-            ]);
+        $userId = auth()->id();
 
-        // Get files
-        $files = $library->media->map(fn ($media) => [
-            'id' => $media->id,
-            'type' => 'file',
-            'name' => $media->name,
-            'file_name' => $media->file_name,
-            'mime_type' => $media->mime_type,
-            'size_human' => Formatters::bytes($media->size),
-            'created_at' => $media->created_at->toISOString(),
-            'thumbnail_url' => $this->getThumbnailUrl($media),
-        ]);
+        if (! $userId) {
+            abort(401);
+        }
+
+        $sortBy = $request->validated('sort_by', 'name');
+        $sortDir = $request->validated('sort_dir', 'asc');
+
+        $items = $this->service->getItemsSorted($id, $userId, $sortBy, $sortDir);
+
+        return response()->json($items);
+    }
+
+    /**
+     * Get the folder tree for sidebar navigation.
+     */
+    public function getFolderTree(): JsonResponse
+    {
+        $userId = auth()->id();
+
+        if (! $userId) {
+            abort(401);
+        }
+
+        $tree = $this->service->getFolderTree($userId);
+
+        return response()->json($tree);
+    }
+
+    /**
+     * Get children of a folder for lazy loading in tree.
+     */
+    public function getFolderChildren(int $id): JsonResponse
+    {
+        $library = Library::findOrFail($id);
+        $this->authorize('view', $library);
+
+        $userId = auth()->id();
+
+        if (! $userId) {
+            abort(401);
+        }
+
+        $children = $this->service->getFolderChildren($userId, $id);
+
+        return response()->json($children);
+    }
+
+    /**
+     * Toggle favorite status on a file or folder.
+     */
+    public function toggleFavorite(LibraryFavoriteRequest $request): JsonResponse
+    {
+        $type = $request->validated('type');
+        $id = $request->validated('id');
+
+        // Authorize based on type
+        if ($type === 'folder') {
+            $library = Library::findOrFail($id);
+            $this->authorize('update', $library);
+        } else {
+            $media = Media::findOrFail($id);
+            $library = $media->model;
+
+            if (! $library instanceof Library) {
+                abort(403);
+            }
+
+            $this->authorize('view', $library);
+        }
+
+        $result = $this->service->toggleFavorite($type, $id);
 
         return response()->json([
-            'folders' => $folders,
-            'files' => $files,
+            'message' => 'Favorite status updated',
+            'is_favorite' => $result['is_favorite'],
         ]);
+    }
+
+    /**
+     * Get quick access files (recent, favorites, by type).
+     */
+    public function getQuickAccessFiles(string $category, LibraryItemsRequest $request): JsonResponse
+    {
+        $userId = auth()->id();
+
+        if (! $userId) {
+            abort(401);
+        }
+
+        $validCategories = ['recent', 'favorites', 'documents', 'images', 'videos', 'audio', 'archives'];
+
+        if (! in_array($category, $validCategories, true)) {
+            abort(404, 'Invalid category');
+        }
+
+        $sortBy = $request->validated('sort_by', $category === 'recent' ? 'updated_at' : 'name');
+        $sortDir = $request->validated('sort_dir', $category === 'recent' ? 'desc' : 'asc');
+        $perPage = $request->validated('per_page', 50);
+
+        $items = $this->service->getQuickAccessFiles($userId, $category, $sortBy, $sortDir, $perPage);
+
+        return response()->json($items);
     }
 
     /**

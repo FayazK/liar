@@ -67,6 +67,16 @@ class LibraryRepository
     }
 
     /**
+     * Find the root library for a user.
+     */
+    public function findRoot(int $userId): ?Library
+    {
+        return Library::where('user_id', $userId)
+            ->where('slug', Library::ROOT_SLUG)
+            ->first();
+    }
+
+    /**
      * Get child libraries for a given parent.
      */
     public function getChildren(int $userId, ?int $parentId): Collection
@@ -212,5 +222,91 @@ class LibraryRepository
             ->where('parent_id', $parentId)
             ->where('slug', $slug)
             ->exists();
+    }
+
+    /**
+     * Get all folders for the user as a flat list with hierarchy info.
+     * Used for building the folder tree in the sidebar.
+     *
+     * @return Collection<int, Library>
+     */
+    public function getFolderTree(int $userId): Collection
+    {
+        return Library::where('user_id', $userId)
+            ->where('slug', '!=', Library::ROOT_SLUG)
+            ->withCount('children')
+            ->withCount('media as file_count')
+            ->orderBy('name', 'asc')
+            ->get();
+    }
+
+    /**
+     * Get immediate child folders for lazy loading in tree.
+     *
+     * @return Collection<int, Library>
+     */
+    public function getFolderChildren(int $userId, int $parentId): Collection
+    {
+        return Library::where('user_id', $userId)
+            ->where('parent_id', $parentId)
+            ->where('slug', '!=', Library::ROOT_SLUG)
+            ->withCount('children')
+            ->withCount('media as file_count')
+            ->orderBy('name', 'asc')
+            ->get();
+    }
+
+    /**
+     * Get favorite folders for a user.
+     *
+     * @return Collection<int, Library>
+     */
+    public function getFavoriteFolders(
+        int $userId,
+        string $sortBy = 'name',
+        string $sortDir = 'asc'
+    ): Collection {
+        return Library::where('user_id', $userId)
+            ->where('is_favorite', true)
+            ->where('slug', '!=', Library::ROOT_SLUG)
+            ->withCount('media as file_count')
+            ->orderBy($sortBy, $sortDir)
+            ->get();
+    }
+
+    /**
+     * Toggle favorite status on a folder.
+     */
+    public function toggleFavorite(int $libraryId): Library
+    {
+        $library = Library::findOrFail($libraryId);
+        $library->update(['is_favorite' => ! $library->is_favorite]);
+
+        return $library->fresh();
+    }
+
+    /**
+     * Get children with sorting support.
+     *
+     * @return Collection<int, Library>
+     */
+    public function getChildrenSorted(
+        int $userId,
+        ?int $parentId,
+        string $sortBy = 'name',
+        string $sortDir = 'asc'
+    ): Collection {
+        $sortColumn = match ($sortBy) {
+            'date', 'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
+            default => 'name',
+        };
+
+        return Library::where('user_id', $userId)
+            ->where('parent_id', $parentId)
+            ->where('slug', '!=', Library::ROOT_SLUG)
+            ->withCount('media as file_count')
+            ->orderBy($sortColumn, $sortDir)
+            ->get();
     }
 }

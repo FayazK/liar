@@ -11,6 +11,11 @@ export type IconName =
     | 'menu-fold'
     | 'menu-unfold'
     | 'home'
+    | 'layout-grid'
+    | 'layout-list'
+    | 'layout-sidebar'
+    | 'layout-sidebar-left-collapse'
+    | 'layout-sidebar-right'
     // User & Auth
     | 'user'
     | 'user-plus'
@@ -36,9 +41,11 @@ export type IconName =
     | 'refresh'
     | 'filter'
     | 'dots'
+    | 'dots-vertical'
     | 'eye'
     // Files & Folders
     | 'folder'
+    | 'folder-open'
     | 'folder-plus'
     | 'file'
     | 'file-text'
@@ -48,7 +55,9 @@ export type IconName =
     | 'file-excel'
     | 'file-ppt'
     | 'file-zip'
+    | 'photo'
     | 'video'
+    | 'music'
     // Status & Feedback
     | 'loader'
     | 'alert-circle'
@@ -84,6 +93,11 @@ export type IconName =
     | 'arrow-up'
     | 'arrow-down'
     | 'arrows-sort'
+    | 'sort-ascending'
+    | 'sort-descending'
+    // Favorites
+    | 'star'
+    | 'star-filled'
     // Drag & Drop
     | 'grip-vertical';
 

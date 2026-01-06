@@ -1,6 +1,7 @@
 import { Icon } from '@/components/ui/Icon';
+import { useLibraryState } from '@/hooks/use-library-state';
 import axios from '@/lib/axios';
-import type { Library } from '@/types/library';
+import type { Library, LibraryItem } from '@/types/library';
 import { getErrorMessage } from '@/utils/errors';
 import { handleFormError } from '@/utils/form-errors';
 import { App, Empty, Form, Input, Modal, Space, Spin, theme, Typography } from 'antd';
@@ -12,33 +13,20 @@ const { confirm } = Modal;
 const { useToken } = theme;
 const { Title } = Typography;
 
-interface GridItem {
-    id: number;
-    type: 'folder' | 'file';
-    name: string;
-    color?: string;
-    file_count?: number;
-    total_size_human?: string;
-    file_name?: string;
-    mime_type?: string;
-    size_human?: string;
-    thumbnail_url?: string | null;
-    created_at: string;
-    updated_at?: string;
-}
-
 interface LibraryGridProps {
     parentId: number;
     onFolderClick: (folder: Library) => void;
+    onItemSelect?: (item: LibraryItem | null) => void;
 }
 
-export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProps) {
+export default function LibraryGrid({ parentId, onFolderClick, onItemSelect }: LibraryGridProps) {
     const { token } = useToken();
     const { message } = App.useApp();
-    const [items, setItems] = useState<GridItem[]>([]);
+    const { selectedItem, setSelectedItem } = useLibraryState();
+    const [items, setItems] = useState<LibraryItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [renameModal, setRenameModal] = useState<{ open: boolean; item: GridItem | null }>({
+    const [renameModal, setRenameModal] = useState<{ open: boolean; item: LibraryItem | null }>({
         open: false,
         item: null,
     });
@@ -54,7 +42,7 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
             const customEvent = event as CustomEvent;
             if (customEvent.detail.libraryId === parentId) {
                 // Add new file to grid
-                const newFile: GridItem = {
+                const newFile: LibraryItem = {
                     id: customEvent.detail.file.id,
                     type: 'file',
                     name: customEvent.detail.file.name || customEvent.detail.file.file_name,
@@ -88,9 +76,20 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
         }
     };
 
-    const handleRename = (item: GridItem) => {
+    const handleRename = (item: LibraryItem) => {
         setRenameModal({ open: true, item });
         form.setFieldsValue({ name: item.name });
+    };
+
+    const handleItemClick = (item: LibraryItem) => {
+        const isSelected = selectedItem?.id === item.id && selectedItem?.type === item.type;
+        if (isSelected) {
+            setSelectedItem(null);
+            onItemSelect?.(null);
+        } else {
+            setSelectedItem(item);
+            onItemSelect?.(item);
+        }
     };
 
     const handleRenameSubmit = async (values: { name: string }) => {
@@ -107,7 +106,7 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
         }
     };
 
-    const handleDelete = (item: GridItem) => {
+    const handleDelete = (item: LibraryItem) => {
         confirm({
             title: `Delete ${item.type === 'folder' ? 'Folder' : 'File'}?`,
             icon: <Icon name="alert-circle" size={22} color="#faad14" />,
@@ -128,6 +127,11 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
                         message.success('File deleted successfully!');
                         setItems((prev) => prev.filter((i) => !(i.type === 'file' && i.id === item.id)));
                     }
+                    // Clear selection if deleted item was selected
+                    if (selectedItem?.id === item.id && selectedItem?.type === item.type) {
+                        setSelectedItem(null);
+                        onItemSelect?.(null);
+                    }
                 } catch (error: unknown) {
                     message.error(getErrorMessage(error, `Failed to delete ${item.type}`));
                 }
@@ -135,7 +139,7 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
         });
     };
 
-    const handleDownload = async (item: GridItem) => {
+    const handleDownload = (item: LibraryItem) => {
         if (item.type !== 'file') return;
         window.location.href = `/library/api/file/${item.id}/download`;
     };
@@ -201,12 +205,15 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
                                 },
                             ];
 
+                            const isSelected = selectedItem?.id === item.id && selectedItem?.type === 'folder';
                             return (
                                 <FolderTile
                                     key={`folder-${item.id}`}
                                     name={item.name}
                                     itemCount={item.file_count || 0}
                                     color={item.color}
+                                    selected={isSelected}
+                                    onSelect={() => handleItemClick(item)}
                                     onFolderClick={() => onFolderClick(item as unknown as Library)}
                                     menuItems={folderMenuItems}
                                 />
@@ -255,6 +262,7 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
                                 },
                             ];
 
+                            const isSelected = selectedItem?.id === item.id && selectedItem?.type === 'file';
                             return (
                                 <FileCard
                                     key={`file-${item.id}`}
@@ -264,6 +272,8 @@ export default function LibraryGrid({ parentId, onFolderClick }: LibraryGridProp
                                     size={item.size_human || ''}
                                     thumbnailUrl={item.thumbnail_url}
                                     menuItems={fileMenuItems}
+                                    selected={isSelected}
+                                    onClick={() => handleItemClick(item)}
                                 />
                             );
                         })}
