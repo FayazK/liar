@@ -32,10 +32,9 @@ export default function SortDropdown({ sortBy, sortOrder, onSort }: SortDropdown
     return (
         <Dropdown menu={{ items, selectedKeys: [sortBy] }} trigger={['click']}>
             <Button>
-                <Space>
-                    <Icon name={sortOrder === 'asc' ? 'sort-ascending' : 'sort-descending'} size={14} />
+                <Space size={4}>
                     {currentLabel}
-                    <Icon name="chevron-down" size={14} />
+                    <Icon name="chevron-down" size={12} />
                 </Space>
             </Button>
         </Dropdown>

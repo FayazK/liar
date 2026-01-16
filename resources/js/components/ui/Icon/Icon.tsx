@@ -16,8 +16,11 @@ export const Icon = forwardRef<SVGSVGElement, IconProps>(({ name, style, classNa
         return null;
     }
 
-    // Build final style object with spin animation if needed
+    // Build final style object with proper alignment and spin animation if needed
     const finalStyle: CSSProperties = {
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        flexShrink: 0,
         ...style,
         ...(spin && {
             animation: 'icon-spin 1s linear infinite',

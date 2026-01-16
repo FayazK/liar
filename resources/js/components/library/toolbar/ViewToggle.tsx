@@ -17,7 +17,9 @@ export default function ViewToggle({ value, onChange }: ViewToggleProps) {
                     value: 'grid',
                     icon: (
                         <Tooltip title="Grid view">
-                            <Icon name="layout-grid" size={16} />
+                            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Icon name="layout-grid" size={16} />
+                            </span>
                         </Tooltip>
                     ),
                 },
@@ -25,7 +27,9 @@ export default function ViewToggle({ value, onChange }: ViewToggleProps) {
                     value: 'list',
                     icon: (
                         <Tooltip title="List view">
-                            <Icon name="layout-list" size={16} />
+                            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Icon name="layout-list" size={16} />
+                            </span>
                         </Tooltip>
                     ),
                 },

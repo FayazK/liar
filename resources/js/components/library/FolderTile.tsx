@@ -1,9 +1,8 @@
 import { Icon } from '@/components/ui/Icon';
 import type { MenuProps } from 'antd';
-import { Dropdown, theme, Typography } from 'antd';
+import { Dropdown, theme } from 'antd';
 import { useState } from 'react';
 
-const { Text } = Typography;
 const { useToken } = theme;
 
 interface FolderTileProps {
@@ -16,16 +15,14 @@ interface FolderTileProps {
     menuItems: MenuProps['items'];
 }
 
-export default function FolderTile({ name, itemCount, color, onFolderClick, onSelect, selected, menuItems }: FolderTileProps) {
+export default function FolderTile({ name, itemCount, onFolderClick, onSelect, selected, menuItems }: FolderTileProps) {
     const { token } = useToken();
     const [isHovered, setIsHovered] = useState(false);
 
-    const accentColor = color || token.colorPrimary;
-
     const getBorderColor = () => {
         if (selected) return token.colorPrimary;
-        if (isHovered) return token.colorPrimaryBorder;
-        return token.colorBorder;
+        if (isHovered) return token.colorBorderSecondary;
+        return 'transparent';
     };
 
     const handleClick = () => {
@@ -39,95 +36,68 @@ export default function FolderTile({ name, itemCount, color, onFolderClick, onSe
     };
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: token.marginMD,
-                padding: token.paddingMD,
-                backgroundColor: selected ? token.colorPrimaryBg : token.colorBgContainer,
-                borderTop: `2px solid ${getBorderColor()}`,
-                borderRight: `2px solid ${getBorderColor()}`,
-                borderBottom: `2px solid ${getBorderColor()}`,
-                borderLeft: `4px solid ${accentColor}`,
-                borderRadius: token.borderRadiusLG,
-                minHeight: 64,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                transform: isHovered ? 'translateY(-2px)' : 'none',
-            }}
-            onClick={handleClick}
-            onDoubleClick={handleDoubleClick}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+        <Dropdown
+            menu={{ items: menuItems }}
+            trigger={['contextMenu']}
         >
-            {/* Icon */}
             <div
                 style={{
-                    flexShrink: 0,
-                    width: 40,
-                    height: 40,
-                    borderRadius: token.borderRadiusSM,
-                    backgroundColor: token.colorFillQuaternary,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    gap: token.marginMD,
+                    padding: `${token.paddingMD}px ${token.paddingLG}px`,
+                    backgroundColor: selected ? token.colorPrimaryBg : token.colorBgContainer,
+                    border: `1px solid ${getBorderColor()}`,
+                    borderRadius: token.borderRadiusLG,
+                    minHeight: 72,
+                    cursor: 'pointer',
+                    transition: 'border-color 0.15s ease, background-color 0.15s ease',
                 }}
+                onClick={handleClick}
+                onDoubleClick={handleDoubleClick}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
             >
-                <Icon name="folder" size={22} color={accentColor} />
-            </div>
-
-            {/* Content */}
-            <div style={{ flex: 1, minWidth: 0 }}>
+                {/* Icon */}
                 <div
                     style={{
-                        fontWeight: 500,
-                        fontSize: 14,
-                        marginBottom: 2,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
+                        flexShrink: 0,
+                        width: 44,
+                        height: 44,
+                        borderRadius: token.borderRadius,
+                        backgroundColor: token.colorFillQuaternary,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                     }}
-                    title={name}
                 >
-                    {name}
+                    <Icon name="folder" size={24} color={token.colorPrimary} />
                 </div>
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                    {itemCount} {itemCount === 1 ? 'item' : 'items'}
-                </Text>
-            </div>
 
-            {/* Menu */}
-            <Dropdown
-                menu={{ items: menuItems }}
-                trigger={['click']}
-                placement="bottomRight"
-                popupRender={(menu) => (
+                {/* Content */}
+                <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                         style={{
-                            border: `1px solid ${token.colorBorder}`,
-                            borderRadius: token.borderRadiusLG,
-                            overflow: 'hidden',
+                            fontWeight: 500,
+                            fontSize: 14,
+                            lineHeight: 1.5,
+                            color: token.colorText,
+                            wordBreak: 'break-word',
                         }}
                     >
-                        {menu}
+                        {name}
                     </div>
-                )}
-            >
-                <div
-                    style={{
-                        padding: 8,
-                        borderRadius: token.borderRadiusSM,
-                        cursor: 'pointer',
-                        opacity: isHovered ? 1 : 0.5,
-                        transition: 'opacity 0.2s',
-                        flexShrink: 0,
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <Icon name="dots" size={16} />
+                    <div
+                        style={{
+                            fontSize: 12,
+                            color: token.colorTextTertiary,
+                            marginTop: 2,
+                        }}
+                    >
+                        {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                    </div>
                 </div>
-            </Dropdown>
-        </div>
+            </div>
+        </Dropdown>
     );
 }

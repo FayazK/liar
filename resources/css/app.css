@@ -171,6 +171,42 @@ body::before {
         );
 }
 
+/* Ant Design Dropdown - subtle border */
+.ant-dropdown .ant-dropdown-menu {
+    border: 1px solid oklch(0.88 0.008 75);
+}
+
+.dark .ant-dropdown .ant-dropdown-menu {
+    border: 1px solid oklch(0.32 0.015 55);
+}
+
+/* Ant Design Segmented - center icons properly */
+.ant-segmented-item-label {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.ant-segmented-item-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+}
+
+/* Ant Design Button - center icon and text */
+.ant-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.ant-btn > .anticon,
+.ant-btn > svg {
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
 /* Icon spin animation for loading states */
 @keyframes icon-spin {
     from {

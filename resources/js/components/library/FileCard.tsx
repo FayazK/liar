@@ -1,9 +1,8 @@
 import { Icon, type IconName } from '@/components/ui/Icon';
 import type { MenuProps } from 'antd';
-import { Dropdown, theme, Typography } from 'antd';
+import { Dropdown, theme } from 'antd';
 import { useState } from 'react';
 
-const { Text } = Typography;
 const { useToken } = theme;
 
 interface FileCardProps {
@@ -48,127 +47,96 @@ function getFileIconConfig(mimeType: string, primaryColor: string): { name: Icon
 export default function FileCard({ name, mimeType, size, thumbnailUrl, menuItems, selected, onClick }: FileCardProps) {
     const { token } = useToken();
     const [isHovered, setIsHovered] = useState(false);
+    const [imageError, setImageError] = useState(false);
 
     const isImage = mimeType.startsWith('image/');
     const iconConfig = getFileIconConfig(mimeType, token.colorPrimary);
+    const showThumbnail = thumbnailUrl && isImage && !imageError;
 
     const getBorderColor = () => {
         if (selected) return token.colorPrimary;
-        if (isHovered) return token.colorPrimaryBorder;
-        return token.colorBorder;
+        if (isHovered) return token.colorBorderSecondary;
+        return 'transparent';
     };
 
     return (
-        <div
-            style={{
-                backgroundColor: selected ? token.colorPrimaryBg : token.colorBgContainer,
-                border: `2px solid ${getBorderColor()}`,
-                borderRadius: token.borderRadiusLG,
-                overflow: 'hidden',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                transform: isHovered ? 'translateY(-2px)' : 'none',
-            }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            onClick={onClick}
+        <Dropdown
+            menu={{ items: menuItems }}
+            trigger={['contextMenu']}
         >
-            {/* Thumbnail/Icon Area */}
             <div
                 style={{
-                    height: 140,
-                    backgroundColor: token.colorFillQuaternary,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
+                    backgroundColor: selected ? token.colorPrimaryBg : token.colorBgContainer,
+                    border: `1px solid ${getBorderColor()}`,
+                    borderRadius: token.borderRadiusLG,
                     overflow: 'hidden',
+                    cursor: 'pointer',
+                    transition: 'border-color 0.15s ease, background-color 0.15s ease',
                 }}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                onClick={onClick}
             >
-                {thumbnailUrl && isImage ? (
-                    <img
-                        src={thumbnailUrl}
-                        alt={name}
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                        }}
-                    />
-                ) : (
-                    <Icon name={iconConfig.name} size={48} color={iconConfig.color || token.colorTextSecondary} />
-                )}
-            </div>
-
-            {/* Info Area */}
-            <div
-                style={{
-                    padding: token.paddingSM,
-                    borderTop: `1px solid ${token.colorBorderSecondary}`,
-                }}
-            >
+                {/* Thumbnail/Icon Area */}
                 <div
                     style={{
+                        height: 120,
+                        backgroundColor: token.colorFillQuaternary,
                         display: 'flex',
-                        alignItems: 'flex-start',
-                        justifyContent: 'space-between',
-                        gap: token.marginXS,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                        overflow: 'hidden',
                     }}
                 >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
+                    {showThumbnail ? (
+                        <img
+                            src={thumbnailUrl}
+                            alt=""
                             style={{
-                                fontWeight: 500,
-                                fontSize: 13,
-                                lineHeight: 1.4,
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                display: '-webkit-box',
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: 'vertical',
-                                wordBreak: 'break-word',
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
                             }}
-                            title={name}
-                        >
-                            {name}
-                        </div>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                            {size}
-                        </Text>
-                    </div>
+                            onError={() => setImageError(true)}
+                        />
+                    ) : (
+                        <Icon
+                            name={iconConfig.name}
+                            size={40}
+                            color={iconConfig.color || token.colorTextTertiary}
+                        />
+                    )}
+                </div>
 
-                    <Dropdown
-                        menu={{ items: menuItems }}
-                        trigger={['click']}
-                        placement="bottomRight"
-                        popupRender={(menu) => (
-                            <div
-                                style={{
-                                    border: `1px solid ${token.colorBorder}`,
-                                    borderRadius: token.borderRadiusLG,
-                                    overflow: 'hidden',
-                                }}
-                            >
-                                {menu}
-                            </div>
-                        )}
+                {/* Info Area */}
+                <div
+                    style={{
+                        padding: token.paddingMD,
+                    }}
+                >
+                    <div
+                        style={{
+                            fontWeight: 500,
+                            fontSize: 13,
+                            lineHeight: 1.5,
+                            color: token.colorText,
+                            wordBreak: 'break-word',
+                        }}
                     >
-                        <div
-                            style={{
-                                padding: 4,
-                                borderRadius: token.borderRadiusSM,
-                                cursor: 'pointer',
-                                opacity: isHovered ? 1 : 0.5,
-                                transition: 'opacity 0.2s',
-                                flexShrink: 0,
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <Icon name="dots" size={16} />
-                        </div>
-                    </Dropdown>
+                        {name}
+                    </div>
+                    <div
+                        style={{
+                            fontSize: 12,
+                            color: token.colorTextTertiary,
+                            marginTop: 4,
+                        }}
+                    >
+                        {size}
+                    </div>
                 </div>
             </div>
-        </div>
+        </Dropdown>
     );
 }

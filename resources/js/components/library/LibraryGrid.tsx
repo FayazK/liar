@@ -4,14 +4,13 @@ import axios from '@/lib/axios';
 import type { Library, LibraryItem } from '@/types/library';
 import { getErrorMessage } from '@/utils/errors';
 import { handleFormError } from '@/utils/form-errors';
-import { App, Empty, Form, Input, Modal, Space, Spin, theme, Typography } from 'antd';
+import { App, Empty, Form, Input, Modal, Space, Spin, theme } from 'antd';
 import { useEffect, useState } from 'react';
 import FileCard from './FileCard';
 import FolderTile from './FolderTile';
 
 const { confirm } = Modal;
 const { useToken } = theme;
-const { Title } = Typography;
 
 interface LibraryGridProps {
     parentId: number;
@@ -168,15 +167,12 @@ export default function LibraryGrid({ parentId, onFolderClick, onItemSelect }: L
         <>
             {/* Folders Section */}
             {folders.length > 0 && (
-                <div style={{ marginBottom: token.marginXL }}>
-                    <Title level={5} style={{ marginBottom: token.marginMD }}>
-                        Folders
-                    </Title>
+                <div style={{ marginBottom: token.marginLG }}>
                     <div
                         style={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                            gap: token.marginMD,
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                            gap: token.marginSM,
                         }}
                     >
                         {folders.map((item) => {
@@ -225,15 +221,12 @@ export default function LibraryGrid({ parentId, onFolderClick, onItemSelect }: L
 
             {/* Files Section */}
             {files.length > 0 && (
-                <div>
-                    <Title level={5} style={{ marginBottom: token.marginMD }}>
-                        Files
-                    </Title>
+                <div style={{ marginTop: folders.length > 0 ? token.marginLG : 0 }}>
                     <div
                         style={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                            gap: token.marginMD,
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                            gap: token.marginSM,
                         }}
                     >
                         {files.map((item) => {

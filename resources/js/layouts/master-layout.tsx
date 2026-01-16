@@ -83,11 +83,14 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
     };
 
     // Build menu items with badge support
+    // When collapsed (and not mobile), hide group labels
+    const showGroupLabels = !collapsed || isMobile;
+
     const menuItems: MenuProps['items'] = [
         ...(buildMenuItems(mainNavItems, isMobile ? closeMobileMenu : undefined) ?? []),
         ...navGroups.map((group) => ({
             key: `group-${group.title.toLowerCase().replace(/\s+/g, '-')}`,
-            label: group.title,
+            label: showGroupLabels ? group.title : null,
             type: 'group' as const,
             children: buildMenuItems(group.items, isMobile ? closeMobileMenu : undefined),
         })),
