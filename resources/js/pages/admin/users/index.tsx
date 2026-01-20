@@ -1,11 +1,12 @@
+import type { ContentHeaderProps } from '@/components/ui/ContentHeader';
 import DataTable from '@/components/ui/DataTable';
 import { Icon } from '@/components/ui/Icon';
 import PageCard from '@/components/ui/PageCard';
 import axios from '@/lib/axios';
-import { create, data, edit, show } from '@/routes/admin/users';
+import { create, data, edit, index, show } from '@/routes/admin/users';
 import type { LaravelPaginatedResponse, User } from '@/types';
 import type { DataTableQueryParams, FilterConfig, TabConfig } from '@/types/datatable';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { App, Avatar, Button, Dropdown, Space, Tag, theme } from 'antd';
 import React from 'react';
@@ -76,6 +77,22 @@ const fetchUsers = async (params: DataTableQueryParams): Promise<LaravelPaginate
 export default function UsersIndex() {
     const { token } = useToken();
     const { message } = App.useApp();
+
+    // ContentHeader configuration
+    const contentHeader: ContentHeaderProps = {
+        primaryAction: {
+            label: 'Add User',
+            icon: 'user-plus',
+            onClick: () => router.visit(create.url()),
+        },
+        breadcrumb: [
+            { title: 'Admin', href: '/admin' },
+            { title: 'Users', href: index.url() },
+        ],
+        actionIcons: [
+            { icon: 'refresh', tooltip: 'Refresh', onClick: () => router.reload() },
+        ],
+    };
 
     // Column definitions using TanStack Table format
     const columns: ColumnDef<User>[] = [
@@ -194,20 +211,11 @@ export default function UsersIndex() {
         },
     ];
 
-    const headerActions = (
-        <Link href={create.url()}>
-            <Button type="primary" icon={<Icon name="user-plus" size={16} />}>
-                Add User
-            </Button>
-        </Link>
-    );
-
     return (
-        <AdminLayout>
+        <AdminLayout contentHeader={contentHeader}>
             <PageCard
                 header={{
                     title: 'Users',
-                    actions: headerActions,
                 }}
                 bodyPadding="none"
             >

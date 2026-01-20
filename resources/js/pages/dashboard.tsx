@@ -1,9 +1,10 @@
 import { Icon } from '@/components/ui/Icon';
 import PageCard from '@/components/ui/PageCard';
 import AppLayout from '@/layouts/app-layout';
+import type { ContentHeaderProps } from '@/components/ui/ContentHeader';
 import { type SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import { Avatar, Button, Card, Col, Dropdown, Flex, Progress, Row, Space, Statistic, Tag, theme, Typography } from 'antd';
+import { App, Avatar, Button, Card, Col, Dropdown, Flex, Progress, Row, Space, Statistic, Tag, theme, Typography } from 'antd';
 
 const { Title, Text, Paragraph } = Typography;
 const { useToken } = theme;
@@ -11,6 +12,29 @@ const { useToken } = theme;
 export default function Dashboard() {
     const { auth } = usePage<SharedData>().props;
     const { token } = useToken();
+    const { message } = App.useApp();
+
+    // Sample ContentHeader configuration for demonstration
+    const contentHeader: ContentHeaderProps = {
+        primaryAction: {
+            label: 'New Report',
+            icon: 'plus',
+            onClick: () => message.info('New report clicked!'),
+        },
+        breadcrumb: [
+            { title: 'Home', href: '/' },
+            { title: 'Dashboard', href: '/dashboard' },
+        ],
+        actionIcons: [
+            { icon: 'refresh', tooltip: 'Refresh', onClick: () => window.location.reload() },
+            { icon: 'download', tooltip: 'Export', onClick: () => message.info('Export clicked!') },
+        ],
+        infoTabs: [
+            { key: 'users', icon: 'users', label: 'Users', value: 1234 },
+            { key: 'revenue', icon: 'currency-dollar', label: 'Revenue', value: '$12.3k' },
+            { key: 'orders', icon: 'shopping-cart', label: 'Orders', value: 56 },
+        ],
+    };
 
     const statsData = [
         {
@@ -120,7 +144,7 @@ export default function Dashboard() {
     );
 
     return (
-        <AppLayout>
+        <AppLayout contentHeader={contentHeader}>
             <Head title="Dashboard" />
 
             <PageCard
