@@ -35,7 +35,7 @@ export default function LibraryLayout({ children, sidebar, preview }: LibraryLay
         <AppLayout>
             <Layout
                 style={{
-                    minHeight: 'calc(100vh - 56px - 32px)', // Account for header and padding
+                    minHeight: 'calc(100vh - 40px - 32px)', // Account for header and padding
                     margin: -token.paddingMD,
                     marginTop: -token.paddingMD,
                 }}
@@ -51,9 +51,11 @@ export default function LibraryLayout({ children, sidebar, preview }: LibraryLay
                         style={{
                             background: token.colorBgContainer,
                             borderRight: `1px solid ${token.colorBorderSecondary}`,
-                            height: 'calc(100vh - 56px)',
+                            borderTopLeftRadius: token.borderRadiusLG,
+                            borderTopRightRadius: token.borderRadiusLG,
+                            height: 'calc(100vh - 40px)',
                             position: 'sticky',
-                            top: 56,
+                            top: 40,
                             overflow: 'auto',
                         }}
                     >
@@ -66,7 +68,7 @@ export default function LibraryLayout({ children, sidebar, preview }: LibraryLay
                     style={{
                         padding: token.paddingMD,
                         background: token.colorBgLayout,
-                        minHeight: 'calc(100vh - 56px)',
+                        minHeight: 'calc(100vh - 40px)',
                         overflow: 'auto',
                     }}
                 >
@@ -84,9 +86,10 @@ export default function LibraryLayout({ children, sidebar, preview }: LibraryLay
                         style={{
                             background: token.colorBgContainer,
                             borderLeft: `1px solid ${token.colorBorderSecondary}`,
-                            height: 'calc(100vh - 56px)',
+                            borderTopLeftRadius: token.borderRadiusLG,
+                            height: 'calc(100vh - 40px)',
                             position: 'sticky',
-                            top: 56,
+                            top: 40,
                             overflow: 'auto',
                         }}
                     >

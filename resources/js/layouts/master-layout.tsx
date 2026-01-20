@@ -8,13 +8,15 @@ import { dashboard } from '@/routes';
 import { type NavGroup, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import type { MenuProps } from 'antd';
-import { Badge, Button, Drawer, Flex, Input, Layout, Menu, theme, Typography } from 'antd';
+import { Badge, Button, Drawer, Flex, Layout, Menu, theme, Typography } from 'antd';
 import { type ReactNode } from 'react';
 import logo from '../../images/logo.svg';
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
 const { useToken } = theme;
+
+const HEADER_HEIGHT = 40;
 
 interface MasterLayoutProps {
     children: ReactNode;
@@ -111,40 +113,9 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
         })),
     ];
 
-    // Sidebar content with logo header and menu
+    // Sidebar content with menu (logo moved to unified header)
     const sidebarContent = (
         <Flex vertical style={{ height: '100%' }}>
-            {/* Logo Section */}
-            <Flex
-                align="center"
-                justify={collapsed ? 'center' : 'flex-start'}
-                style={{
-                    height: '56px',
-                    padding: collapsed ? 0 : `0 ${token.paddingMD}px`,
-                    flexShrink: 0,
-                }}
-            >
-                <Link href={dashboard()} prefetch>
-                    <Flex align="center" gap="small">
-                        <img
-                            src={logo}
-                            alt="Liar Logo"
-                            width="32"
-                            height="32"
-                            style={{
-                                height: '32px',
-                                width: '32px',
-                            }}
-                        />
-                        {!collapsed && (
-                            <Text strong style={{ fontSize: '20px', color: token.colorText }}>
-                                Liar
-                            </Text>
-                        )}
-                    </Flex>
-                </Link>
-            </Flex>
-
             {/* Menu Section */}
             <Flex vertical style={{ flex: 1, overflow: 'auto', paddingTop: token.paddingXS }}>
                 <Menu
@@ -238,7 +209,7 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
             <GlobalSearch open={isSearchOpen} onClose={closeSearch} />
 
             <Layout style={{ minHeight: '100vh' }}>
-                {/* Desktop Sidebar - full height from top */}
+                {/* Desktop Sidebar - starts below unified header */}
                 {!isMobile && (
                     <Sider
                         trigger={null}
@@ -248,12 +219,11 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
                         collapsedWidth={80}
                         style={{
                             background: 'transparent',
-                            height: '100vh',
+                            height: `calc(100vh - ${HEADER_HEIGHT}px)`,
                             position: 'fixed',
                             left: 0,
-                            top: 0,
-                            bottom: 0,
-                            zIndex: 11,
+                            top: HEADER_HEIGHT,
+                            zIndex: 10,
                         }}
                     >
                         <nav aria-label="Main navigation" style={{ height: '100%' }}>
@@ -287,7 +257,7 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
                         background: token.colorBgLayout,
                     }}
                 >
-                    {/* Header - spans content area only */}
+                    {/* Unified Header - spans full viewport width */}
                     <Header
                         style={{
                             padding: `0 ${token.paddingMD}px`,
@@ -295,50 +265,62 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
                             position: 'fixed',
                             top: 0,
                             right: 0,
-                            left: isMobile ? 0 : collapsed ? 80 : 200,
-                            zIndex: 10,
-                            height: '56px',
-                            transition: 'left 0.2s',
+                            left: 0,
+                            zIndex: 11,
+                            height: `${HEADER_HEIGHT}px`,
                         }}
                     >
                         <Flex justify="space-between" align="center" style={{ height: '100%' }}>
-                            {/* Left Section: Toggle + Search */}
-                            <Flex align="center" gap="middle">
+                            {/* Left Section: Logo + Toggle */}
+                            <Flex align="center" gap="small">
+                                {/* Logo - always visible */}
+                                <Link href={dashboard()} prefetch>
+                                    <Flex align="center" gap="small">
+                                        <img
+                                            src={logo}
+                                            alt="Liar Logo"
+                                            width="20"
+                                            height="20"
+                                            style={{
+                                                height: '20px',
+                                                width: '20px',
+                                            }}
+                                        />
+                                        <Text strong style={{ fontSize: '14px', color: token.colorText }}>
+                                            Liar
+                                        </Text>
+                                    </Flex>
+                                </Link>
+
                                 {/* Sidebar Toggle */}
                                 <Button
                                     type="text"
                                     icon={
                                         isMobile ? (
-                                            <Icon name="menu" size={18} />
+                                            <Icon name="menu" size={16} />
                                         ) : collapsed ? (
-                                            <Icon name="menu-unfold" size={18} />
+                                            <Icon name="menu-unfold" size={16} />
                                         ) : (
-                                            <Icon name="menu-fold" size={18} />
+                                            <Icon name="menu-fold" size={16} />
                                         )
                                     }
                                     onClick={toggleCollapsed}
                                     aria-label={isMobile ? 'Toggle navigation menu' : collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                                 />
-
-                                {/* Inline Search Bar (desktop only) */}
-                                {!isMobile && (
-                                    <Input
-                                        prefix={<Icon name="search" size={16} style={{ color: token.colorTextPlaceholder }} />}
-                                        placeholder="Type to search..."
-                                        onClick={openSearch}
-                                        readOnly
-                                        style={{
-                                            width: 200,
-                                            cursor: 'pointer',
-                                        }}
-                                    />
-                                )}
                             </Flex>
 
-                            {/* Right Section: Actions + Notifications + User */}
+                            {/* Right Section: Actions + Search + Notifications + User */}
                             <Flex align="center" gap="small">
                                 {/* Page-specific Actions */}
                                 {actions}
+
+                                {/* Search Icon Button */}
+                                <Button
+                                    type="text"
+                                    icon={<Icon name="search" size={16} />}
+                                    onClick={openSearch}
+                                    aria-label="Search"
+                                />
 
                                 {/* Notifications */}
                                 <NotificationsCenter />
@@ -354,9 +336,9 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
                         id="main-content"
                         role="main"
                         style={{
-                            marginTop: '56px',
+                            marginTop: `${HEADER_HEIGHT}px`,
                             padding: token.paddingMD,
-                            minHeight: `calc(100vh - 56px)`,
+                            minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
                         }}
                     >
                         {/* Content Wrapper with max-width */}
