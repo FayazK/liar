@@ -1,4 +1,5 @@
 import { dashboard as adminDashboard } from '@/routes/admin';
+import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as libraryIndex } from '@/routes/library';
 import { type NavGroup, type NavItem } from '@/types';
 
@@ -25,6 +26,16 @@ export const adminNavGroups: NavGroup[] = [
                 title: 'User Management',
                 href: '/admin/users',
                 icon: 'users',
+            },
+        ],
+    },
+    {
+        title: 'Access Control',
+        items: [
+            {
+                title: 'Roles',
+                href: rolesIndex.url(),
+                icon: 'shield',
             },
         ],
     },

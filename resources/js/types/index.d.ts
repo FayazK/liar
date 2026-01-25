@@ -32,11 +32,22 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
+export interface Role {
+    id: number;
+    name: string;
+    description?: string | null;
+    users_count?: number;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface User {
     id: number;
     first_name: string;
     last_name: string;
     email: string;
+    role_id?: number | null;
+    role?: Role | null;
     phone?: string;
     date_of_birth?: string;
     avatar_url?: string;
@@ -51,7 +62,7 @@ export interface User {
     updated_at: string;
     full_name: string; // Computed attribute from Laravel
     initials: string; // Computed attribute from Laravel
-    [key: string]: string | number | boolean | null | undefined; // Required for DataTable generic constraint
+    [key: string]: unknown; // Required for DataTable generic constraint
 }
 
 export interface PaginationLinks {

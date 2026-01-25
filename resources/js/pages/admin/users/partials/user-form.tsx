@@ -1,9 +1,10 @@
 import AdvancedSelect from '@/components/advanced-select';
 import api from '@/lib/axios';
-import type { User } from '@/types';
+import type { Role, User } from '@/types';
 import { isApiError } from '@/utils/errors';
 import { router } from '@inertiajs/react';
-import { Button, Col, DatePicker, Form, Input, notification, Row, Switch } from 'antd';
+import { useQuery } from '@tanstack/react-query';
+import { Button, Col, DatePicker, Form, Input, notification, Row, Select, Switch } from 'antd';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
@@ -12,6 +13,7 @@ interface UserFormValues {
     first_name: string;
     last_name: string;
     email: string;
+    role_id?: number | null;
     phone?: string;
     password?: string;
     password_confirmation?: string;
@@ -31,11 +33,21 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
 
+    // Fetch roles for the select dropdown
+    const { data: roles } = useQuery({
+        queryKey: ['roles'],
+        queryFn: async () => {
+            const response = await api.get<{ data: Role[] }>('/admin/roles/data');
+            return response.data.data;
+        },
+    });
+
     useEffect(() => {
         form.setFieldsValue({
             first_name: user?.first_name || '',
             last_name: user?.last_name || '',
             email: user?.email || '',
+            role_id: user?.role_id || null,
             phone: user?.phone || '',
             date_of_birth: user?.date_of_birth ? dayjs(user.date_of_birth) : null,
             bio: user?.bio || '',
@@ -103,6 +115,17 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
 
             <Form.Item label="Email" name="email" rules={[{ required: true, type: 'email', message: 'Please input a valid email!' }]}>
                 <Input type="email" />
+            </Form.Item>
+
+            <Form.Item label="Role" name="role_id">
+                <Select
+                    placeholder="Select a role"
+                    allowClear
+                    options={roles?.map((role) => ({
+                        label: role.name,
+                        value: role.id,
+                    }))}
+                />
             </Form.Item>
 
             <Row gutter={16}>

@@ -105,7 +105,7 @@ export default function UsersIndex() {
                 const user = row.original;
                 return (
                     <Space>
-                        <Avatar src={user.avatar} icon={<Icon name="user" size={16} />} size={32}>
+                        <Avatar src={user.avatar_url} icon={<Icon name="user" size={16} />} size={32}>
                             {user.initials}
                         </Avatar>
                         <div>
@@ -114,6 +114,17 @@ export default function UsersIndex() {
                         </div>
                     </Space>
                 );
+            },
+        },
+        {
+            id: 'role',
+            header: 'Role',
+            accessorKey: 'role',
+            enableSorting: false,
+            size: 120,
+            cell: ({ row }) => {
+                const role = row.original.role;
+                return role ? <Tag color="blue">{role.name}</Tag> : <Tag>No Role</Tag>;
             },
         },
         {

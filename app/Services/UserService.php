@@ -23,6 +23,7 @@ class UserService
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'email' => $data['email'],
+            'role_id' => $data['role_id'] ?? null,
             'password' => Hash::make($data['password']),
             'timezone' => $data['timezone'] ?? 'UTC',
             'locale' => $data['locale'] ?? 'en',
@@ -41,7 +42,7 @@ class UserService
         $updateData = [];
 
         $allowedFields = [
-            'first_name', 'last_name', 'email', 'phone',
+            'first_name', 'last_name', 'email', 'role_id', 'phone',
             'date_of_birth', 'bio', 'timezone', 'locale',
         ];
 

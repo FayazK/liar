@@ -34,6 +34,7 @@ class UserStoreRequest extends FormRequest
                 'max:255',
                 'unique:'.User::class,
             ],
+            'role_id' => ['nullable', 'exists:roles,id'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'phone' => ['nullable', 'string', 'max:20'],
             'date_of_birth' => ['nullable', 'date', 'before:today'],

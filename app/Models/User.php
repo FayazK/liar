@@ -7,6 +7,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Plank\Metable\Metable;
@@ -29,6 +30,7 @@ class User extends Authenticatable implements HasMedia
         'first_name',
         'last_name',
         'email',
+        'role_id',
         'password',
         'phone',
         'date_of_birth',
@@ -59,6 +61,7 @@ class User extends Authenticatable implements HasMedia
         'initials',
         'avatar_url',
         'avatar_thumb_url',
+        'role',
     ];
 
     /**
@@ -127,5 +130,13 @@ class User extends Authenticatable implements HasMedia
     public function getAvatarThumbUrlAttribute(): ?string
     {
         return $this->getFirstMediaUrl('avatar', 'thumb') ?: null;
+    }
+
+    /**
+     * Get the role that owns the user.
+     */
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
     }
 }

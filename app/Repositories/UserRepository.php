@@ -60,7 +60,7 @@ class UserRepository
         ?string $sortBy = 'created_at',
         string $sortDirection = 'desc'
     ): LengthAwarePaginator {
-        $query = User::query();
+        $query = User::query()->with('role');
 
         // Apply search
         if ($search) {
