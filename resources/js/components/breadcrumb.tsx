@@ -1,7 +1,7 @@
+import { Icon } from '@/components/ui/Icon';
+import { type BreadcrumbItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Breadcrumb as AntBreadcrumb, theme } from 'antd';
-import { HomeOutlined } from '@ant-design/icons';
-import { type BreadcrumbItem } from '@/types';
 
 const { useToken } = theme;
 
@@ -23,7 +23,7 @@ export default function Breadcrumb({ items, showHome = true }: BreadcrumbProps) 
                   {
                       title: (
                           <Link href="/">
-                              <HomeOutlined style={{ fontSize: '14px' }} />
+                              <Icon name="home" size={14} />
                           </Link>
                       ),
                   },
@@ -33,11 +33,7 @@ export default function Breadcrumb({ items, showHome = true }: BreadcrumbProps) 
             const isLast = index === items.length - 1;
 
             return {
-                title: isLast ? (
-                    <span style={{ color: token.colorText }}>{item.title}</span>
-                ) : (
-                    <Link href={item.href}>{item.title}</Link>
-                ),
+                title: isLast ? <span style={{ color: token.colorText }}>{item.title}</span> : <Link href={item.href}>{item.title}</Link>,
             };
         }),
     ];

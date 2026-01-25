@@ -1,8 +1,8 @@
 import { home } from '@/routes';
 import { Link } from '@inertiajs/react';
-import { Card, Typography, Flex, theme } from 'antd';
+import { Card, Flex, theme, Typography } from 'antd';
 import { type PropsWithChildren } from 'react';
-import logo from '../../images/logo.svg'
+import logo from '../../images/logo.svg';
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
@@ -51,7 +51,7 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
                     styles={{
                         body: {
                             padding: token.paddingXL,
-                        }
+                        },
                     }}
                 >
                     {/* Header */}

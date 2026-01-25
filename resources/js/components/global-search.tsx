@@ -1,16 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import { router } from '@inertiajs/react';
-import { Modal, Input, List, Empty, Flex, Typography, theme } from 'antd';
-import {
-    SearchOutlined,
-    DashboardOutlined,
-    SettingOutlined,
-    UserOutlined,
-    FileTextOutlined,
-} from '@ant-design/icons';
+import { Icon, type IconName } from '@/components/ui/Icon';
 import { dashboard } from '@/routes';
-import profile from '@/routes/profile';
-import { appearance } from '@/routes';
+import { router } from '@inertiajs/react';
+import { Empty, Flex, Input, List, Modal, Typography, theme } from 'antd';
+import { useCallback, useEffect, useState } from 'react';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -20,7 +12,7 @@ interface SearchResult {
     title: string;
     description: string;
     url: string;
-    icon: React.ReactNode;
+    icon: IconName;
     category: 'pages' | 'settings' | 'actions';
 }
 
@@ -31,23 +23,39 @@ const searchableItems: SearchResult[] = [
         title: 'Dashboard',
         description: 'View your dashboard',
         url: dashboard().url,
-        icon: <DashboardOutlined />,
+        icon: 'dashboard',
         category: 'pages',
+    },
+    {
+        id: 'account',
+        title: 'Account',
+        description: 'Manage your account settings',
+        url: '/settings/account',
+        icon: 'settings',
+        category: 'settings',
     },
     {
         id: 'profile',
         title: 'Profile',
         description: 'Edit your profile information',
-        url: profile.edit().url,
-        icon: <UserOutlined />,
+        url: '/settings/account#profile',
+        icon: 'user',
+        category: 'settings',
+    },
+    {
+        id: 'password',
+        title: 'Password',
+        description: 'Change your password',
+        url: '/settings/account#password',
+        icon: 'lock',
         category: 'settings',
     },
     {
         id: 'appearance',
         title: 'Appearance',
         description: 'Customize theme and appearance',
-        url: appearance().url,
-        icon: <SettingOutlined />,
+        url: '/settings/account#appearance',
+        icon: 'palette',
         category: 'settings',
     },
 ];
@@ -70,9 +78,7 @@ export default function GlobalSearch({ open, onClose }: GlobalSearchProps) {
         } else {
             const query = searchQuery.toLowerCase();
             const filtered = searchableItems.filter(
-                item =>
-                    item.title.toLowerCase().includes(query) ||
-                    item.description.toLowerCase().includes(query),
+                (item) => item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query),
             );
             setFilteredResults(filtered);
         }
@@ -97,13 +103,11 @@ export default function GlobalSearch({ open, onClose }: GlobalSearchProps) {
             switch (e.key) {
                 case 'ArrowDown':
                     e.preventDefault();
-                    setSelectedIndex(prev =>
-                        prev < filteredResults.length - 1 ? prev + 1 : prev,
-                    );
+                    setSelectedIndex((prev) => (prev < filteredResults.length - 1 ? prev + 1 : prev));
                     break;
                 case 'ArrowUp':
                     e.preventDefault();
-                    setSelectedIndex(prev => (prev > 0 ? prev - 1 : prev));
+                    setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
                     break;
                 case 'Enter':
                     e.preventDefault();
@@ -157,9 +161,9 @@ export default function GlobalSearch({ open, onClose }: GlobalSearchProps) {
                         autoFocus
                         size="large"
                         placeholder="Search pages, settings, and actions..."
-                        prefix={<SearchOutlined />}
+                        prefix={<Icon name="search" size={16} />}
                         value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={handleKeyDown}
                         style={{ border: 'none' }}
                     />
@@ -173,11 +177,7 @@ export default function GlobalSearch({ open, onClose }: GlobalSearchProps) {
                     }}
                 >
                     {filteredResults.length === 0 ? (
-                        <Empty
-                            image={Empty.PRESENTED_IMAGE_SIMPLE}
-                            description="No results found"
-                            style={{ padding: '32px' }}
-                        />
+                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No results found" style={{ padding: '32px' }} />
                     ) : (
                         <List
                             dataSource={filteredResults}
@@ -188,14 +188,8 @@ export default function GlobalSearch({ open, onClose }: GlobalSearchProps) {
                                     style={{
                                         padding: '12px 16px',
                                         cursor: 'pointer',
-                                        backgroundColor:
-                                            index === selectedIndex
-                                                ? token.colorPrimaryBg
-                                                : 'transparent',
-                                        borderLeft:
-                                            index === selectedIndex
-                                                ? `3px solid ${token.colorPrimary}`
-                                                : '3px solid transparent',
+                                        backgroundColor: index === selectedIndex ? token.colorPrimaryBg : 'transparent',
+                                        borderLeft: index === selectedIndex ? `3px solid ${token.colorPrimary}` : '3px solid transparent',
                                         transition: 'all 0.2s',
                                     }}
                                     onMouseEnter={() => setSelectedIndex(index)}
@@ -203,18 +197,14 @@ export default function GlobalSearch({ open, onClose }: GlobalSearchProps) {
                                     <Flex align="center" gap="middle" style={{ width: '100%' }}>
                                         <div
                                             style={{
-                                                fontSize: '20px',
                                                 color: token.colorPrimary,
                                             }}
                                         >
-                                            {item.icon}
+                                            <Icon name={item.icon} size={20} />
                                         </div>
                                         <Flex vertical style={{ flex: 1 }}>
                                             <Text strong>{item.title}</Text>
-                                            <Text
-                                                type="secondary"
-                                                style={{ fontSize: '12px' }}
-                                            >
+                                            <Text type="secondary" style={{ fontSize: '12px' }}>
                                                 {item.description}
                                             </Text>
                                         </Flex>

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class UserRepository
 {
@@ -27,12 +29,14 @@ class UserRepository
     {
         $user = User::findOrFail($id);
         $user->update($data);
+
         return $user->fresh();
     }
 
     public function delete(int $id): bool
     {
         $user = User::findOrFail($id);
+
         return $user->delete();
     }
 
@@ -40,6 +44,7 @@ class UserRepository
     {
         $user = User::findOrFail($id);
         $user->update(['last_login_at' => now()]);
+
         return $user->fresh();
     }
 
@@ -60,8 +65,9 @@ class UserRepository
         // Apply search
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -84,7 +90,7 @@ class UserRepository
         }
 
         // Apply sorting
-        $allowedSortColumns = ['name', 'email', 'created_at', 'last_login_at', 'is_active'];
+        $allowedSortColumns = ['first_name', 'last_name', 'email', 'created_at', 'last_login_at', 'is_active'];
         if (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);
         }

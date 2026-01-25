@@ -44,7 +44,7 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => fn () => $request->user()
-                    ? $request->user()->only('id', 'first_name', 'last_name', 'email', 'avatar', 'full_name', 'initials')
+                    ? $request->user()->only('id', 'first_name', 'last_name', 'email', 'avatar_url', 'avatar_thumb_url', 'full_name', 'initials')
                     : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',

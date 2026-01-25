@@ -1,8 +1,9 @@
+import { Icon } from '@/components/ui/Icon';
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
+import { handleFormError } from '@/utils/form-errors';
 import { Head } from '@inertiajs/react';
-import { Alert, Button, Form, Input, Space, Typography, theme, message } from 'antd';
-import { LoadingOutlined, SafetyOutlined } from '@ant-design/icons';
+import { Alert, App, Button, Form, Input, Space, Typography, theme } from 'antd';
 import { useState } from 'react';
 
 const { Text } = Typography;
@@ -16,6 +17,7 @@ export default function ConfirmPassword() {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const { token } = useToken();
+    const { message } = App.useApp();
 
     const handleSubmit = async (values: ConfirmPasswordFormData) => {
         setLoading(true);
@@ -24,19 +26,8 @@ export default function ConfirmPassword() {
             message.success('Password confirmed successfully!');
             // Redirect back to the intended page
             window.history.back();
-        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
-            if (error.response?.status === 422) {
-                // Validation errors
-                const errors = error.response.data.errors;
-                form.setFields(
-                    Object.keys(errors).map(field => ({
-                        name: field,
-                        errors: errors[field],
-                    }))
-                );
-            } else {
-                message.error('Password confirmation failed. Please try again.');
-            }
+        } catch (error: unknown) {
+            handleFormError(error, form, 'Password confirmation failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -49,35 +40,23 @@ export default function ConfirmPassword() {
         >
             <Head title="Confirm password" />
 
-            <Space direction="vertical" size="large" className="w-full">
+            <Space orientation="vertical" size="large" className="w-full">
                 <Alert
                     message="Security Check Required"
                     description="For your security, please confirm your current password to continue accessing this protected area."
                     type="info"
                     showIcon
-                    icon={<SafetyOutlined />}
+                    icon={<Icon name="shield" size={18} />}
                 />
 
-                <Form
-                    form={form}
-                    onFinish={handleSubmit}
-                    layout="vertical"
-                    requiredMark={false}
-                >
-                    <Space direction="vertical" size="middle" className="w-full">
+                <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
+                    <Space orientation="vertical" size="middle" className="w-full">
                         <Form.Item
                             name="password"
                             label={<Text style={{ color: token.colorText }}>Current Password</Text>}
-                            rules={[
-                                { required: true, message: 'Please input your current password!' }
-                            ]}
+                            rules={[{ required: true, message: 'Please input your current password!' }]}
                         >
-                            <Input.Password
-                                placeholder="Enter your current password"
-                                autoComplete="current-password"
-                                autoFocus
-                                size="large"
-                            />
+                            <Input.Password placeholder="Enter your current password" autoComplete="current-password" autoFocus size="large" />
                         </Form.Item>
 
                         <Form.Item>
@@ -87,7 +66,7 @@ export default function ConfirmPassword() {
                                 size="large"
                                 block
                                 loading={loading}
-                                icon={loading ? <LoadingOutlined /> : <SafetyOutlined />}
+                                icon={loading ? <Icon name="loader" spin size={16} /> : <Icon name="shield" size={16} />}
                             >
                                 Confirm password
                             </Button>

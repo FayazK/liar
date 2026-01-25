@@ -1,89 +1,173 @@
-import React from 'react';
-import { Button, Space, Tag, Dropdown, Avatar } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined, MoreOutlined } from '@ant-design/icons';
-import { Link } from '@inertiajs/react';
-import AdminLayout from '@/layouts/admin-layout';
+import type { ContentHeaderProps } from '@/components/ui/ContentHeader';
 import DataTable from '@/components/ui/DataTable';
-import type { User } from '@/types';
-import { show, edit, data, create } from '@/routes/admin/users';
+import { Icon } from '@/components/ui/Icon';
+import PageCard from '@/components/ui/PageCard';
+import axios from '@/lib/axios';
+import { create, data, edit, index, show } from '@/routes/admin/users';
+import type { LaravelPaginatedResponse, User } from '@/types';
+import type { DataTableQueryParams, FilterConfig, TabConfig } from '@/types/datatable';
+import { Link, router } from '@inertiajs/react';
+import type { ColumnDef } from '@tanstack/react-table';
+import { App, Avatar, Button, Dropdown, Space, Tag, theme } from 'antd';
+import React from 'react';
 
+const { useToken } = theme;
+
+// Tab configurations for preset filters
+const tabs: TabConfig[] = [
+    {
+        id: 'all',
+        label: 'All Users',
+        filters: {},
+    },
+    {
+        id: 'active',
+        label: 'Active',
+        filters: {
+            is_active: { operator: 'eq', value: true },
+        },
+    },
+    {
+        id: 'inactive',
+        label: 'Inactive',
+        filters: {
+            is_active: { operator: 'eq', value: false },
+        },
+    },
+];
+
+// Filter configurations for the toolbar
+const filters: FilterConfig[] = [
+    {
+        type: 'boolean',
+        key: 'is_active',
+        label: 'Status',
+        trueLabel: 'Active',
+        falseLabel: 'Inactive',
+    },
+    {
+        type: 'dateRange',
+        key: 'created_at',
+        label: 'Created Date',
+    },
+];
+
+// Query function to fetch users data
+const fetchUsers = async (params: DataTableQueryParams): Promise<LaravelPaginatedResponse<User>> => {
+    const queryParams = new URLSearchParams();
+
+    if (params.page) queryParams.set('page', params.page.toString());
+    if (params.per_page) queryParams.set('per_page', params.per_page.toString());
+    if (params.search) queryParams.set('search', params.search);
+
+    // Handle filters in new format
+    if (params.filters) {
+        queryParams.set('filters', JSON.stringify(params.filters));
+    }
+
+    // Handle sorts
+    if (params.sorts && params.sorts.length > 0) {
+        queryParams.set('sorts', JSON.stringify(params.sorts));
+    }
+
+    const response = await axios.get<LaravelPaginatedResponse<User>>(`${data.url()}?${queryParams.toString()}`);
+    return response.data;
+};
 
 export default function UsersIndex() {
-    const columns = [
+    const { token } = useToken();
+    const { message } = App.useApp();
+
+    // ContentHeader configuration
+    const contentHeader: ContentHeaderProps = {
+        primaryAction: {
+            label: 'Add User',
+            icon: 'user-plus',
+            onClick: () => router.visit(create.url()),
+        },
+        breadcrumb: [
+            { title: 'Admin', href: '/admin' },
+            { title: 'Users', href: index.url() },
+        ],
+        actionIcons: [
+            { icon: 'refresh', tooltip: 'Refresh', onClick: () => router.reload() },
+        ],
+    };
+
+    // Column definitions using TanStack Table format
+    const columns: ColumnDef<User>[] = [
         {
-            title: 'User',
-            dataIndex: 'full_name',
-            key: 'user',
-            searchable: true,
-            sorter: true,
-            render: (_: unknown, record: User) => (
-                <Space>
-                    <Avatar
-                        src={record.avatar}
-                        icon={<UserOutlined />}
-                        size={32}
-                    >
-                        {record.initials}
-                    </Avatar>
-                    <div>
-                        <div style={{ fontWeight: 500 }}>{record.full_name}</div>
-                        <div style={{ color: '#666', fontSize: '12px' }}>{record.email}</div>
-                    </div>
-                </Space>
-            ),
+            id: 'full_name',
+            header: 'User',
+            accessorKey: 'full_name',
+            enableSorting: true,
+            cell: ({ row }) => {
+                const user = row.original;
+                return (
+                    <Space>
+                        <Avatar src={user.avatar} icon={<Icon name="user" size={16} />} size={32}>
+                            {user.initials}
+                        </Avatar>
+                        <div>
+                            <div style={{ fontWeight: 500 }}>{user.full_name}</div>
+                            <div style={{ color: token.colorTextSecondary, fontSize: '12px' }}>{user.email}</div>
+                        </div>
+                    </Space>
+                );
+            },
         },
         {
-            title: 'Status',
-            dataIndex: 'is_active',
-            key: 'is_active',
-            width: 100,
-            filterable: true,
-            sorter: true,
-            render: (isActive: boolean) => (
-                <Tag color={isActive ? 'green' : 'red'}>
-                    {isActive ? 'Active' : 'Inactive'}
-                </Tag>
-            ),
+            id: 'is_active',
+            header: 'Status',
+            accessorKey: 'is_active',
+            enableSorting: true,
+            size: 100,
+            cell: ({ getValue }) => {
+                const isActive = getValue() as boolean;
+                return <Tag color={isActive ? 'green' : 'red'}>{isActive ? 'Active' : 'Inactive'}</Tag>;
+            },
         },
         {
-            title: 'Phone',
-            dataIndex: 'phone',
-            key: 'phone',
-            width: 150,
-            sorter: true,
-            render: (phone: string | null) => phone || 'N/A',
+            id: 'phone',
+            header: 'Phone',
+            accessorKey: 'phone',
+            enableSorting: true,
+            size: 150,
+            cell: ({ getValue }) => (getValue() as string) || 'N/A',
         },
         {
-            title: 'Last Login',
-            dataIndex: 'last_login_at',
-            key: 'last_login_at',
-            width: 140,
-            sorter: true,
-            render: (lastLogin: string | null) => (
-                lastLogin ? new Date(lastLogin).toLocaleDateString() : 'Never'
-            ),
+            id: 'last_login_at',
+            header: 'Last Login',
+            accessorKey: 'last_login_at',
+            enableSorting: true,
+            size: 140,
+            cell: ({ getValue }) => {
+                const lastLogin = getValue() as string | null;
+                return lastLogin ? new Date(lastLogin).toLocaleDateString() : 'Never';
+            },
         },
         {
-            title: 'Created',
-            dataIndex: 'created_at',
-            key: 'created_at',
-            width: 120,
-            filterable: true,
-            sorter: true,
-            render: (createdAt: string) => new Date(createdAt).toLocaleDateString(),
+            id: 'created_at',
+            header: 'Created',
+            accessorKey: 'created_at',
+            enableSorting: true,
+            size: 120,
+            cell: ({ getValue }) => new Date(getValue() as string).toLocaleDateString(),
         },
         {
-            title: 'Actions',
-            key: 'actions',
-            width: 100,
-            render: (_: unknown, record: User) => {
+            id: 'actions',
+            header: 'Actions',
+            size: 100,
+            enableSorting: false,
+            cell: ({ row }) => {
+                const user = row.original;
                 const menuItems = [
                     {
                         key: 'view',
                         label: (
-                            <Link href={show.url(record.id)}>
+                            <Link href={show.url(user.id)}>
                                 <Space>
-                                    <EyeOutlined />
+                                    <Icon name="eye" size={16} />
                                     View
                                 </Space>
                             </Link>
@@ -92,9 +176,9 @@ export default function UsersIndex() {
                     {
                         key: 'edit',
                         label: (
-                            <Link href={edit({user: record.id}).url}>
+                            <Link href={edit({ user: user.id }).url}>
                                 <Space>
-                                    <EditOutlined />
+                                    <Icon name="edit" size={16} />
                                     Edit
                                 </Space>
                             </Link>
@@ -107,25 +191,20 @@ export default function UsersIndex() {
                         key: 'delete',
                         label: (
                             <Space>
-                                <DeleteOutlined />
+                                <Icon name="trash" size={16} />
                                 Delete
                             </Space>
                         ),
                         danger: true,
                         onClick: () => {
-                            // TODO: Implement delete confirmation modal
-                            console.log('Delete user:', record.id);
+                            message.info('Delete functionality coming soon');
                         },
                     },
                 ];
 
                 return (
-                    <Dropdown
-                        menu={{ items: menuItems }}
-                        trigger={['click']}
-                        placement="bottomRight"
-                    >
-                        <Button type="text" icon={<MoreOutlined />} />
+                    <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
+                        <Button type="text" icon={<Icon name="dots" size={16} />} />
                     </Dropdown>
                 );
             },
@@ -133,19 +212,35 @@ export default function UsersIndex() {
     ];
 
     return (
-        <AdminLayout pageTitle={"Users"} actions={        <Link href={create.url()}>
-            <Button type="primary" icon={<UserOutlined />}>
-                Add User
-            </Button>
-        </Link>}>
-            <DataTable<User>
-                fetchUrl={data.url()}
-                columns={columns}
-                searchPlaceholder="Search users by name or email..."
-                defaultPageSize={15}
-            />
+        <AdminLayout contentHeader={contentHeader}>
+            <PageCard
+                header={{
+                    title: 'Users',
+                }}
+                bodyPadding="none"
+            >
+                <DataTable<User>
+                    queryKey={['admin', 'users']}
+                    queryFn={fetchUsers}
+                    columns={columns}
+                    tabs={tabs}
+                    defaultTab="all"
+                    enableCustomTabs
+                    enableColumnVisibility
+                    enableColumnOrdering
+                    filters={filters}
+                    persistenceKey="admin-users-table"
+                    searchPlaceholder="Search users by name or email..."
+                    defaultPageSize={15}
+                    emptyMessage="No users have been created yet."
+                    emptyFilterMessage="No users match your search criteria."
+                />
+            </PageCard>
         </AdminLayout>
     );
 }
+
+// Import AdminLayout here to fix the usage
+import AdminLayout from '@/layouts/admin-layout';
 
 UsersIndex.layout = (page: React.ReactNode) => page;

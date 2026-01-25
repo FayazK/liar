@@ -1,9 +1,10 @@
+import { Icon } from '@/components/ui/Icon';
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
 import { login } from '@/routes';
+import { handleFormError } from '@/utils/form-errors';
 import { Head, router } from '@inertiajs/react';
-import { Button, Flex, Form, Input, Typography, theme, message } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
+import { App, Button, Flex, Form, Input, Typography, theme } from 'antd';
 import { useState } from 'react';
 
 const { Link, Text } = Typography;
@@ -21,6 +22,7 @@ export default function Register() {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const { token } = useToken();
+    const { message } = App.useApp();
 
     const handleSubmit = async (values: RegisterFormData) => {
         setLoading(true);
@@ -29,19 +31,8 @@ export default function Register() {
             message.success('Account created successfully');
             // Redirect to dashboard or email verification
             router.visit('/dashboard');
-        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
-            if (error.response?.status === 422) {
-                // Validation errors
-                const errors = error.response.data.errors;
-                form.setFields(
-                    Object.keys(errors).map(field => ({
-                        name: field,
-                        errors: errors[field],
-                    }))
-                );
-            } else {
-                message.error('Account creation failed. Please try again.');
-            }
+        } catch (error: unknown) {
+            handleFormError(error, form, 'Account creation failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -51,27 +42,17 @@ export default function Register() {
         <AuthLayout title="Create an account" description="Enter your details to get started">
             <Head title="Create account" />
 
-            <Form
-                form={form}
-                onFinish={handleSubmit}
-                layout="vertical"
-                requiredMark={false}
-            >
+            <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
                 <Form.Item
                     name="first_name"
                     label={<Text style={{ color: token.colorText, fontSize: token.fontSize }}>First name</Text>}
                     rules={[
                         { required: true, message: 'Please enter your first name' },
-                        { min: 2, message: 'First name must be at least 2 characters' }
+                        { min: 2, message: 'First name must be at least 2 characters' },
                     ]}
                     style={{ marginBottom: token.marginLG }}
                 >
-                    <Input
-                        placeholder="Enter your first name"
-                        autoComplete="given-name"
-                        autoFocus
-                        size="large"
-                    />
+                    <Input placeholder="Enter your first name" autoComplete="given-name" autoFocus size="large" />
                 </Form.Item>
 
                 <Form.Item
@@ -79,15 +60,11 @@ export default function Register() {
                     label={<Text style={{ color: token.colorText, fontSize: token.fontSize }}>Last name</Text>}
                     rules={[
                         { required: true, message: 'Please enter your last name' },
-                        { min: 2, message: 'Last name must be at least 2 characters' }
+                        { min: 2, message: 'Last name must be at least 2 characters' },
                     ]}
                     style={{ marginBottom: token.marginLG }}
                 >
-                    <Input
-                        placeholder="Enter your last name"
-                        autoComplete="family-name"
-                        size="large"
-                    />
+                    <Input placeholder="Enter your last name" autoComplete="family-name" size="large" />
                 </Form.Item>
 
                 <Form.Item
@@ -95,15 +72,11 @@ export default function Register() {
                     label={<Text style={{ color: token.colorText, fontSize: token.fontSize }}>Email address</Text>}
                     rules={[
                         { required: true, message: 'Please enter your email address' },
-                        { type: 'email', message: 'Please enter a valid email address' }
+                        { type: 'email', message: 'Please enter a valid email address' },
                     ]}
                     style={{ marginBottom: token.marginLG }}
                 >
-                    <Input
-                        placeholder="email@example.com"
-                        autoComplete="email"
-                        size="large"
-                    />
+                    <Input placeholder="email@example.com" autoComplete="email" size="large" />
                 </Form.Item>
 
                 <Form.Item
@@ -111,15 +84,11 @@ export default function Register() {
                     label={<Text style={{ color: token.colorText, fontSize: token.fontSize }}>Password</Text>}
                     rules={[
                         { required: true, message: 'Please enter your password' },
-                        { min: 8, message: 'Password must be at least 8 characters' }
+                        { min: 8, message: 'Password must be at least 8 characters' },
                     ]}
                     style={{ marginBottom: token.marginLG }}
                 >
-                    <Input.Password
-                        placeholder="Create a password"
-                        autoComplete="new-password"
-                        size="large"
-                    />
+                    <Input.Password placeholder="Create a password" autoComplete="new-password" size="large" />
                 </Form.Item>
 
                 <Form.Item
@@ -139,11 +108,7 @@ export default function Register() {
                     ]}
                     style={{ marginBottom: token.marginLG }}
                 >
-                    <Input.Password
-                        placeholder="Confirm your password"
-                        autoComplete="new-password"
-                        size="large"
-                    />
+                    <Input.Password placeholder="Confirm your password" autoComplete="new-password" size="large" />
                 </Form.Item>
 
                 <Form.Item style={{ marginBottom: 0 }}>
@@ -153,7 +118,7 @@ export default function Register() {
                         size="large"
                         block
                         loading={loading}
-                        icon={loading ? <LoadingOutlined /> : null}
+                        icon={loading ? <Icon name="loader" spin size={16} /> : null}
                     >
                         Create account
                     </Button>

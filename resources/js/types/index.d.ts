@@ -1,6 +1,5 @@
+import type { IconName } from '@/components/ui/Icon';
 import { InertiaLinkProps } from '@inertiajs/react';
-import { ForwardRefExoticComponent, RefAttributes } from 'react';
-import { AntdIconProps } from '@ant-design/icons/lib/components/AntdIcon';
 
 export interface Auth {
     user: User;
@@ -19,8 +18,10 @@ export interface NavGroup {
 export interface NavItem {
     title: string;
     href: NonNullable<InertiaLinkProps['href']>;
-    icon?: ForwardRefExoticComponent<Omit<AntdIconProps, 'ref'> & RefAttributes<HTMLSpanElement>> | null;
+    icon?: IconName | null;
     isActive?: boolean;
+    badge?: number | string;
+    children?: NavItem[];
 }
 
 export interface SharedData {
@@ -38,7 +39,8 @@ export interface User {
     email: string;
     phone?: string;
     date_of_birth?: string;
-    avatar?: string;
+    avatar_url?: string;
+    avatar_thumb_url?: string;
     bio?: string;
     timezone: string;
     locale: string;
@@ -49,7 +51,7 @@ export interface User {
     updated_at: string;
     full_name: string; // Computed attribute from Laravel
     initials: string; // Computed attribute from Laravel
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: string | number | boolean | null | undefined; // Required for DataTable generic constraint
 }
 
 export interface PaginationLinks {
@@ -75,23 +77,17 @@ export interface LaravelPaginatedResponse<T = unknown> {
     meta: PaginationMeta;
 }
 
-export interface DataTableProps<T = unknown> {
-    fetchUrl: string;
-    columns: Array<{
-        title: string;
-        dataIndex?: string;
-        key: string;
-        width?: number;
-        sorter?: boolean;
-        searchable?: boolean;
-        filterable?: boolean;
-        render?: (value: unknown, record: T, index: number) => React.ReactNode;
-    }>;
-    searchPlaceholder?: string;
-    defaultPageSize?: number;
-    className?: string;
-}
-
-export interface DataTableFilters {
-    [key: string]: unknown;
-}
+// Re-export DataTable types from dedicated module
+export type {
+    BooleanFilterConfig,
+    CustomFilterConfig,
+    DataTableColumn,
+    DataTableError,
+    DataTableFilters,
+    DataTableProps,
+    DataTableQueryParams,
+    DateRangeFilterConfig,
+    FilterConfig,
+    SelectFilterConfig,
+    SortState,
+} from './datatable';

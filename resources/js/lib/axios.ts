@@ -6,7 +6,7 @@ const api = axios.create({
     withCredentials: true,
     headers: {
         'X-Requested-With': 'XMLHttpRequest',
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
     },
 });
@@ -23,7 +23,7 @@ api.interceptors.request.use(
     },
     (error) => {
         return Promise.reject(error);
-    }
+    },
 );
 
 // Response interceptor to handle common errors
@@ -35,7 +35,7 @@ api.interceptors.response.use(
             window.location.reload();
         }
         return Promise.reject(error);
-    }
+    },
 );
 
 export default api;

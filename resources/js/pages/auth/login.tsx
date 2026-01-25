@@ -1,11 +1,12 @@
+import { Icon } from '@/components/ui/Icon';
 import AuthLayout from '@/layouts/auth-layout';
 import api from '@/lib/axios';
-import { request } from '@/routes/password';
-import { Head, router } from '@inertiajs/react';
-import { Alert, Button, Checkbox, Flex, Form, Input, Typography, theme, message } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
-import { useState } from 'react';
 import { register } from '@/routes';
+import { request } from '@/routes/password';
+import { handleFormError } from '@/utils/form-errors';
+import { Head, router } from '@inertiajs/react';
+import { Alert, App, Button, Checkbox, Flex, Form, Input, Typography, theme } from 'antd';
+import { useState } from 'react';
 
 const { Link, Text } = Typography;
 const { useToken } = theme;
@@ -25,6 +26,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const { token } = useToken();
+    const { message } = App.useApp();
 
     const handleSubmit = async (values: LoginFormData) => {
         setLoading(true);
@@ -33,19 +35,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             message.success('Sign in successful');
             // Redirect to intended page or dashboard
             router.visit('/dashboard');
-        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
-            if (error.response?.status === 422) {
-                // Validation errors
-                const errors = error.response.data.errors;
-                form.setFields(
-                    Object.keys(errors).map(field => ({
-                        name: field,
-                        errors: errors[field],
-                    }))
-                );
-            } else {
-                message.error('Sign in failed. Please check your email and password.');
-            }
+        } catch (error: unknown) {
+            handleFormError(error, form, 'Sign in failed. Please check your email and password.');
         } finally {
             setLoading(false);
         }
@@ -55,36 +46,19 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         <AuthLayout title="Sign in to your account" description="Enter your email and password to continue">
             <Head title="Sign in" />
 
-            {status && (
-                <Alert
-                    message={status}
-                    type="success"
-                    showIcon
-                    style={{ marginBottom: token.marginMD }}
-                />
-            )}
+            {status && <Alert message={status} type="success" showIcon style={{ marginBottom: token.marginMD }} />}
 
-            <Form
-                form={form}
-                onFinish={handleSubmit}
-                layout="vertical"
-                requiredMark={false}
-            >
+            <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
                 <Form.Item
                     name="email"
                     label={<Text style={{ color: token.colorText, fontSize: token.fontSize }}>Email address</Text>}
                     rules={[
                         { required: true, message: 'Please enter your email address' },
-                        { type: 'email', message: 'Please enter a valid email address' }
+                        { type: 'email', message: 'Please enter a valid email address' },
                     ]}
                     style={{ marginBottom: token.marginLG }}
                 >
-                    <Input
-                        placeholder="email@example.com"
-                        autoComplete="email"
-                        autoFocus
-                        size="large"
-                    />
+                    <Input placeholder="email@example.com" autoComplete="email" autoFocus size="large" />
                 </Form.Item>
 
                 <Form.Item
@@ -93,19 +67,13 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     rules={[{ required: true, message: 'Please enter your password' }]}
                     style={{ marginBottom: token.marginMD }}
                 >
-                    <Input.Password
-                        placeholder="Enter your password"
-                        autoComplete="current-password"
-                        size="large"
-                    />
+                    <Input.Password placeholder="Enter your password" autoComplete="current-password" size="large" />
                 </Form.Item>
 
                 <Flex justify="space-between" align="center" style={{ marginBottom: token.marginLG }}>
                     <Form.Item name="remember" valuePropName="checked" style={{ marginBottom: 0 }}>
                         <Checkbox>
-                            <Text style={{ color: token.colorText, fontSize: token.fontSize }}>
-                                Remember me
-                            </Text>
+                            <Text style={{ color: token.colorText, fontSize: token.fontSize }}>Remember me</Text>
                         </Checkbox>
                     </Form.Item>
 
@@ -129,7 +97,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         size="large"
                         block
                         loading={loading}
-                        icon={loading ? <LoadingOutlined /> : null}
+                        icon={loading ? <Icon name="loader" spin size={16} /> : null}
                     >
                         Sign in
                     </Button>

@@ -14,10 +14,13 @@
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.10",
-        "nnjeim/world": "^1.1"
+        "nnjeim/world": "^1.1",
+        "plank/laravel-metable": "^6.2",
+        "spatie/laravel-medialibrary": "^11.17"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "laravel/boost": "^1.1",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.18",
         "laravel/sail": "^1.41",

@@ -1,293 +1,303 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Table, Input, Select, DatePicker, Space, Typography } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-import type { TableProps, TableColumnType } from 'antd';
-import axios from '@/lib/axios';
-import { DataTableProps, DataTableFilters, LaravelPaginatedResponse } from '@/types';
-import { debounce } from '@/lib/utils';
+import { useDataTable } from '@/hooks/useDataTable';
+import type {
+    BulkActionConfig,
+    CustomTab,
+    DataTableFilters,
+    DataTableQueryFn,
+    FilterConfig,
+    TabConfig,
+} from '@/types/datatable';
+import type { ColumnDef, Row } from '@tanstack/react-table';
+import { theme } from 'antd';
+import { useState } from 'react';
+import { BulkActionsBar, ColumnManager, CustomTabModal, TableBody, TableHeader, TablePagination } from './data-table';
 
-const { Text } = Typography;
-const { RangePicker } = DatePicker;
+const { useToken } = theme;
 
-interface DataTableState<T> {
-    data: T[];
-    loading: boolean;
-    pagination: {
-        current: number;
-        pageSize: number;
-        total: number;
-        showSizeChanger: boolean;
-        showQuickJumper: boolean;
-        showTotal: (total: number, range: [number, number]) => string;
-    };
+export interface DataTableProps<TData> {
+    /** Unique key for TanStack Query caching */
+    queryKey: string[];
+    /** Function to fetch paginated data */
+    queryFn: DataTableQueryFn<TData>;
+    /** TanStack Table column definitions */
+    columns: ColumnDef<TData>[];
+    /** Predefined tabs with filters */
+    tabs?: TabConfig[];
+    /** Default active tab ID */
+    defaultTab?: string;
+    /** Allow users to create custom filter tabs (localStorage) */
+    enableCustomTabs?: boolean;
+    /** Enable row selection checkboxes */
+    enableRowSelection?: boolean | ((row: Row<TData>) => boolean);
+    /** Enable column visibility management */
+    enableColumnVisibility?: boolean;
+    /** Enable column reordering via drag-and-drop */
+    enableColumnOrdering?: boolean;
+    /** Bulk actions for selected rows */
+    bulkActions?: BulkActionConfig<TData>[];
+    /** LocalStorage key for persisting table state */
+    persistenceKey?: string;
+    /** Placeholder text for search input */
+    searchPlaceholder?: string;
+    /** Message when no data exists */
+    emptyMessage?: string;
+    /** Message when filters return no results */
+    emptyFilterMessage?: string;
+    /** Filter configurations */
+    filters?: FilterConfig[];
+    /** Default page size */
+    defaultPageSize?: number;
+    /** Callback when a row is clicked */
+    onRowClick?: (row: Row<TData>) => void;
 }
 
-function DataTable<T extends Record<string, unknown>>({
-    fetchUrl,
+export function DataTable<TData>({
+    queryKey,
+    queryFn,
     columns,
-    searchPlaceholder = "Search...",
+    tabs = [],
+    defaultTab,
+    enableCustomTabs = false,
+    enableRowSelection = false,
+    enableColumnVisibility = false,
+    enableColumnOrdering = false,
+    bulkActions = [],
+    persistenceKey,
+    searchPlaceholder = 'Search...',
+    emptyMessage = 'No data available',
+    emptyFilterMessage = 'No results match your filters',
+    filters: filterConfigs = [],
     defaultPageSize = 15,
-}: DataTableProps<T>) {
-    const [state, setState] = useState<DataTableState<T>>({
-        data: [],
-        loading: false,
-        pagination: {
-            current: 1,
-            pageSize: defaultPageSize,
-            total: 0,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-        },
+    onRowClick,
+}: DataTableProps<TData>) {
+    const { token } = useToken();
+
+    // Column manager modal state
+    const [columnManagerOpen, setColumnManagerOpen] = useState(false);
+
+    // Custom tab modal state
+    const [customTabModalOpen, setCustomTabModalOpen] = useState(false);
+    const [editingTab, setEditingTab] = useState<CustomTab | null>(null);
+
+    // Use the main data table hook
+    const {
+        table,
+        isLoading,
+        isFetching,
+        data,
+        totalCount,
+        pageCount,
+        currentPage,
+        pageSize,
+        searchValue,
+        setSearchValue,
+        filters,
+        setFilter,
+        clearFilters,
+        activeTabId,
+        setActiveTab,
+        customTabs,
+        createCustomTab,
+        updateCustomTab,
+        deleteCustomTab,
+        selectedRows,
+        clearSelection,
+        columnVisibility,
+        setColumnVisibility,
+        columnOrder,
+        setColumnOrder,
+        resetColumnSettings,
+    } = useDataTable({
+        queryKey,
+        queryFn,
+        columns,
+        persistenceKey,
+        defaultPageSize,
+        tabs,
+        defaultTab,
+        enableRowSelection: typeof enableRowSelection === 'function' ? enableRowSelection : enableRowSelection,
     });
 
-    const [search, setSearch] = useState<string>('');
-    const [filters, setFilters] = useState<DataTableFilters>({});
-    const [sorter, setSorter] = useState<{
-        field?: string | number;
-        order?: 'ascend' | 'descend';
-    }>({});
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(defaultPageSize);
+    // Determine if we have active filters
+    const hasFilters = searchValue.length > 0 || Object.keys(filters).length > 0;
 
-    const fetchData = useCallback(async (params: {
-        page?: number;
-        per_page?: number;
-        search?: string;
-        filters?: DataTableFilters;
-        sort_by?: string;
-        sort_direction?: 'asc' | 'desc';
-    } = {}) => {
-        setState(prev => ({ ...prev, loading: true }));
+    // Show header section (tabs + search/filters)
+    const showHeader = tabs.length > 0 || customTabs.length > 0 || enableCustomTabs || filterConfigs.length > 0;
 
-        try {
-            const queryParams = new URLSearchParams();
+    // Handle page change
+    const handlePageChange = (page: number) => {
+        table.setPageIndex(page - 1);
+    };
 
-            if (params.page) queryParams.set('page', params.page.toString());
-            if (params.per_page) queryParams.set('per_page', params.per_page.toString());
-            if (params.search) queryParams.set('search', params.search);
-            if (params.sort_by) queryParams.set('sort_by', params.sort_by);
-            if (params.sort_direction) queryParams.set('sort_direction', params.sort_direction);
+    // Handle page size change
+    const handlePageSizeChange = (newPageSize: number) => {
+        table.setPageSize(newPageSize);
+    };
 
-            // Add filters to query params
-            if (params.filters) {
-                Object.entries(params.filters).forEach(([key, value]) => {
-                    if (value !== undefined && value !== null && value !== '') {
-                        if (Array.isArray(value)) {
-                            queryParams.set(key, JSON.stringify(value));
-                        } else {
-                            queryParams.set(key, value.toString());
-                        }
-                    }
-                });
-            }
+    // Handle custom tab creation
+    const handleCreateTab = () => {
+        setEditingTab(null);
+        setCustomTabModalOpen(true);
+    };
 
-            const url = `${fetchUrl}?${queryParams.toString()}`;
-            const response = await axios.get<LaravelPaginatedResponse<T>>(url);
+    // Handle custom tab edit
+    const handleEditTab = (tab: CustomTab) => {
+        setEditingTab(tab);
+        setCustomTabModalOpen(true);
+    };
 
-            setState(prev => ({
-                ...prev,
-                data: response.data.data,
-                loading: false,
-                pagination: {
-                    ...prev.pagination,
-                    current: response.data.meta.current_page,
-                    total: response.data.meta.total,
-                    pageSize: response.data.meta.per_page,
-                },
-            }));
-        } catch (error) {
-            console.error('Failed to fetch data:', error);
-            setState(prev => ({ ...prev, loading: false, data: [] }));
-        }
-    }, [fetchUrl]);
-
-    const debouncedFetchData = useCallback(
-        (params: Parameters<typeof fetchData>[0]) => {
-            const debouncedFn = debounce((p: Parameters<typeof fetchData>[0]) => {
-                fetchData(p);
-            }, 300);
-            debouncedFn(params);
-        },
-        [fetchData]
-    );
-
-    useEffect(() => {
-        fetchData({
-            page: 1,
-            per_page: defaultPageSize,
-        });
-    }, [fetchData, defaultPageSize]);
-
-    useEffect(() => {
-        const params = {
-            page: currentPage,
-            per_page: pageSize,
-            search: search || undefined,
-            filters: Object.keys(filters).length > 0 ? filters : undefined,
-            sort_by: sorter.field ? String(sorter.field) : undefined,
-            sort_direction: sorter.order === 'ascend' ? 'asc' as const : sorter.order === 'descend' ? 'desc' as const : undefined,
-        };
-
-        if (search) {
-            debouncedFetchData({ ...params, page: 1 });
+    // Handle custom tab save
+    const handleSaveTab = (label: string, tabFilters: DataTableFilters) => {
+        if (editingTab) {
+            updateCustomTab(editingTab.id, { label, filters: tabFilters });
         } else {
-            fetchData(params);
+            createCustomTab(label, tabFilters);
         }
-    }, [search, filters, sorter, fetchData, debouncedFetchData, currentPage, pageSize]);
-
-    const handleTableChange: TableProps<T>['onChange'] = (pagination, _, sorter) => {
-        const newPage = pagination.current || 1;
-        const newPageSize = pagination.pageSize || defaultPageSize;
-        
-        setCurrentPage(newPage);
-        setPageSize(newPageSize);
-        
-        setState(prev => ({
-            ...prev,
-            pagination: {
-                ...prev.pagination,
-                current: newPage,
-                pageSize: newPageSize,
-            },
-        }));
-
-        if (Array.isArray(sorter)) {
-            setSorter(sorter[0] || {});
-        } else {
-            setSorter(sorter || {});
-        }
-    };
-
-    const handleSearch = (value: string) => {
-        setSearch(value);
-        setCurrentPage(1);
-        setState(prev => ({
-            ...prev,
-            pagination: { ...prev.pagination, current: 1 },
-        }));
-    };
-
-    const handleFilter = (key: string, value: unknown) => {
-        setFilters(prev => ({
-            ...prev,
-            [key]: value,
-        }));
-        setCurrentPage(1);
-        setState(prev => ({
-            ...prev,
-            pagination: { ...prev.pagination, current: 1 },
-        }));
-    };
-
-    const clearFilters = () => {
-        setSearch('');
-        setFilters({});
-        setSorter({});
-        setCurrentPage(1);
-        setState(prev => ({
-            ...prev,
-            pagination: { ...prev.pagination, current: 1 },
-        }));
-    };
-
-    // Process columns to add sorting and filtering
-    const processedColumns: TableColumnType<T>[] = columns.map(col => {
-        const column: TableColumnType<T> = {
-            ...col,
-            sorter: col.sorter ? true : false,
-        };
-
-        return column;
-    });
-
-    const renderSearchAndFilters = () => {
-        const searchableColumns = columns.filter(col => col.searchable);
-        const filterableColumns = columns.filter(col => col.filterable);
-
-        if (searchableColumns.length === 0 && filterableColumns.length === 0) {
-            return null;
-        }
-
-        return (
-            <Space direction="vertical" size="middle" style={{ width: '100%', marginBottom: 16 }}>
-                <Space wrap>
-                    {searchableColumns.length > 0 && (
-                        <Input
-                            placeholder={searchPlaceholder}
-                            prefix={<SearchOutlined />}
-                            value={search}
-                            onChange={(e) => handleSearch(e.target.value)}
-                            style={{ width: 300 }}
-                            allowClear
-                        />
-                    )}
-
-                    {filterableColumns.map(col => {
-                        if (col.dataIndex === 'is_active') {
-                            return (
-                                <Select
-                                    key={col.key}
-                                    placeholder={`Filter by ${col.title}`}
-                                    value={filters[col.dataIndex]}
-                                    onChange={(value) => handleFilter(col.dataIndex, value)}
-                                    style={{ width: 150 }}
-                                    allowClear
-                                >
-                                    <Select.Option value={true}>Active</Select.Option>
-                                    <Select.Option value={false}>Inactive</Select.Option>
-                                </Select>
-                            );
-                        }
-
-                        if (col.dataIndex === 'created_at') {
-                            return (
-                                <RangePicker
-                                    key={col.key}
-                                    placeholder={['Start Date', 'End Date']}
-                                    value={filters[col.dataIndex]}
-                                    onChange={(dates) => handleFilter(col.dataIndex, dates)}
-                                    style={{ width: 240 }}
-                                />
-                            );
-                        }
-
-                        return null;
-                    })}
-
-                    {(search || Object.keys(filters).length > 0) && (
-                        <a onClick={clearFilters}>Clear all filters</a>
-                    )}
-                </Space>
-            </Space>
-        );
     };
 
     return (
-        <>
-            {renderSearchAndFilters()}
-
-            <Table<T>
-                columns={processedColumns}
-                dataSource={state.data}
-                pagination={state.pagination}
-                loading={state.loading}
-                onChange={handleTableChange}
-                rowKey="id"
-                scroll={{ x: 'max-content' }}
-                size="middle"
-            />
-
-            {state.pagination.total > 0 && (
-                <div style={{ marginTop: 16, textAlign: 'right' }}>
-                    <Text type="secondary">
-                        Showing {state.pagination.current === 1 ? 1 : (state.pagination.current - 1) * state.pagination.pageSize + 1} to{' '}
-                        {Math.min(state.pagination.current * state.pagination.pageSize, state.pagination.total)} of{' '}
-                        {state.pagination.total} entries
-                    </Text>
-                </div>
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                backgroundColor: token.colorBgContainer,
+                borderRadius: token.borderRadiusLG,
+                border: `1px solid ${token.colorBorderSecondary}`,
+                overflow: 'hidden',
+                height: '100%',
+            }}
+        >
+            {/* Header Section (Tabs + Search/Filters combined) */}
+            {showHeader && (
+                <TableHeader
+                    tabs={tabs}
+                    customTabs={customTabs}
+                    activeTabId={activeTabId}
+                    onTabChange={setActiveTab}
+                    enableCustomTabs={enableCustomTabs}
+                    onCreateTab={handleCreateTab}
+                    onEditTab={handleEditTab}
+                    onDeleteTab={deleteCustomTab}
+                    searchValue={searchValue}
+                    onSearchChange={setSearchValue}
+                    searchPlaceholder={searchPlaceholder}
+                    filters={filterConfigs}
+                    filterValues={filters}
+                    onFilterChange={setFilter}
+                    onClearFilters={clearFilters}
+                    enableColumnVisibility={enableColumnVisibility || enableColumnOrdering}
+                    onColumnManagerOpen={() => setColumnManagerOpen(true)}
+                />
             )}
-        </>
+
+            {/* Scrollable Table Container */}
+            <div
+                style={{
+                    position: 'relative',
+                    flex: 1,
+                    overflow: 'auto',
+                    minHeight: 0,
+                    maxHeight: 'calc(100vh - 280px)',
+                }}
+            >
+                <TableBody
+                    table={table}
+                    isLoading={isLoading}
+                    enableRowSelection={!!enableRowSelection}
+                    onRowClick={onRowClick}
+                    emptyMessage={emptyMessage}
+                    emptyFilterMessage={emptyFilterMessage}
+                    hasFilters={hasFilters}
+                />
+
+                {/* Pagination - inside scroll container for sticky bottom */}
+                {data.length > 0 && (
+                    <TablePagination
+                        currentPage={currentPage}
+                        pageSize={pageSize}
+                        totalCount={totalCount}
+                        pageCount={pageCount}
+                        onPageChange={handlePageChange}
+                        onPageSizeChange={handlePageSizeChange}
+                    />
+                )}
+
+                {/* Loading overlay for refetching */}
+                {isFetching && !isLoading && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 5,
+                        }}
+                    />
+                )}
+            </div>
+
+            {/* Bulk Actions Bar */}
+            {bulkActions.length > 0 && (
+                <BulkActionsBar
+                    selectedRows={selectedRows}
+                    actions={bulkActions}
+                    onClearSelection={clearSelection}
+                />
+            )}
+
+            {/* Column Manager Modal */}
+            {(enableColumnVisibility || enableColumnOrdering) && (
+                <ColumnManager
+                    columns={table.getAllLeafColumns()}
+                    columnVisibility={columnVisibility}
+                    columnOrder={columnOrder}
+                    onVisibilityChange={setColumnVisibility}
+                    onOrderChange={setColumnOrder}
+                    onReset={resetColumnSettings}
+                    open={columnManagerOpen}
+                    onClose={() => setColumnManagerOpen(false)}
+                />
+            )}
+
+            {/* Custom Tab Modal */}
+            {enableCustomTabs && (
+                <CustomTabModal
+                    open={customTabModalOpen}
+                    onClose={() => {
+                        setCustomTabModalOpen(false);
+                        setEditingTab(null);
+                    }}
+                    onSave={handleSaveTab}
+                    editingTab={editingTab}
+                    currentFilters={filters}
+                />
+            )}
+
+            {/* Screen reader announcement */}
+            <div
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+                style={{
+                    position: 'absolute',
+                    width: 1,
+                    height: 1,
+                    padding: 0,
+                    margin: -1,
+                    overflow: 'hidden',
+                    clip: 'rect(0, 0, 0, 0)',
+                    whiteSpace: 'nowrap',
+                    border: 0,
+                }}
+            >
+                {isLoading ? 'Loading data...' : `Showing ${data.length} of ${totalCount} items`}
+            </div>
+        </div>
     );
 }
 

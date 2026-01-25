@@ -1,31 +1,18 @@
+import { ContentHeader, type ContentHeaderProps } from '@/components/ui/ContentHeader';
 import { type ReactNode } from 'react';
 import MasterLayout from './master-layout';
-import {
-    appMainNavItems,
-    appSettingsNavItems,
-    appFooterNavItems,
-} from './menus/app-menu';
+import { appFooterNavItems, appMainNavItems, appNavGroups } from './menus/app-menu';
 
 interface AppLayoutProps {
     children: ReactNode;
-    pageTitle?: string;
     actions?: ReactNode;
+    contentHeader?: ContentHeaderProps;
 }
 
-export default function AppLayout({ children, pageTitle, actions }: AppLayoutProps) {
+export default function AppLayout({ children, actions, contentHeader }: AppLayoutProps) {
     return (
-        <MasterLayout
-            pageTitle={pageTitle}
-            actions={actions}
-            mainNavItems={appMainNavItems}
-            navGroups={[
-                {
-                    title: 'Settings',
-                    items: appSettingsNavItems,
-                },
-            ]}
-            footerNavItems={appFooterNavItems}
-        >
+        <MasterLayout actions={actions} mainNavItems={appMainNavItems} navGroups={appNavGroups} footerNavItems={appFooterNavItems}>
+            {contentHeader && <ContentHeader {...contentHeader} />}
             {children}
         </MasterLayout>
     );

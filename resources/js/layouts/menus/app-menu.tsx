@@ -1,53 +1,39 @@
-import { type NavItem } from '@/types';
-import { dashboard, appearance } from '@/routes';
-import profile from '@/routes/profile';
-import password from '@/routes/password';
-import {
-    DashboardOutlined,
-    GithubOutlined,
-    BookOutlined,
-    SettingOutlined,
-    UserOutlined,
-    LockOutlined,
-    BgColorsOutlined,
-} from '@ant-design/icons';
+import { dashboard } from '@/routes';
+import { index as libraryIndex } from '@/routes/library';
+import { type NavGroup, type NavItem } from '@/types';
 
+// Dashboard is standalone (outside groups)
 export const appMainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
-        icon: DashboardOutlined,
+        icon: 'dashboard',
     },
 ];
 
-// Settings submenu items
-export const appSettingsNavItems: NavItem[] = [
+// Section groupings for sidebar
+export const appNavGroups: NavGroup[] = [
     {
-        title: 'Profile',
-        href: profile.edit(),
-        icon: UserOutlined,
+        title: 'Pages',
+        items: [
+            {
+                title: 'Library',
+                href: libraryIndex(),
+                icon: 'folder',
+            },
+        ],
     },
     {
-        title: 'Password',
-        href: password.edit(),
-        icon: LockOutlined,
-    },
-    {
-        title: 'Appearance',
-        href: appearance(),
-        icon: BgColorsOutlined,
+        title: 'Misc',
+        items: [
+            {
+                title: 'Settings',
+                href: '/settings',
+                icon: 'settings',
+                children: [{ title: 'Account', href: '/settings/account', icon: null }],
+            },
+        ],
     },
 ];
 
-export const appFooterNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: GithubOutlined,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOutlined,
-    },
-];
+export const appFooterNavItems: NavItem[] = [];

@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
 
 class DropdownRepository
 {
@@ -42,7 +42,7 @@ class DropdownRepository
     private function buildQuery(string $model, array $params, string $searchField): array
     {
         $search = isset($params['search']) ? trim((string) $params['search']) : '';
-        $id     = $params['id'] ?? null;
+        $id = $params['id'] ?? null;
 
         // If search is empty and ID is provided, return the ID record
         // along with the first 24 results from the base query.
@@ -71,6 +71,7 @@ class DropdownRepository
             }
 
             $results = $combined->values()->toArray();
+
             return $this->appendTimezoneUtcIfNeeded($model, $results);
         }
 
@@ -84,6 +85,7 @@ class DropdownRepository
         }
 
         $results = $query->limit(25)->get()->toArray();
+
         return $this->appendTimezoneUtcIfNeeded($model, $results);
     }
 
@@ -101,6 +103,7 @@ class DropdownRepository
                 $results = array_slice($results, 0, 25);
             }
         }
+
         return $results;
     }
 }

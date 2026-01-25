@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Admin;
 
 use App\Models\User;
@@ -11,7 +13,9 @@ class UserStoreRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        // Admin routes are protected by auth middleware
+        // Add role-based authorization when role system is implemented
+        return $this->user() !== null;
     }
 
     /**
@@ -28,7 +32,7 @@ class UserStoreRequest extends FormRequest
                 'lowercase',
                 'email',
                 'max:255',
-                'unique:' . User::class,
+                'unique:'.User::class,
             ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'phone' => ['nullable', 'string', 'max:20'],

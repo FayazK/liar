@@ -1,30 +1,39 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+interface DropdownOption {
+    id: number;
+    name: string;
+}
 
 const useDropdown = (type: string, params: object = {}, id: number | null = null) => {
-    const [options, setOptions] = useState([]);
+    const [options, setOptions] = useState<DropdownOption[]>([]);
     const [loading, setLoading] = useState(false);
 
     // Stabilize params in dependencies to avoid infinite re-renders
     const paramsKey = useMemo(() => JSON.stringify(params || {}), [params]);
 
-    const fetchOptions = useCallback(async (search = '') => {
-        setLoading(true);
-        try {
-            const response = await axios.get('/dropdown', {
-                params: {
-                    type,
-                    search,
-                    id,
-                    ...params,
-                },
-            });
-            setOptions(response.data);
-        } catch (error) {
-            console.error('Failed to fetch dropdown options', error);
-        }
-        setLoading(false);
-    }, [type, id, paramsKey]);
+    const fetchOptions = useCallback(
+        async (search = '') => {
+            setLoading(true);
+            try {
+                const response = await axios.get('/dropdown', {
+                    params: {
+                        type,
+                        search,
+                        id,
+                        ...params,
+                    },
+                });
+                setOptions(response.data);
+            } catch {
+                // Silently fail - user will see empty dropdown
+                setOptions([]);
+            }
+            setLoading(false);
+        },
+        [type, id, paramsKey],
+    );
 
     useEffect(() => {
         fetchOptions();

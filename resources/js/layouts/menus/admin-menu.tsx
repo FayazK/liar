@@ -1,58 +1,58 @@
-import { type NavItem } from '@/types';
-import { dashboard } from '@/routes';
-import {
-    DashboardOutlined,
-    UsergroupAddOutlined,
-    SettingOutlined,
-    BarChartOutlined,
-    DatabaseOutlined,
-    SecurityScanOutlined,
-    GithubOutlined,
-    BookOutlined
-} from '@ant-design/icons';
+import { dashboard as adminDashboard } from '@/routes/admin';
+import { index as libraryIndex } from '@/routes/library';
+import { type NavGroup, type NavItem } from '@/types';
 
+// Dashboard is standalone (outside groups)
 export const adminMainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: dashboard(),
-        icon: DashboardOutlined,
-    },
-    {
-        title: 'User Management',
-        href: '/admin/users',
-        icon: UsergroupAddOutlined,
-    },
-    {
-        title: 'Analytics',
-        href: '/admin/analytics',
-        icon: BarChartOutlined,
-    },
-    {
-        title: 'Database',
-        href: '/admin/database',
-        icon: DatabaseOutlined,
-    },
-    {
-        title: 'Security',
-        href: '/admin/security',
-        icon: SecurityScanOutlined,
-    },
-    {
-        title: 'System Settings',
-        href: '/admin/settings',
-        icon: SettingOutlined,
+        href: adminDashboard(),
+        icon: 'dashboard',
     },
 ];
 
-export const adminFooterNavItems: NavItem[] = [
+// Section groupings for admin sidebar
+export const adminNavGroups: NavGroup[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: GithubOutlined,
+        title: 'Content',
+        items: [
+            {
+                title: 'Library',
+                href: libraryIndex(),
+                icon: 'folder',
+            },
+            {
+                title: 'User Management',
+                href: '/admin/users',
+                icon: 'users',
+            },
+        ],
     },
     {
-        title: 'Admin Docs',
-        href: 'https://laravel.com/docs/admin',
-        icon: BookOutlined,
+        title: 'System',
+        items: [
+            {
+                title: 'Analytics',
+                href: '/admin/analytics',
+                icon: 'chart-bar',
+            },
+            {
+                title: 'Database',
+                href: '/admin/database',
+                icon: 'database',
+            },
+            {
+                title: 'Security',
+                href: '/admin/security',
+                icon: 'shield-check',
+            },
+            {
+                title: 'System Settings',
+                href: '/admin/settings',
+                icon: 'settings',
+            },
+        ],
     },
 ];
+
+export const adminFooterNavItems: NavItem[] = [];
