@@ -1,12 +1,13 @@
 import type { ContentHeaderProps } from '@/components/ui/ContentHeader';
-import { Icon } from '@/components/ui/Icon';
 import PageCard from '@/components/ui/PageCard';
 import AdminLayout from '@/layouts/admin-layout';
 import axios from '@/lib/axios';
 import { destroy, edit, index } from '@/routes/admin/users';
 import type { User } from '@/types';
 import { router } from '@inertiajs/react';
-import { App, Button, Divider } from 'antd';
+import { App } from 'antd';
+import { useRef, useState } from 'react';
+import type { UserFormRef } from './partials/user-form';
 import UserForm from './partials/user-form';
 
 interface EditUserProps {
@@ -15,13 +16,11 @@ interface EditUserProps {
 
 export default function EditUser({ user }: EditUserProps) {
     const { modal, message } = App.useApp();
+    const formRef = useRef<UserFormRef>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const contentHeader: ContentHeaderProps = {
-        breadcrumb: [
-            { title: 'Admin', href: '/admin' },
-            { title: 'Users', href: index.url() },
-            { title: user?.full_name || 'Edit', href: user?.id ? edit.url(user.id) : '#' },
-        ],
+    const handleUpdate = () => {
+        formRef.current?.submit();
     };
 
     const handleDelete = () => {
@@ -42,24 +41,37 @@ export default function EditUser({ user }: EditUserProps) {
         });
     };
 
+    const contentHeader: ContentHeaderProps = {
+        breadcrumb: [
+            { title: 'Admin', href: '/admin' },
+            { title: 'Users', href: index.url() },
+            { title: user?.full_name || 'Edit', href: user?.id ? edit.url(user.id) : '#' },
+        ],
+        actionButtons: [
+            {
+                label: 'Delete',
+                icon: 'trash',
+                danger: true,
+                onClick: handleDelete,
+            },
+            {
+                label: 'Update',
+                icon: 'check',
+                type: 'primary',
+                onClick: handleUpdate,
+                loading: isSubmitting,
+            },
+        ],
+    };
+
     if (!user?.id) {
         return null;
     }
 
     return (
         <AdminLayout contentHeader={contentHeader}>
-            <PageCard header={{ title: `Edit User: ${user.full_name}` }}>
-                <UserForm user={user} isEdit />
-
-                <Divider />
-
-                <div style={{ marginTop: 24 }}>
-                    <h3 style={{ marginBottom: 8, fontSize: 16, fontWeight: 600, color: '#cf1322' }}>Danger Zone</h3>
-                    <p style={{ marginBottom: 16, color: '#666' }}>Once you delete a user, there is no going back. Please be certain.</p>
-                    <Button danger icon={<Icon name="trash" />} onClick={handleDelete}>
-                        Delete User
-                    </Button>
-                </div>
+            <PageCard>
+                <UserForm ref={formRef} user={user} isEdit onSubmittingChange={setIsSubmitting} hideSubmitButton />
             </PageCard>
         </AdminLayout>
     );

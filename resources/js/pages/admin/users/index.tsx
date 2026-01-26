@@ -167,12 +167,7 @@ export default function UsersIndex() {
 
     return (
         <AdminLayout contentHeader={contentHeader}>
-            <PageCard
-                header={{
-                    title: 'Users',
-                }}
-                bodyPadding="none"
-            >
+            <PageCard bodyPadding="none">
                 <DataTable<User>
                     queryKey={['admin', 'users']}
                     queryFn={fetchUsers}

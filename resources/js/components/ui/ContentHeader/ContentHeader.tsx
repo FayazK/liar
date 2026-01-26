@@ -33,6 +33,7 @@ export default function ContentHeader({
     saveLabel,
     discardLabel,
     recordNavigation,
+    actionButtons,
     // Layout options
     sticky = true,
 }: ContentHeaderProps) {
@@ -41,7 +42,7 @@ export default function ContentHeader({
     // Check if there's any content to render
     const hasLeftContent = primaryAction || (breadcrumb && breadcrumb.length > 0) || (actionIcons && actionIcons.length > 0);
     const hasCenterContent = infoTabs && infoTabs.length > 0;
-    const hasRightContent = (isDirty && onSave && onDiscard) || (recordNavigation && recordNavigation.total > 0);
+    const hasRightContent = (isDirty && onSave && onDiscard) || (recordNavigation && recordNavigation.total > 0) || (actionButtons && actionButtons.length > 0);
 
     if (!hasLeftContent && !hasCenterContent && !hasRightContent) {
         return null;
@@ -82,6 +83,7 @@ export default function ContentHeader({
                 saveLabel={saveLabel}
                 discardLabel={discardLabel}
                 recordNavigation={recordNavigation}
+                actionButtons={actionButtons}
             />
         </Flex>
     );

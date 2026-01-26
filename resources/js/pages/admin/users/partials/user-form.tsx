@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { App, Button, Col, DatePicker, Form, Input, Row, Select, Switch } from 'antd';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useImperativeHandle, useState } from 'react';
 
 interface UserFormValues {
     first_name: string;
@@ -24,15 +24,28 @@ interface UserFormValues {
     is_active: boolean;
 }
 
+export interface UserFormRef {
+    submit: () => void;
+}
+
 interface UserFormProps {
     user?: User;
     isEdit?: boolean;
+    onSubmittingChange?: (isSubmitting: boolean) => void;
+    hideSubmitButton?: boolean;
+    ref?: React.Ref<UserFormRef>;
 }
 
-export default function UserForm({ user, isEdit = false }: UserFormProps) {
+export default function UserForm({ user, isEdit = false, onSubmittingChange, hideSubmitButton = false, ref }: UserFormProps) {
     const { notification } = App.useApp();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
+
+    useImperativeHandle(ref, () => ({
+        submit: () => {
+            form.submit();
+        },
+    }));
 
     // Fetch roles for the select dropdown
     const { data: roles } = useQuery({
@@ -60,6 +73,7 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
 
     const onFinish = async (values: UserFormValues) => {
         setLoading(true);
+        onSubmittingChange?.(true);
         const requestData = {
             ...values,
             date_of_birth: values.date_of_birth ? values.date_of_birth.format('YYYY-MM-DD') : null,
@@ -96,6 +110,7 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
             }
         } finally {
             setLoading(false);
+            onSubmittingChange?.(false);
         }
     };
 
@@ -191,11 +206,13 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
                 <Switch />
             </Form.Item>
 
-            <Form.Item>
-                <Button type="primary" htmlType="submit" loading={loading}>
-                    {isEdit ? 'Update User' : 'Create User'}
-                </Button>
-            </Form.Item>
+            {!hideSubmitButton && (
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                        {isEdit ? 'Update User' : 'Create User'}
+                    </Button>
+                </Form.Item>
+            )}
         </Form>
     );
 }

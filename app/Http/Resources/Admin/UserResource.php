@@ -19,6 +19,12 @@ class UserResource extends JsonResource
             'is_active' => $this->is_active,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'last_login_at' => $this->last_login_at?->format('Y-m-d H:i:s'),
+            'role' => $this->whenLoaded('role', fn () => [
+                'id' => $this->role?->id,
+                'name' => $this->role?->name,
+            ]),
+            'avatar_url' => $this->avatar_url,
+            'initials' => $this->initials,
         ];
     }
 }

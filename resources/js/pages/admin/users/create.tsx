@@ -15,7 +15,7 @@ export default function CreateUser() {
 
     return (
         <AdminLayout contentHeader={contentHeader}>
-            <PageCard header={{ title: 'Create New User' }}>
+            <PageCard>
                 <UserForm />
             </PageCard>
         </AdminLayout>

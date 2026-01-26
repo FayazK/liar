@@ -17,12 +17,14 @@ export default function ContentHeaderRight({
     saveLabel = 'Save',
     discardLabel = 'Discard',
     recordNavigation,
+    actionButtons,
 }: ContentHeaderRightProps) {
     const { token } = useToken();
 
     const hasSaveDiscard = isDirty && onSave && onDiscard;
     const hasRecordNav = recordNavigation && recordNavigation.total > 0;
-    const hasContent = hasSaveDiscard || hasRecordNav;
+    const hasActionButtons = actionButtons && actionButtons.length > 0;
+    const hasContent = hasSaveDiscard || hasRecordNav || hasActionButtons;
 
     if (!hasContent) {
         return null;
@@ -30,6 +32,26 @@ export default function ContentHeaderRight({
 
     return (
         <Flex align="center" gap={token.marginSM} style={{ flexShrink: 0 }}>
+            {/* Custom Action Buttons */}
+            {hasActionButtons && (
+                <Flex align="center" gap={token.marginXS}>
+                    {actionButtons.map((action, index) => (
+                        <Button
+                            key={index}
+                            type={action.type || 'default'}
+                            size="small"
+                            danger={action.danger}
+                            onClick={action.onClick}
+                            loading={action.loading}
+                            disabled={action.disabled}
+                            icon={action.icon ? <Icon name={action.icon} size={14} /> : undefined}
+                        >
+                            {action.label}
+                        </Button>
+                    ))}
+                </Flex>
+            )}
+
             {/* Save/Discard Buttons - only show when form is dirty */}
             {hasSaveDiscard && (
                 <Flex align="center" gap={token.marginXS}>

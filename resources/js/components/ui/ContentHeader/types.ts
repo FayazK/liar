@@ -61,6 +61,19 @@ export interface ContentHeaderCenterProps {
 }
 
 /**
+ * Custom action button configuration for right section
+ */
+export interface ContentHeaderActionButton {
+    label: string;
+    icon?: IconName;
+    onClick: () => void;
+    loading?: boolean;
+    disabled?: boolean;
+    type?: 'primary' | 'default' | 'dashed' | 'link' | 'text';
+    danger?: boolean;
+}
+
+/**
  * Props for the right section of ContentHeader
  */
 export interface ContentHeaderRightProps {
@@ -71,6 +84,7 @@ export interface ContentHeaderRightProps {
     saveLabel?: string;
     discardLabel?: string;
     recordNavigation?: ContentHeaderRecordNav;
+    actionButtons?: ContentHeaderActionButton[];
 }
 
 /**
