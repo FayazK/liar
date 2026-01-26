@@ -13,7 +13,7 @@ export default function AdminDashboard() {
         <AdminLayout>
             <Head title="Admin Dashboard" />
 
-            <PageCard header={{ title: 'Admin Dashboard' }}>
+            <PageCard>
                 <div
                     style={{
                         display: 'flex',

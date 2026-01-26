@@ -44,7 +44,6 @@ export default function RolesIndex() {
             onClick: () => router.visit(create.url()),
         },
         breadcrumb: [
-            { title: 'Admin', href: '/admin' },
             { title: 'Roles', href: index.url() },
         ],
     };
@@ -94,7 +93,7 @@ export default function RolesIndex() {
 
     return (
         <AdminLayout contentHeader={contentHeader}>
-            <PageCard header={{ title: 'Roles' }} bodyPadding="none">
+            <PageCard bodyPadding="none">
                 <DataTable<Role>
                     queryKey={['admin', 'roles']}
                     queryFn={fetchRoles}

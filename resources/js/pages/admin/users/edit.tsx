@@ -43,7 +43,6 @@ export default function EditUser({ user }: EditUserProps) {
 
     const contentHeader: ContentHeaderProps = {
         breadcrumb: [
-            { title: 'Admin', href: '/admin' },
             { title: 'Users', href: index.url() },
             { title: user?.full_name || 'Edit', href: user?.id ? edit.url(user.id) : '#' },
         ],

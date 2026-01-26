@@ -86,7 +86,6 @@ export default function UsersIndex() {
             onClick: () => router.visit(create.url()),
         },
         breadcrumb: [
-            { title: 'Admin', href: '/admin' },
             { title: 'Users', href: index.url() },
         ],
         actionIcons: [{ icon: 'refresh', tooltip: 'Refresh', onClick: () => router.reload() }],

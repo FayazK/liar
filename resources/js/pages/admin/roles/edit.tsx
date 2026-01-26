@@ -18,7 +18,6 @@ export default function EditRole({ role }: EditRoleProps) {
 
     const contentHeader: ContentHeaderProps = {
         breadcrumb: [
-            { title: 'Admin', href: '/admin' },
             { title: 'Roles', href: index.url() },
             { title: role?.name || 'Edit', href: role?.id ? edit.url(role.id) : '#' },
         ],
@@ -48,7 +47,7 @@ export default function EditRole({ role }: EditRoleProps) {
 
     return (
         <AdminLayout contentHeader={contentHeader}>
-            <PageCard header={{ title: `Edit Role: ${role.name}` }}>
+            <PageCard>
                 <RoleForm role={role} isEdit />
 
                 <Divider />

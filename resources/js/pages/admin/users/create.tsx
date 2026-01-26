@@ -7,7 +7,6 @@ import UserForm from './partials/user-form';
 export default function CreateUser() {
     const contentHeader: ContentHeaderProps = {
         breadcrumb: [
-            { title: 'Admin', href: '/admin' },
             { title: 'Users', href: index.url() },
             { title: 'Create User', href: create.url() },
         ],

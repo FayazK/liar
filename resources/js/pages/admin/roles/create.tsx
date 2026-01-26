@@ -7,7 +7,6 @@ import RoleForm from './partials/role-form';
 export default function CreateRole() {
     const contentHeader: ContentHeaderProps = {
         breadcrumb: [
-            { title: 'Admin', href: '/admin' },
             { title: 'Roles', href: index.url() },
             { title: 'Create Role', href: create.url() },
         ],
@@ -15,7 +14,7 @@ export default function CreateRole() {
 
     return (
         <AdminLayout contentHeader={contentHeader}>
-            <PageCard header={{ title: 'Create New Role' }}>
+            <PageCard>
                 <RoleForm />
             </PageCard>
         </AdminLayout>
