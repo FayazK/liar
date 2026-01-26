@@ -1,9 +1,22 @@
-import type { Permission } from '@/types';
+import type { Permission, SharedData } from '@/types';
+
+/**
+ * Check if user is a root user (super admin by email).
+ * Root users bypass ALL permission checks.
+ */
+export function isRootUser(user?: SharedData['auth']['user']): boolean {
+    return user?.is_root_user === true;
+}
 
 /**
  * Check if user has a specific permission.
  */
-export function can(permissionKey: string, userPermissions?: string[]): boolean {
+export function can(permissionKey: string, userPermissions?: string[], user?: SharedData['auth']['user']): boolean {
+    // Root user bypass - highest priority
+    if (isRootUser(user)) {
+        return true;
+    }
+
     if (!userPermissions) {
         return false;
     }
@@ -14,7 +27,12 @@ export function can(permissionKey: string, userPermissions?: string[]): boolean 
 /**
  * Check if user has any of the specified permissions.
  */
-export function canAny(permissionKeys: string[], userPermissions?: string[]): boolean {
+export function canAny(permissionKeys: string[], userPermissions?: string[], user?: SharedData['auth']['user']): boolean {
+    // Root user bypass - highest priority
+    if (isRootUser(user)) {
+        return true;
+    }
+
     if (!userPermissions) {
         return false;
     }
@@ -25,7 +43,12 @@ export function canAny(permissionKeys: string[], userPermissions?: string[]): bo
 /**
  * Check if user has all of the specified permissions.
  */
-export function canAll(permissionKeys: string[], userPermissions?: string[]): boolean {
+export function canAll(permissionKeys: string[], userPermissions?: string[], user?: SharedData['auth']['user']): boolean {
+    // Root user bypass - highest priority
+    if (isRootUser(user)) {
+        return true;
+    }
+
     if (!userPermissions) {
         return false;
     }

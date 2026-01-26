@@ -112,4 +112,20 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Root Users (Super Admins)
+    |--------------------------------------------------------------------------
+    |
+    | Root users have complete access to all features, bypassing both
+    | roles and permissions. These are defined by email address.
+    | Use this for system administrators who need unrestricted access.
+    |
+    */
+
+    'root_users' => [
+        env('ROOT_USER_EMAIL', 'info@fayazk.com'),
+        // Add more root user emails here
+    ],
+
 ];

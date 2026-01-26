@@ -49,6 +49,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => fn () => $request->user()
                     ? [
                         ...$request->user()->only('id', 'first_name', 'last_name', 'email', 'avatar_url', 'avatar_thumb_url', 'full_name', 'initials'),
+                        'is_root_user' => is_root_user($request->user()),
                         'permissions' => $request->user()->getPermissions()->pluck('key')->toArray(),
                     ]
                     : null,

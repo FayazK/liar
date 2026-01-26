@@ -60,6 +60,7 @@ export interface User {
     email: string;
     role_id?: number | null;
     role?: Role | null;
+    is_root_user?: boolean;
     permissions?: string[];
     phone?: string;
     date_of_birth?: string;
