@@ -65,6 +65,108 @@ tests/Unit/               # Unit tests (minimal)
 ```
 
 
+=== api rules ===
+
+## API Architecture
+
+**Purpose:** Versioned REST API using Laravel Sanctum token authentication for mobile apps and external integrations.
+
+**Core Principles:**
+- Full namespace separation under `App\Http\Controllers\Api\V1`
+- Reuse existing Services and Repositories (no logic duplication)
+- JSON:API compliant error responses
+- Token abilities inherit from user role permissions
+- Rate limiting per token/IP with JSON error responses
+- URL-based versioning for future compatibility
+
+**Directory Structure:**
+- `app/Http/Controllers/Api/ApiController.php` - Base with response traits and pagination helpers
+- `app/Http/Controllers/Api/V1/` - Versioned controllers (Auth, UserController, RoleController)
+- `app/Http/Requests/Api/ApiRequest.php` - Base with JSON:API validation formatting
+- `app/Http/Requests/Api/V1/` - Versioned request validators
+- `app/Http/Resources/Api/ApiResource.php` - Base with data wrapping and date formatting
+- `app/Http/Resources/Api/V1/` - Versioned resources (UserResource, TokenResource)
+- `app/Http/Middleware/ApiJsonResponse.php` - Forces JSON, adds CORS headers
+- `app/Http/Middleware/EnsureTokenAbility.php` - Checks token permissions
+- `app/Http/Traits/ApiResponse.php` - Response helpers (success, error, created, etc.)
+- `app/Http/Traits/HandlesApiErrors.php` - Converts exceptions to JSON:API format
+- `app/Services/TokenService.php` - Create, refresh, revoke tokens
+- `app/Exceptions/Api/` - Custom API exceptions (Unauthorized, Forbidden, NotFound)
+- `config/api.php` - Rate limits, CORS, pagination, token config
+- `routes/api.php` - All API routes with v1 prefix
+- `tests/Feature/Api/V1/` - Feature tests organized by resource
+
+**Base Classes:**
+- ApiController extends Controller, uses response traits, provides getPerPage() helper
+- ApiRequest formats validation errors in JSON:API format automatically
+- ApiResource wraps data, provides formatDate() for ISO 8601 dates
+- All API controllers/requests/resources extend these bases
+
+**Response Format:**
+- Success: data + message object
+- Errors: JSON:API format with status, title, detail, source pointer
+- Use trait methods: success(), created(), noContent(), error(), notFound(), forbidden(), unauthorized()
+
+**Authentication:**
+- User model uses HasApiTokens trait
+- Login creates token with user's role permissions as abilities
+- Protected routes use auth:sanctum middleware
+- Tokens never expire by default (configurable)
+- TokenService handles create, refresh, revoke operations
+- Logout revokes all user tokens
+
+**Middleware:**
+- ApiJsonResponse applies to all API routes (forces JSON, CORS, version header)
+- EnsureTokenAbility checks permissions, auto-infers from route action (index→read, store→create)
+
+**Rate Limiting:**
+- Default 60 requests per minute per token/IP
+- Configured via API_RATE_LIMIT env variable
+- Returns 429 with JSON:API error format
+- Applied automatically to all API routes
+
+**CORS:**
+- Configured in config/api.php
+- Origins, methods, headers, exposed headers
+- Controlled via API_CORS_ORIGINS env variable
+
+**Versioning:**
+- Current: v1 with /api/v1/ prefix
+- Future: Copy V1 namespace to V2, add new route prefix, maintain v1 alongside
+- Never break backward compatibility in same version
+- Communicate deprecation timeline when introducing v2
+
+**Controllers:**
+- Inject Services and Repositories via constructor
+- Use existing Services (never duplicate business logic)
+- Return Resources for consistent formatting
+- Use base controller response helpers
+- Eager load relationships to prevent N+1
+- Validate with dedicated Request classes
+- Keep controllers thin (orchestration only)
+
+**Testing:**
+- Feature tests in tests/Feature/Api/V1/ organized by resource
+- Use Sanctum::actingAs($user) for authenticated requests
+- Test authentication, authorization, validation, and CRUD operations
+- Organize tests: Auth/ folder for auth endpoints, separate files per resource
+
+**Best Practices:**
+- ✓ Reuse Services/Repositories, return consistent responses, validate all input
+- ✓ Eager load relationships, add rate limiting, test thoroughly
+- ✓ Use token abilities for permissions, version from start
+- ✗ Never duplicate logic, use different formats, skip validation
+- ✗ Never forget eager loading, skip rate limiting, trust client input
+
+**Configuration:**
+- Environment: API_RATE_LIMIT, API_CORS_ORIGINS
+- config/api.php: rate limits, CORS settings, token expiration, pagination defaults
+
+**Common Endpoints:**
+- Auth: login, register, logout, refresh, user, password/forgot, password/reset
+- Resources: GET list, POST create, GET show, PATCH update, DELETE destroy
+
+
 === crud rules ===
 
 ## CRUD Patterns for Admin Modules

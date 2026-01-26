@@ -15,6 +15,17 @@ class UserRepository
         return User::find($id);
     }
 
+    public function findOrFail(int $id, array $with = []): User
+    {
+        $query = User::query();
+
+        if (! empty($with)) {
+            $query->with($with);
+        }
+
+        return $query->findOrFail($id);
+    }
+
     public function findByEmail(string $email): ?User
     {
         return User::where('email', $email)->first();
@@ -101,5 +112,16 @@ class UserRepository
     public function existsByEmail(string $email): bool
     {
         return User::where('email', $email)->exists();
+    }
+
+    public function paginate(int $perPage = 15, array $with = []): LengthAwarePaginator
+    {
+        $query = User::query();
+
+        if (! empty($with)) {
+            $query->with($with);
+        }
+
+        return $query->paginate($perPage);
     }
 }
