@@ -1,7 +1,7 @@
 import { Icon } from '@/components/ui/Icon';
 import { useLibraryState } from '@/hooks/use-library-state';
-import type { BreadcrumbItem } from '@/types/library';
 import { index } from '@/routes/library';
+import type { BreadcrumbItem } from '@/types/library';
 import { router } from '@inertiajs/react';
 import { Breadcrumb, Button, Flex, Space, Tooltip, theme } from 'antd';
 import SortDropdown from './SortDropdown';
@@ -17,16 +17,8 @@ interface LibraryToolbarProps {
 
 export default function LibraryToolbar({ breadcrumbs, onNewFolder, onUpload }: LibraryToolbarProps) {
     const { token } = useToken();
-    const {
-        viewMode,
-        setViewMode,
-        sortBy,
-        toggleSort,
-        librarySidebarCollapsed,
-        toggleLibrarySidebar,
-        previewPanelVisible,
-        togglePreviewPanel,
-    } = useLibraryState();
+    const { viewMode, setViewMode, sortBy, toggleSort, librarySidebarCollapsed, toggleLibrarySidebar, previewPanelVisible, togglePreviewPanel } =
+        useLibraryState();
 
     const breadcrumbItems = [
         {

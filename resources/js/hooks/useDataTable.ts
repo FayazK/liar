@@ -63,11 +63,9 @@ export function useDataTable<TData>({
     const [sorting, setSorting] = useState<SortingState>(persistence.state.sorting);
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
     const [columnVisibility, setColumnVisibilityInternal] = useState<VisibilityState>(
-        initialTabSettings?.columnVisibility ?? persistence.state.columnVisibility
+        initialTabSettings?.columnVisibility ?? persistence.state.columnVisibility,
     );
-    const [columnOrder, setColumnOrderInternal] = useState<string[]>(
-        initialTabSettings?.columnOrder ?? persistence.state.columnOrder
-    );
+    const [columnOrder, setColumnOrderInternal] = useState<string[]>(initialTabSettings?.columnOrder ?? persistence.state.columnOrder);
     const [pagination, setPagination] = useState<PaginationState>({
         pageIndex: 0,
         pageSize: persistence.state.pageSize,

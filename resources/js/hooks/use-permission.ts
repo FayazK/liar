@@ -1,6 +1,6 @@
-import { usePage } from '@inertiajs/react';
 import type { SharedData } from '@/types';
-import { can, canAny, canAll, isRootUser } from '@/utils/permissions';
+import { can, canAll, canAny, isRootUser } from '@/utils/permissions';
+import { usePage } from '@inertiajs/react';
 
 /**
  * Hook to check if user has a specific permission.

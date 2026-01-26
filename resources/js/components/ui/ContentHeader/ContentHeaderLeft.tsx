@@ -42,7 +42,7 @@ export default function ContentHeaderLeft({ primaryAction, breadcrumb, actionIco
                     align="center"
                     gap={4}
                     style={{
-                        fontSize: 13,
+                        fontSize: token.fontSizeLG,
                         minWidth: 0,
                         overflow: 'hidden',
                     }}

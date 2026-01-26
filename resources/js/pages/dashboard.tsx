@@ -1,7 +1,7 @@
+import type { ContentHeaderProps } from '@/components/ui/ContentHeader';
 import { Icon } from '@/components/ui/Icon';
 import PageCard from '@/components/ui/PageCard';
 import AppLayout from '@/layouts/app-layout';
-import type { ContentHeaderProps } from '@/components/ui/ContentHeader';
 import { type SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { App, Avatar, Button, Card, Col, Dropdown, Flex, Progress, Row, Space, Statistic, Tag, theme, Typography } from 'antd';

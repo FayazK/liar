@@ -1,5 +1,6 @@
 import GlobalSearch, { useGlobalSearch } from '@/components/global-search';
 import NotificationsCenter from '@/components/notifications-center';
+import { ContentHeader, type ContentHeaderProps } from '@/components/ui/ContentHeader';
 import { Icon } from '@/components/ui/Icon';
 import UserDropdown from '@/components/user-dropdown';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -21,6 +22,7 @@ const HEADER_HEIGHT = 40;
 interface MasterLayoutProps {
     children: ReactNode;
     actions?: ReactNode;
+    contentHeader?: ContentHeaderProps;
     mainNavItems: NavItem[];
     navGroups?: NavGroup[];
     footerNavItems?: NavItem[];
@@ -69,7 +71,7 @@ function buildMenuItems(items: NavItem[], onNavigate?: () => void): MenuProps['i
     });
 }
 
-export default function MasterLayout({ children, actions, mainNavItems, navGroups = [], footerNavItems = [] }: MasterLayoutProps) {
+export default function MasterLayout({ children, actions, contentHeader, mainNavItems, navGroups = [], footerNavItems = [] }: MasterLayoutProps) {
     const { collapsed, toggleCollapsed } = useSidebarState();
     const isMobile = useIsMobile();
     const { auth } = usePage<SharedData>().props;
@@ -315,12 +317,7 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
                                 {actions}
 
                                 {/* Search Icon Button */}
-                                <Button
-                                    type="text"
-                                    icon={<Icon name="search" size={16} />}
-                                    onClick={openSearch}
-                                    aria-label="Search"
-                                />
+                                <Button type="text" icon={<Icon name="search" size={16} />} onClick={openSearch} aria-label="Search" />
 
                                 {/* Notifications */}
                                 <NotificationsCenter />
@@ -337,12 +334,27 @@ export default function MasterLayout({ children, actions, mainNavItems, navGroup
                         role="main"
                         style={{
                             marginTop: `${HEADER_HEIGHT}px`,
-                            padding: token.paddingMD,
                             minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
                         }}
                     >
-                        {/* Content Wrapper with max-width */}
-                        <div>{children}</div>
+                        {/* ContentHeader section (if enabled) */}
+                        {contentHeader && (
+                            <div style={{ paddingTop: token.paddingMD / 2 }}>
+                                <ContentHeader {...contentHeader} />
+                            </div>
+                        )}
+
+                        {/* Content Wrapper with conditional padding */}
+                        <div
+                            style={{
+                                paddingTop: contentHeader ? token.paddingMD / 2 : token.paddingMD,
+                                paddingLeft: token.paddingMD,
+                                paddingRight: token.paddingMD,
+                                paddingBottom: token.paddingMD,
+                            }}
+                        >
+                            {children}
+                        </div>
                     </Content>
                 </Layout>
             </Layout>

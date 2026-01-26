@@ -20,7 +20,11 @@ export default function RolesIndex() {
     const { modal, message } = App.useApp();
 
     // Fetch roles using TanStack Query
-    const { data: roles, isLoading, refetch } = useQuery({
+    const {
+        data: roles,
+        isLoading,
+        refetch,
+    } = useQuery({
         queryKey: ['roles'],
         queryFn: fetchRoles,
     });
@@ -36,9 +40,7 @@ export default function RolesIndex() {
             { title: 'Admin', href: '/admin' },
             { title: 'Roles', href: index.url() },
         ],
-        actionIcons: [
-            { icon: 'refresh', tooltip: 'Refresh', onClick: () => refetch() },
-        ],
+        actionIcons: [{ icon: 'refresh', tooltip: 'Refresh', onClick: () => refetch() }],
     };
 
     // Handle delete role

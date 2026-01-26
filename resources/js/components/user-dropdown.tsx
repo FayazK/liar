@@ -144,13 +144,7 @@ export default function UserDropdown({ user }: UserDropdownProps) {
     const firstName = user.first_name || user.full_name?.split(' ')[0] || '';
 
     return (
-        <Dropdown
-            popupRender={() => dropdownContent}
-            trigger={['click']}
-            placement="bottomRight"
-            open={open}
-            onOpenChange={setOpen}
-        >
+        <Dropdown popupRender={() => dropdownContent} trigger={['click']} placement="bottomRight" open={open} onOpenChange={setOpen}>
             <Flex align="center" gap={8} style={{ cursor: 'pointer' }}>
                 <Text style={{ fontSize: 13, color: token.colorText }}>{firstName}</Text>
                 <Avatar src={user.avatar_thumb_url} size={28} icon={<Icon name="user" size={14} />} />

@@ -47,17 +47,11 @@ export default function FileMetadata({ item }: FileMetadataProps) {
                         {item.file_count ?? 0} {(item.file_count ?? 0) === 1 ? 'item' : 'items'}
                     </Descriptions.Item>
                     {item.total_size_human && (
-                        <Descriptions.Item label={<Text type="secondary">Total Size</Text>}>
-                            {item.total_size_human}
-                        </Descriptions.Item>
+                        <Descriptions.Item label={<Text type="secondary">Total Size</Text>}>{item.total_size_human}</Descriptions.Item>
                     )}
-                    <Descriptions.Item label={<Text type="secondary">Created</Text>}>
-                        {formatDate(item.created_at)}
-                    </Descriptions.Item>
+                    <Descriptions.Item label={<Text type="secondary">Created</Text>}>{formatDate(item.created_at)}</Descriptions.Item>
                     {item.updated_at && (
-                        <Descriptions.Item label={<Text type="secondary">Modified</Text>}>
-                            {formatDate(item.updated_at)}
-                        </Descriptions.Item>
+                        <Descriptions.Item label={<Text type="secondary">Modified</Text>}>{formatDate(item.updated_at)}</Descriptions.Item>
                     )}
                 </Descriptions>
 
@@ -80,9 +74,7 @@ export default function FileMetadata({ item }: FileMetadataProps) {
                 <Descriptions.Item label={<Text type="secondary">Type</Text>}>
                     <Tag>{fileType}</Tag>
                 </Descriptions.Item>
-                <Descriptions.Item label={<Text type="secondary">Size</Text>}>
-                    {item.size_human || '--'}
-                </Descriptions.Item>
+                <Descriptions.Item label={<Text type="secondary">Size</Text>}>{item.size_human || '--'}</Descriptions.Item>
                 {item.file_name && (
                     <Descriptions.Item label={<Text type="secondary">File Name</Text>}>
                         <Text
@@ -102,18 +94,10 @@ export default function FileMetadata({ item }: FileMetadataProps) {
                         </Text>
                     </Descriptions.Item>
                 )}
-                {item.folder_name && (
-                    <Descriptions.Item label={<Text type="secondary">Location</Text>}>
-                        {item.folder_name}
-                    </Descriptions.Item>
-                )}
-                <Descriptions.Item label={<Text type="secondary">Created</Text>}>
-                    {formatDate(item.created_at)}
-                </Descriptions.Item>
+                {item.folder_name && <Descriptions.Item label={<Text type="secondary">Location</Text>}>{item.folder_name}</Descriptions.Item>}
+                <Descriptions.Item label={<Text type="secondary">Created</Text>}>{formatDate(item.created_at)}</Descriptions.Item>
                 {item.updated_at && (
-                    <Descriptions.Item label={<Text type="secondary">Modified</Text>}>
-                        {formatDate(item.updated_at)}
-                    </Descriptions.Item>
+                    <Descriptions.Item label={<Text type="secondary">Modified</Text>}>{formatDate(item.updated_at)}</Descriptions.Item>
                 )}
             </Descriptions>
 

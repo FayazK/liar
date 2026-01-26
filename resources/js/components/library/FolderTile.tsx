@@ -36,10 +36,7 @@ export default function FolderTile({ name, itemCount, onFolderClick, onSelect, s
     };
 
     return (
-        <Dropdown
-            menu={{ items: menuItems }}
-            trigger={['contextMenu']}
-        >
+        <Dropdown menu={{ items: menuItems }} trigger={['contextMenu']}>
             <div
                 style={{
                     display: 'flex',

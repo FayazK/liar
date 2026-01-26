@@ -53,9 +53,9 @@ export default function ContentHeader({
             justify="space-between"
             style={{
                 height: 44,
-                padding: `0 ${token.paddingMD}px`,
-                backgroundColor: token.colorBgContainer,
-                borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                paddingLeft: token.paddingMD,
+                paddingRight: token.paddingMD,
+                background: token.colorBgLayout,
                 ...(sticky && {
                     position: 'sticky',
                     top: HEADER_HEIGHT,

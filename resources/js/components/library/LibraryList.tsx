@@ -225,10 +225,7 @@ export default function LibraryList({ parentId, onFolderClick, onItemSelect }: L
             key: 'name',
             render: (name: string, record: LibraryItem) => (
                 <Dropdown menu={{ items: getContextMenuItems(record) }} trigger={['contextMenu']}>
-                    <Space
-                        style={{ cursor: 'pointer', width: '100%' }}
-                        onClick={() => handleRowClick(record)}
-                    >
+                    <Space style={{ cursor: 'pointer', width: '100%' }} onClick={() => handleRowClick(record)}>
                         {getItemIcon(record)}
                         <span
                             style={{
@@ -307,12 +304,7 @@ export default function LibraryList({ parentId, onFolderClick, onItemSelect }: L
             width: 50,
             render: (_: unknown, record: LibraryItem) => (
                 <Dropdown menu={{ items: getContextMenuItems(record) }} trigger={['click']}>
-                    <Icon
-                        name="dots-vertical"
-                        size={16}
-                        style={{ cursor: 'pointer', padding: 4 }}
-                        onClick={(e) => e.stopPropagation()}
-                    />
+                    <Icon name="dots-vertical" size={16} style={{ cursor: 'pointer', padding: 4 }} onClick={(e) => e.stopPropagation()} />
                 </Dropdown>
             ),
         },
@@ -331,12 +323,7 @@ export default function LibraryList({ parentId, onFolderClick, onItemSelect }: L
     }
 
     if (items.length === 0) {
-        return (
-            <Empty
-                description="No folders or files yet. Create a folder or upload files to get started!"
-                style={{ marginTop: token.marginXL }}
-            />
-        );
+        return <Empty description="No folders or files yet. Create a folder or upload files to get started!" style={{ marginTop: token.marginXL }} />;
     }
 
     return (
@@ -361,10 +348,7 @@ export default function LibraryList({ parentId, onFolderClick, onItemSelect }: L
                     onDoubleClick: () => handleRowClick(record),
                     style: {
                         cursor: 'pointer',
-                        background:
-                            selectedItem?.id === record.id && selectedItem?.type === record.type
-                                ? token.colorPrimaryBg
-                                : undefined,
+                        background: selectedItem?.id === record.id && selectedItem?.type === record.type ? token.colorPrimaryBg : undefined,
                     },
                 })}
             />

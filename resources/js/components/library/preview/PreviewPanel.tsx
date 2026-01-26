@@ -33,14 +33,7 @@ export default function PreviewPanel({ item, onDownload, onToggleFavorite }: Pre
                     padding: token.paddingLG,
                 }}
             >
-                <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description={
-                        <Text type="secondary">
-                            Select a file or folder to preview
-                        </Text>
-                    }
-                />
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<Text type="secondary">Select a file or folder to preview</Text>} />
             </div>
         );
     }
@@ -72,11 +65,7 @@ export default function PreviewPanel({ item, onDownload, onToggleFavorite }: Pre
             <Space wrap style={{ marginTop: token.marginSM }}>
                 {item.type === 'file' && onDownload && (
                     <Tooltip title="Download">
-                        <Button
-                            type="primary"
-                            icon={<Icon name="download" size={16} />}
-                            onClick={() => onDownload(item)}
-                        >
+                        <Button type="primary" icon={<Icon name="download" size={16} />} onClick={() => onDownload(item)}>
                             Download
                         </Button>
                     </Tooltip>

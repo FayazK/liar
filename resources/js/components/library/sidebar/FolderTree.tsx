@@ -1,8 +1,8 @@
 import { Icon } from '@/components/ui/Icon';
 import { useLibraryState } from '@/hooks/use-library-state';
 import axios from '@/lib/axios';
-import type { FolderTreeNode, FolderTreeResponse } from '@/types/library';
 import { folderTree } from '@/routes/library/api';
+import type { FolderTreeNode, FolderTreeResponse } from '@/types/library';
 import { Spin, theme, Tree, Typography } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import { useCallback, useEffect, useState } from 'react';
@@ -22,20 +22,23 @@ export default function FolderTree({ currentFolderId, onFolderSelect }: FolderTr
     const [loading, setLoading] = useState(true);
 
     // Convert folder tree nodes to Ant Design tree data nodes
-    const convertToTreeData = useCallback((nodes: FolderTreeNode[]): DataNode[] => {
-        return nodes.map((node) => ({
-            key: node.id.toString(),
-            title: (
-                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <Icon name="folder" size={14} color={node.color || token.colorTextSecondary} />
-                    <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{node.name}</span>
-                    {node.is_favorite && <Icon name="star-filled" size={12} color={token.colorWarning} />}
-                </span>
-            ),
-            isLeaf: !node.has_children,
-            children: node.children ? convertToTreeData(node.children) : undefined,
-        }));
-    }, [token]);
+    const convertToTreeData = useCallback(
+        (nodes: FolderTreeNode[]): DataNode[] => {
+            return nodes.map((node) => ({
+                key: node.id.toString(),
+                title: (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Icon name="folder" size={14} color={node.color || token.colorTextSecondary} />
+                        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{node.name}</span>
+                        {node.is_favorite && <Icon name="star-filled" size={12} color={token.colorWarning} />}
+                    </span>
+                ),
+                isLeaf: !node.has_children,
+                children: node.children ? convertToTreeData(node.children) : undefined,
+            }));
+        },
+        [token],
+    );
 
     // Fetch folder tree on mount
     useEffect(() => {

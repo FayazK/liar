@@ -60,10 +60,7 @@ export default function FileCard({ name, mimeType, size, thumbnailUrl, menuItems
     };
 
     return (
-        <Dropdown
-            menu={{ items: menuItems }}
-            trigger={['contextMenu']}
-        >
+        <Dropdown menu={{ items: menuItems }} trigger={['contextMenu']}>
             <div
                 style={{
                     backgroundColor: selected ? token.colorPrimaryBg : token.colorBgContainer,
@@ -101,11 +98,7 @@ export default function FileCard({ name, mimeType, size, thumbnailUrl, menuItems
                             onError={() => setImageError(true)}
                         />
                     ) : (
-                        <Icon
-                            name={iconConfig.name}
-                            size={40}
-                            color={iconConfig.color || token.colorTextTertiary}
-                        />
+                        <Icon name={iconConfig.name} size={40} color={iconConfig.color || token.colorTextTertiary} />
                     )}
                 </div>
 

@@ -89,9 +89,7 @@ export default function UsersIndex() {
             { title: 'Admin', href: '/admin' },
             { title: 'Users', href: index.url() },
         ],
-        actionIcons: [
-            { icon: 'refresh', tooltip: 'Refresh', onClick: () => router.reload() },
-        ],
+        actionIcons: [{ icon: 'refresh', tooltip: 'Refresh', onClick: () => router.reload() }],
     };
 
     // Column definitions using TanStack Table format

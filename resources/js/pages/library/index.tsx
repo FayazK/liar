@@ -20,11 +20,7 @@ const { useToken } = theme;
 export default function LibraryIndex({ currentFolder, breadcrumbs }: LibraryPageProps) {
     const { token } = useToken();
     const { message } = App.useApp();
-    const {
-        viewMode,
-        selectedItem,
-        setSelectedItem,
-    } = useLibraryState();
+    const { viewMode, selectedItem, setSelectedItem } = useLibraryState();
 
     const [showCreateFolder, setShowCreateFolder] = useState(false);
     const [showUploadFiles, setShowUploadFiles] = useState(false);
@@ -91,26 +87,13 @@ export default function LibraryIndex({ currentFolder, breadcrumbs }: LibraryPage
         />
     );
 
-    const preview = (
-        <PreviewPanel
-            item={selectedItem}
-            onDownload={handleDownload}
-            onToggleFavorite={handleToggleFavorite}
-        />
-    );
+    const preview = <PreviewPanel item={selectedItem} onDownload={handleDownload} onToggleFavorite={handleToggleFavorite} />;
 
     return (
-        <LibraryLayout
-            sidebar={sidebar}
-            preview={preview}
-        >
+        <LibraryLayout sidebar={sidebar} preview={preview}>
             <Head title="Library" />
 
-            <LibraryToolbar
-                breadcrumbs={breadcrumbs}
-                onNewFolder={() => setShowCreateFolder(true)}
-                onUpload={() => setShowUploadFiles(true)}
-            />
+            <LibraryToolbar breadcrumbs={breadcrumbs} onNewFolder={() => setShowCreateFolder(true)} onUpload={() => setShowUploadFiles(true)} />
 
             <div style={{ flex: 1, overflow: 'auto', padding: `0 ${token.paddingXS}px` }}>
                 {viewMode === 'grid' ? (

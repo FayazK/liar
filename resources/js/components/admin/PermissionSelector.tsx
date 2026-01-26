@@ -1,7 +1,6 @@
-import { Checkbox, Collapse, theme } from 'antd';
-import type { CheckboxProps } from 'antd';
 import type { Permission } from '@/types';
 import { groupPermissionsByModule } from '@/utils/permissions';
+import { Checkbox, Collapse, theme } from 'antd';
 import { useMemo } from 'react';
 
 interface PermissionSelectorProps {
@@ -116,12 +115,5 @@ export function PermissionSelector({ permissions, value = [], onChange, disabled
         };
     });
 
-    return (
-        <Collapse
-            items={items}
-            defaultActiveKey={modules}
-            className="bg-transparent"
-            style={{ borderColor: token.colorBorder }}
-        />
-    );
+    return <Collapse items={items} defaultActiveKey={modules} className="bg-transparent" style={{ borderColor: token.colorBorder }} />;
 }

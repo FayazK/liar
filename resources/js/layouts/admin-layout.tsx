@@ -1,4 +1,4 @@
-import { ContentHeader, type ContentHeaderProps } from '@/components/ui/ContentHeader';
+import type { ContentHeaderProps } from '@/components/ui/ContentHeader';
 import { type ReactNode } from 'react';
 import MasterLayout from './master-layout';
 import { adminFooterNavItems, adminMainNavItems, adminNavGroups } from './menus/admin-menu';
@@ -11,8 +11,13 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children, actions, contentHeader }: AdminLayoutProps) {
     return (
-        <MasterLayout actions={actions} mainNavItems={adminMainNavItems} navGroups={adminNavGroups} footerNavItems={adminFooterNavItems}>
-            {contentHeader && <ContentHeader {...contentHeader} />}
+        <MasterLayout
+            actions={actions}
+            contentHeader={contentHeader}
+            mainNavItems={adminMainNavItems}
+            navGroups={adminNavGroups}
+            footerNavItems={adminFooterNavItems}
+        >
             {children}
         </MasterLayout>
     );

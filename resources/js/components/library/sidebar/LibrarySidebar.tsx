@@ -13,12 +13,7 @@ interface LibrarySidebarProps {
     onCategorySelect: (category: QuickAccessCategory) => void;
 }
 
-export default function LibrarySidebar({
-    currentFolderId,
-    selectedCategory,
-    onFolderSelect,
-    onCategorySelect,
-}: LibrarySidebarProps) {
+export default function LibrarySidebar({ currentFolderId, selectedCategory, onFolderSelect, onCategorySelect }: LibrarySidebarProps) {
     const { token } = useToken();
     const { librarySidebarCollapsed } = useLibraryState();
 

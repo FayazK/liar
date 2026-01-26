@@ -1,10 +1,10 @@
+import { PermissionSelector } from '@/components/admin/PermissionSelector';
 import api from '@/lib/axios';
 import type { Role, SharedData } from '@/types';
 import { isApiError } from '@/utils/errors';
-import { usePage, router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Button, Form, Input, notification } from 'antd';
 import { useEffect, useState } from 'react';
-import { PermissionSelector } from '@/components/admin/PermissionSelector';
 
 interface RoleFormValues {
     name: string;

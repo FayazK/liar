@@ -216,11 +216,7 @@ export default function NotificationsCenter() {
     return (
         <Dropdown popupRender={() => dropdownContent} trigger={['click']} placement="bottomRight">
             <Badge count={unreadCount} size="small" offset={[-6, 6]}>
-                <Button
-                    type="text"
-                    icon={<Icon name="bell" size={16} />}
-                    aria-label="Open notifications"
-                />
+                <Button type="text" icon={<Icon name="bell" size={16} />} aria-label="Open notifications" />
             </Badge>
         </Dropdown>
     );
