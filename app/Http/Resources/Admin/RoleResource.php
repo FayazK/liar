@@ -21,6 +21,9 @@ class RoleResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'users_count' => $this->whenLoaded('users', fn () => $this->users->count()),
+            'permissions_count' => $this->whenCounted('permissions'),
+            'permission_ids' => $this->whenLoaded('permissions', fn () => $this->permissions->pluck('id')),
+            'permissions' => PermissionResource::collection($this->whenLoaded('permissions')),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

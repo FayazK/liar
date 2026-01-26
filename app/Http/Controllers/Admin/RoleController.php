@@ -9,7 +9,7 @@ use App\Http\Requests\Admin\RoleStoreRequest;
 use App\Http\Requests\Admin\RoleUpdateRequest;
 use App\Http\Resources\Admin\RoleResource;
 use App\Models\Role;
-use App\Repositories\RoleRepository;
+use App\Services\RoleService;
 use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -17,7 +17,7 @@ use Inertia\Response;
 class RoleController extends Controller
 {
     public function __construct(
-        private readonly RoleRepository $roleRepository
+        private readonly RoleService $roleService
     ) {}
 
     public function index(): Response
@@ -32,7 +32,7 @@ class RoleController extends Controller
 
     public function data(): JsonResponse
     {
-        $roles = $this->roleRepository->getAll()->loadCount('users');
+        $roles = $this->roleService->getAllRoles()->loadCount(['users', 'permissions']);
 
         return response()->json([
             'data' => RoleResource::collection($roles),
@@ -41,6 +41,8 @@ class RoleController extends Controller
 
     public function edit(Role $role): Response
     {
+        $role->load('permissions');
+
         return Inertia::render('admin/roles/edit', [
             'role' => new RoleResource($role),
         ]);
@@ -48,7 +50,7 @@ class RoleController extends Controller
 
     public function store(RoleStoreRequest $request): JsonResponse
     {
-        $role = $this->roleRepository->create($request->validated());
+        $role = $this->roleService->createRole($request->validated());
 
         return response()->json([
             'message' => 'Role created successfully',
@@ -58,7 +60,7 @@ class RoleController extends Controller
 
     public function update(RoleUpdateRequest $request, Role $role): JsonResponse
     {
-        $updatedRole = $this->roleRepository->update($role->id, $request->validated());
+        $updatedRole = $this->roleService->updateRole($role->id, $request->validated());
 
         return response()->json([
             'message' => 'Role updated successfully',
@@ -68,7 +70,7 @@ class RoleController extends Controller
 
     public function destroy(Role $role): JsonResponse
     {
-        $this->roleRepository->delete($role->id);
+        $this->roleService->deleteRole($role->id);
 
         return response()->json([
             'message' => 'Role deleted successfully',

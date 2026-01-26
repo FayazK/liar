@@ -28,8 +28,17 @@ export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    permissions?: Permission[];
     sidebarOpen: boolean;
     [key: string]: unknown;
+}
+
+export interface Permission {
+    id: number;
+    key: string;
+    title: string;
+    description?: string | null;
+    module: string;
 }
 
 export interface Role {
@@ -37,6 +46,9 @@ export interface Role {
     name: string;
     description?: string | null;
     users_count?: number;
+    permissions_count?: number;
+    permission_ids?: number[];
+    permissions?: Permission[];
     created_at: string;
     updated_at: string;
 }
@@ -48,6 +60,7 @@ export interface User {
     email: string;
     role_id?: number | null;
     role?: Role | null;
+    permissions?: string[];
     phone?: string;
     date_of_birth?: string;
     avatar_url?: string;

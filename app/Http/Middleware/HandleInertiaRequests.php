@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
+use App\Models\Permission;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -44,9 +47,17 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => fn () => $request->user()
-                    ? $request->user()->only('id', 'first_name', 'last_name', 'email', 'avatar_url', 'avatar_thumb_url', 'full_name', 'initials')
+                    ? [
+                        ...$request->user()->only('id', 'first_name', 'last_name', 'email', 'avatar_url', 'avatar_thumb_url', 'full_name', 'initials'),
+                        'permissions' => $request->user()->getPermissions()->pluck('key')->toArray(),
+                    ]
                     : null,
             ],
+            'permissions' => fn () => Permission::query()
+                ->select('id', 'key', 'title', 'description', 'module')
+                ->orderBy('module')
+                ->orderBy('title')
+                ->get(),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

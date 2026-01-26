@@ -29,6 +29,8 @@ class RoleUpdateRequest extends FormRequest
                 Rule::unique(Role::class)->ignore($this->route('role')),
             ],
             'description' => ['nullable', 'string', 'max:255'],
+            'permission_ids' => ['nullable', 'array'],
+            'permission_ids.*' => ['exists:permissions,id'],
         ];
     }
 }

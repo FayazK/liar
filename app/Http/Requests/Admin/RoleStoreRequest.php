@@ -23,6 +23,8 @@ class RoleStoreRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:50', 'unique:'.Role::class],
             'description' => ['nullable', 'string', 'max:255'],
+            'permission_ids' => ['nullable', 'array'],
+            'permission_ids.*' => ['exists:permissions,id'],
         ];
     }
 }

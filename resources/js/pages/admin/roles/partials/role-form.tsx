@@ -1,13 +1,15 @@
 import api from '@/lib/axios';
-import type { Role } from '@/types';
+import type { Role, SharedData } from '@/types';
 import { isApiError } from '@/utils/errors';
-import { router } from '@inertiajs/react';
+import { usePage, router } from '@inertiajs/react';
 import { Button, Form, Input, notification } from 'antd';
 import { useEffect, useState } from 'react';
+import { PermissionSelector } from '@/components/admin/PermissionSelector';
 
 interface RoleFormValues {
     name: string;
     description?: string;
+    permission_ids?: number[];
 }
 
 interface RoleFormProps {
@@ -18,11 +20,13 @@ interface RoleFormProps {
 export default function RoleForm({ role, isEdit = false }: RoleFormProps) {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
+    const { permissions = [] } = usePage<SharedData>().props;
 
     useEffect(() => {
         form.setFieldsValue({
             name: role?.name || '',
             description: role?.description || '',
+            permission_ids: role?.permission_ids || [],
         });
     }, [role, form]);
 
@@ -71,6 +75,10 @@ export default function RoleForm({ role, isEdit = false }: RoleFormProps) {
 
             <Form.Item label="Description" name="description">
                 <Input.TextArea rows={4} maxLength={255} />
+            </Form.Item>
+
+            <Form.Item label="Permissions" name="permission_ids">
+                <PermissionSelector permissions={permissions} />
             </Form.Item>
 
             <Form.Item>

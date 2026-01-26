@@ -6,10 +6,12 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 use Plank\Metable\Metable;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
@@ -138,5 +140,53 @@ class User extends Authenticatable implements HasMedia
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Get user permissions with caching (1 hour TTL).
+     */
+    public function getPermissions(): Collection
+    {
+        return Cache::remember(
+            "user_permissions_{$this->id}",
+            now()->addHour(),
+            fn (): Collection => $this->role?->permissions ?? new Collection()
+        );
+    }
+
+    /**
+     * Check if user has a specific permission.
+     */
+    public function hasPermission(string $permissionKey): bool
+    {
+        return $this->getPermissions()->contains('key', $permissionKey);
+    }
+
+    /**
+     * Check if user has any of the given permissions.
+     */
+    public function hasAnyPermission(array $permissionKeys): bool
+    {
+        $userPermissions = $this->getPermissions()->pluck('key')->toArray();
+
+        return ! empty(array_intersect($permissionKeys, $userPermissions));
+    }
+
+    /**
+     * Check if user has all of the given permissions.
+     */
+    public function hasAllPermissions(array $permissionKeys): bool
+    {
+        $userPermissions = $this->getPermissions()->pluck('key')->toArray();
+
+        return empty(array_diff($permissionKeys, $userPermissions));
+    }
+
+    /**
+     * Clear permission cache for this user.
+     */
+    public function clearPermissionCache(): void
+    {
+        Cache::forget("user_permissions_{$this->id}");
     }
 }

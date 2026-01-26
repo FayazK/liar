@@ -7,7 +7,7 @@ import { create, data, edit, index } from '@/routes/admin/roles';
 import type { Role } from '@/types';
 import { router } from '@inertiajs/react';
 import { useQuery } from '@tanstack/react-query';
-import { App, Button, Dropdown, Table } from 'antd';
+import { App, Badge, Button, Dropdown, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 // Fetch roles data
@@ -81,6 +81,15 @@ export default function RolesIndex() {
             width: 100,
             align: 'center',
             sorter: (a, b) => (a.users_count || 0) - (b.users_count || 0),
+        },
+        {
+            title: 'Permissions',
+            dataIndex: 'permissions_count',
+            key: 'permissions_count',
+            width: 120,
+            align: 'center',
+            sorter: (a, b) => (a.permissions_count || 0) - (b.permissions_count || 0),
+            render: (count: number) => <Badge count={count} showZero color="blue" />,
         },
         {
             title: 'Actions',

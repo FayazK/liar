@@ -43,4 +43,31 @@ class RoleRepository
 
         return $role->delete();
     }
+
+    /**
+     * Find role with permissions eager loaded.
+     */
+    public function findWithPermissions(int $id): ?Role
+    {
+        return Role::query()->with('permissions')->find($id);
+    }
+
+    /**
+     * Get all roles with permissions eager loaded.
+     */
+    public function getAllWithPermissions(): Collection
+    {
+        return Role::query()
+            ->with('permissions')
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * Sync permissions for a role.
+     */
+    public function syncPermissions(Role $role, array $permissionIds): void
+    {
+        $role->syncPermissions($permissionIds);
+    }
 }
