@@ -84,4 +84,11 @@ return [
             'description' => 'Modify application settings',
         ],
     ],
+
+    'admin' => [
+        'admin.access' => [
+            'title' => 'Access Admin Area',
+            'description' => 'Access the admin dashboard and management area',
+        ],
+    ],
 ];
