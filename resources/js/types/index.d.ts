@@ -53,6 +53,27 @@ export interface Role {
     updated_at: string;
 }
 
+export interface Taxonomy {
+    id: number;
+    name: string;
+    slug: string;
+    type: string;
+    description?: string | null;
+    parent_id?: number | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface DropdownOption {
+    id: number;
+    name: string;
+}
+
+export interface GroupedDropdownOption {
+    label: string;
+    options: DropdownOption[];
+}
+
 export interface User {
     id: number;
     first_name: string;

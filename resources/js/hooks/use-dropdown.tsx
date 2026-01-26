@@ -6,12 +6,21 @@ interface DropdownOption {
     name: string;
 }
 
-const useDropdown = (type: string, params: object = {}, id: number | null = null) => {
+const useDropdown = (type: string, params: object = {}, id: number | number[] | null = null) => {
     const [options, setOptions] = useState<DropdownOption[]>([]);
     const [loading, setLoading] = useState(false);
 
     // Stabilize params in dependencies to avoid infinite re-renders
     const paramsKey = useMemo(() => JSON.stringify(params || {}), [params]);
+
+    // Normalize ID to comma-separated string for API
+    const normalizedId = useMemo(() => {
+        if (id === null) return null;
+        if (Array.isArray(id)) {
+            return id.length > 0 ? id.join(',') : null;
+        }
+        return id;
+    }, [id]);
 
     const fetchOptions = useCallback(
         async (search = '') => {
@@ -21,7 +30,7 @@ const useDropdown = (type: string, params: object = {}, id: number | null = null
                     params: {
                         type,
                         search,
-                        id,
+                        ...(normalizedId !== null ? { id: normalizedId } : {}),
                         ...params,
                     },
                 });
@@ -32,7 +41,7 @@ const useDropdown = (type: string, params: object = {}, id: number | null = null
             }
             setLoading(false);
         },
-        [type, id, paramsKey],
+        [type, normalizedId, paramsKey],
     );
 
     useEffect(() => {

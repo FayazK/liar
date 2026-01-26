@@ -14,6 +14,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
+    Route::get('test-dropdown', function () {
+        return Inertia::render('test-dropdown');
+    })->name('test-dropdown');
+
     Route::get('dropdown', DropdownController::class)->name('dropdown');
 
     // Table preferences API
