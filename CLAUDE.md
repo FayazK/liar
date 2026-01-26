@@ -65,6 +65,57 @@ tests/Unit/               # Unit tests (minimal)
 ```
 
 
+=== crud rules ===
+
+## CRUD Patterns for Admin Modules
+
+**DataTable for Index Pages:**
+- Always use the DataTable component for paginated records (never use Ant Design Table directly)
+- Implement server-side pagination with DataTableRequest and DataTableQueryService
+- Include search and filtering capabilities
+- Enable column visibility toggle
+- Set up state persistence with unique `persistenceKey`
+
+**Row Interaction Pattern:**
+- DO NOT show edit/delete buttons in table rows or action columns
+- Make entire row clickable to navigate to edit page
+- Use `cursor-pointer` and `hover:bg-gray-50` for visual feedback
+- Navigate with `router.visit(edit.url(record.id))` on row click
+
+**Edit Page Pattern:**
+- Show delete button on edit page (not in index table)
+- Place delete button in a prominent but safe location (e.g., danger zone section)
+- Require confirmation before deletion
+- After deletion, redirect back to index page
+
+**Example Implementation:**
+```tsx
+// Index page - clickable rows, no action buttons
+<DataTable<Role>
+  columns={columns}
+  onRow={(record) => ({
+    onClick: () => router.visit(edit.url(record.id)),
+    style: { cursor: 'pointer' },
+    className: 'hover:bg-gray-50'
+  })}
+/>
+
+// Edit page - delete button visible
+<Button
+  danger
+  icon={<Icon name="trash" />}
+  onClick={() => handleDelete(role)}
+>
+  Delete Role
+</Button>
+```
+
+**Consistency:**
+- Follow this pattern for ALL CRUD modules (users, roles, permissions, etc.)
+- Keep UX consistent across the admin interface
+- Users learn once, apply everywhere
+
+
 === php rules ===
 
 ## PHP 8.3

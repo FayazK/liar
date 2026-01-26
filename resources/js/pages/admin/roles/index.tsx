@@ -1,35 +1,45 @@
 import type { ContentHeaderProps } from '@/components/ui/ContentHeader';
+import DataTable from '@/components/ui/DataTable';
 import { Icon } from '@/components/ui/Icon';
 import PageCard from '@/components/ui/PageCard';
 import AdminLayout from '@/layouts/admin-layout';
 import axios from '@/lib/axios';
 import { create, data, edit, index } from '@/routes/admin/roles';
-import type { Role } from '@/types';
+import type { LaravelPaginatedResponse, Role } from '@/types';
+import type { DataTableQueryParams, FilterConfig } from '@/types/datatable';
 import { router } from '@inertiajs/react';
-import { useQuery } from '@tanstack/react-query';
-import { App, Badge, Button, Dropdown, Table } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+import type { ColumnDef } from '@tanstack/react-table';
+import { App, Badge, Button, Dropdown, Space } from 'antd';
+import React from 'react';
 
-// Fetch roles data
-const fetchRoles = async (): Promise<Role[]> => {
-    const response = await axios.get<{ data: Role[] }>(data.url());
-    return response.data.data;
+// Filter configurations
+const filters: FilterConfig[] = [
+    {
+        type: 'dateRange',
+        key: 'created_at',
+        label: 'Created Date',
+    },
+];
+
+// Query function for server-side pagination
+const fetchRoles = async (params: DataTableQueryParams): Promise<LaravelPaginatedResponse<Role>> => {
+    const queryParams = new URLSearchParams();
+
+    if (params.page) queryParams.set('page', params.page.toString());
+    if (params.per_page) queryParams.set('per_page', params.per_page.toString());
+    if (params.search) queryParams.set('search', params.search);
+    if (params.filters) queryParams.set('filters', JSON.stringify(params.filters));
+    if (params.sorts && params.sorts.length > 0) {
+        queryParams.set('sorts', JSON.stringify(params.sorts));
+    }
+
+    const response = await axios.get<LaravelPaginatedResponse<Role>>(`${data.url()}?${queryParams.toString()}`);
+    return response.data;
 };
 
 export default function RolesIndex() {
     const { modal, message } = App.useApp();
 
-    // Fetch roles using TanStack Query
-    const {
-        data: roles,
-        isLoading,
-        refetch,
-    } = useQuery({
-        queryKey: ['roles'],
-        queryFn: fetchRoles,
-    });
-
-    // ContentHeader configuration
     const contentHeader: ContentHeaderProps = {
         primaryAction: {
             label: 'Add Role',
@@ -40,11 +50,10 @@ export default function RolesIndex() {
             { title: 'Admin', href: '/admin' },
             { title: 'Roles', href: index.url() },
         ],
-        actionIcons: [{ icon: 'refresh', tooltip: 'Refresh', onClick: () => refetch() }],
     };
 
-    // Handle delete role
-    const handleDelete = (role: Role) => {
+    // Handle delete
+    const handleDelete = async (role: Role) => {
         modal.confirm({
             title: `Delete ${role.name}?`,
             content: 'This action cannot be undone.',
@@ -54,7 +63,6 @@ export default function RolesIndex() {
                 try {
                     await axios.delete(`/admin/roles/${role.id}`);
                     message.success('Role deleted successfully');
-                    refetch();
                 } catch {
                     message.error('Failed to delete role');
                 }
@@ -63,86 +71,105 @@ export default function RolesIndex() {
     };
 
     // Column definitions
-    const columns: ColumnsType<Role> = [
+    const columns: ColumnDef<Role>[] = [
         {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
-            sorter: (a, b) => a.name.localeCompare(b.name),
+            id: 'name',
+            header: 'Name',
+            accessorKey: 'name',
+            enableSorting: true,
+            cell: ({ getValue }) => <div style={{ fontWeight: 500 }}>{getValue() as string}</div>,
         },
         {
-            title: 'Description',
-            dataIndex: 'description',
-            key: 'description',
-            ellipsis: true,
+            id: 'description',
+            header: 'Description',
+            accessorKey: 'description',
+            enableSorting: true,
+            cell: ({ getValue }) => {
+                const description = getValue() as string | null;
+                return description || <span style={{ color: '#999' }}>No description</span>;
+            },
         },
         {
-            title: 'Users',
-            dataIndex: 'users_count',
-            key: 'users_count',
-            width: 100,
-            align: 'center',
-            sorter: (a, b) => (a.users_count || 0) - (b.users_count || 0),
+            id: 'users_count',
+            header: 'Users',
+            accessorKey: 'users_count',
+            enableSorting: true,
+            size: 100,
+            cell: ({ getValue }) => {
+                const count = (getValue() as number) || 0;
+                return <div style={{ textAlign: 'center' }}>{count}</div>;
+            },
         },
         {
-            title: 'Permissions',
-            dataIndex: 'permissions_count',
-            key: 'permissions_count',
-            width: 120,
-            align: 'center',
-            sorter: (a, b) => (a.permissions_count || 0) - (b.permissions_count || 0),
-            render: (count: number) => <Badge count={count} showZero color="blue" />,
+            id: 'permissions_count',
+            header: 'Permissions',
+            accessorKey: 'permissions_count',
+            enableSorting: true,
+            size: 120,
+            cell: ({ getValue }) => {
+                const count = (getValue() as number) || 0;
+                return <Badge count={count} showZero color="blue" />;
+            },
         },
         {
-            title: 'Actions',
-            key: 'actions',
-            width: 100,
-            align: 'center',
-            render: (_, role) => (
-                <Dropdown
-                    menu={{
-                        items: [
-                            {
-                                key: 'edit',
-                                label: 'Edit',
-                                icon: <Icon name="edit" size={14} />,
-                                onClick: () => router.visit(edit.url(role.id)),
-                            },
-                            {
-                                type: 'divider',
-                            },
-                            {
-                                key: 'delete',
-                                label: 'Delete',
-                                icon: <Icon name="trash" size={14} />,
-                                danger: true,
-                                onClick: () => handleDelete(role),
-                            },
-                        ],
-                    }}
-                    trigger={['click']}
-                >
-                    <Button type="text" icon={<Icon name="dots-vertical" size={16} />} />
-                </Dropdown>
-            ),
+            id: 'actions',
+            header: 'Actions',
+            size: 100,
+            enableSorting: false,
+            cell: ({ row }) => {
+                const role = row.original;
+                const menuItems = [
+                    {
+                        key: 'edit',
+                        label: (
+                            <Space>
+                                <Icon name="edit" size={16} />
+                                Edit
+                            </Space>
+                        ),
+                        onClick: () => router.visit(edit.url(role.id)),
+                    },
+                    { type: 'divider' as const },
+                    {
+                        key: 'delete',
+                        label: (
+                            <Space>
+                                <Icon name="trash" size={16} />
+                                Delete
+                            </Space>
+                        ),
+                        danger: true,
+                        onClick: () => handleDelete(role),
+                    },
+                ];
+
+                return (
+                    <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
+                        <Button type="text" icon={<Icon name="dots-vertical" size={16} />} />
+                    </Dropdown>
+                );
+            },
         },
     ];
 
     return (
         <AdminLayout contentHeader={contentHeader}>
-            <PageCard>
-                <Table
+            <PageCard header={{ title: 'Roles' }} bodyPadding="none">
+                <DataTable<Role>
+                    queryKey={['admin', 'roles']}
+                    queryFn={fetchRoles}
                     columns={columns}
-                    dataSource={roles}
-                    rowKey="id"
-                    loading={isLoading}
-                    pagination={{
-                        pageSize: 50,
-                        showSizeChanger: false,
-                        showTotal: (total) => `Total ${total} roles`,
-                    }}
+                    enableColumnVisibility
+                    filters={filters}
+                    persistenceKey="admin-roles-table"
+                    searchPlaceholder="Search roles by name or description..."
+                    defaultPageSize={15}
+                    emptyMessage="No roles have been created yet."
+                    emptyFilterMessage="No roles match your search criteria."
                 />
             </PageCard>
         </AdminLayout>
     );
 }
+
+RolesIndex.layout = (page: React.ReactNode) => page;

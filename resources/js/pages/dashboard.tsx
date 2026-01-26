@@ -153,7 +153,7 @@ export default function Dashboard() {
                     actions: headerActions,
                 }}
             >
-                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                <Space orientation="vertical" size="large" style={{ width: '100%' }}>
                     <div>
                         <Title level={2} style={{ marginBottom: token.marginXS }}>
                             Welcome back, {auth.user.full_name}!
@@ -204,9 +204,9 @@ export default function Dashboard() {
                         </Col>
 
                         <Col xs={24} lg={8}>
-                            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                            <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                                 <Card title="Performance">
-                                    <Space direction="vertical" style={{ width: '100%' }}>
+                                    <Space orientation="vertical" style={{ width: '100%' }}>
                                         <div>
                                             <Text>CPU Usage</Text>
                                             <Progress percent={65} strokeColor={token.colorSuccess} />
@@ -223,7 +223,7 @@ export default function Dashboard() {
                                 </Card>
 
                                 <Card title="Quick Stats">
-                                    <Space direction="vertical" style={{ width: '100%' }}>
+                                    <Space orientation="vertical" style={{ width: '100%' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                             <Text>Active Sessions</Text>
                                             <Text strong>24</Text>

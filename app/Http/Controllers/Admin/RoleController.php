@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\RoleDataTableRequest;
 use App\Http\Requests\Admin\RoleStoreRequest;
 use App\Http\Requests\Admin\RoleUpdateRequest;
+use App\Http\Resources\Admin\RoleCollection;
 use App\Http\Resources\Admin\RoleResource;
 use App\Models\Role;
+use App\Queries\RoleDataTableQueryService;
 use App\Services\RoleService;
 use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
@@ -30,13 +33,12 @@ class RoleController extends Controller
         return Inertia::render('admin/roles/create');
     }
 
-    public function data(): JsonResponse
+    public function data(RoleDataTableRequest $request): RoleCollection
     {
-        $roles = $this->roleService->getAllRoles()->loadCount(['users', 'permissions']);
+        $query = Role::query()->withCount(['users', 'permissions']);
+        $paginatedRoles = (new RoleDataTableQueryService($query, $request))->getResults();
 
-        return response()->json([
-            'data' => RoleResource::collection($roles),
-        ]);
+        return new RoleCollection($paginatedRoles);
     }
 
     public function edit(Role $role): Response
