@@ -25,8 +25,8 @@ class UserService
             'email' => $data['email'],
             'role_id' => $data['role_id'] ?? null,
             'password' => Hash::make($data['password']),
-            'timezone' => $data['timezone'] ?? 'UTC',
-            'locale' => $data['locale'] ?? 'en',
+            'timezone_id' => $data['timezone_id'] ?? null,
+            'language_id' => $data['language_id'] ?? null,
             'is_active' => $data['is_active'] ?? true,
         ];
 
@@ -43,7 +43,7 @@ class UserService
 
         $allowedFields = [
             'first_name', 'last_name', 'email', 'role_id', 'phone',
-            'date_of_birth', 'bio', 'timezone', 'locale',
+            'date_of_birth', 'bio', 'timezone_id', 'language_id',
         ];
 
         foreach ($allowedFields as $field) {

@@ -4,7 +4,7 @@ import type { Role, User } from '@/types';
 import { isApiError } from '@/utils/errors';
 import { router } from '@inertiajs/react';
 import { useQuery } from '@tanstack/react-query';
-import { Button, Col, DatePicker, Form, Input, notification, Row, Select, Switch } from 'antd';
+import { App, Button, Col, DatePicker, Form, Input, Row, Select, Switch } from 'antd';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
@@ -30,6 +30,7 @@ interface UserFormProps {
 }
 
 export default function UserForm({ user, isEdit = false }: UserFormProps) {
+    const { notification } = App.useApp();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
 
@@ -70,7 +71,7 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
         try {
             const response = await api[method](url, requestData);
             notification.success({
-                message: response.data.message || `User ${isEdit ? 'updated' : 'created'} successfully`,
+                title: response.data.message || `User ${isEdit ? 'updated' : 'created'} successfully`,
             });
             router.visit('/admin/users');
         } catch (error: unknown) {
@@ -84,12 +85,12 @@ export default function UserForm({ user, isEdit = false }: UserFormProps) {
                     form.setFields(formErrors);
                 }
                 notification.error({
-                    message: 'Validation Error',
+                    title: 'Validation Error',
                     description: error.response.data.message,
                 });
             } else {
                 notification.error({
-                    message: 'Error',
+                    title: 'Error',
                     description: 'An unexpected error occurred.',
                 });
             }

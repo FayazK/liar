@@ -3,7 +3,7 @@ import api from '@/lib/axios';
 import type { Role, SharedData } from '@/types';
 import { isApiError } from '@/utils/errors';
 import { router, usePage } from '@inertiajs/react';
-import { Button, Form, Input, notification } from 'antd';
+import { App, Button, Form, Input } from 'antd';
 import { useEffect, useState } from 'react';
 
 interface RoleFormValues {
@@ -18,6 +18,7 @@ interface RoleFormProps {
 }
 
 export default function RoleForm({ role, isEdit = false }: RoleFormProps) {
+    const { notification } = App.useApp();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const { permissions = [] } = usePage<SharedData>().props;
@@ -39,7 +40,7 @@ export default function RoleForm({ role, isEdit = false }: RoleFormProps) {
         try {
             const response = await api[method](url, values);
             notification.success({
-                message: response.data.message || `Role ${isEdit ? 'updated' : 'created'} successfully`,
+                title: response.data.message || `Role ${isEdit ? 'updated' : 'created'} successfully`,
             });
             router.visit('/admin/roles');
         } catch (error: unknown) {
@@ -53,12 +54,12 @@ export default function RoleForm({ role, isEdit = false }: RoleFormProps) {
                     form.setFields(formErrors);
                 }
                 notification.error({
-                    message: 'Validation Error',
+                    title: 'Validation Error',
                     description: error.response.data.message,
                 });
             } else {
                 notification.error({
-                    message: 'Error',
+                    title: 'Error',
                     description: 'An unexpected error occurred.',
                 });
             }

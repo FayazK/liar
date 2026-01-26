@@ -183,6 +183,22 @@ function ThemedApp({ App, props }: ThemedAppProps) {
                         // Select dropdowns
                         Select: {
                             optionPadding: '10px 14px',
+                            boxShadowSecondary: `0 0 0 1px ${isDark ? mujiDarkTheme.colorBorder : mujiLightTheme.colorBorder}`,
+                        },
+
+                        // DatePicker - subtle border (includes TimePicker)
+                        DatePicker: {
+                            boxShadowSecondary: `0 0 0 1px ${isDark ? mujiDarkTheme.colorBorder : mujiLightTheme.colorBorder}`,
+                        },
+
+                        // Cascader - subtle border
+                        Cascader: {
+                            boxShadowSecondary: `0 0 0 1px ${isDark ? mujiDarkTheme.colorBorder : mujiLightTheme.colorBorder}`,
+                        },
+
+                        // TreeSelect - subtle border
+                        TreeSelect: {
+                            boxShadowSecondary: `0 0 0 1px ${isDark ? mujiDarkTheme.colorBorder : mujiLightTheme.colorBorder}`,
                         },
 
                         // Tables - clean, readable
@@ -230,26 +246,26 @@ function ThemedApp({ App, props }: ThemedAppProps) {
                             paddingContentHorizontalLG: 28,
                             headerBg: 'transparent',
                             contentBg: isDark ? '#2D2B28' : '#FAF8F5',
-                            boxShadow: 'none',
+                            boxShadow: `0 0 0 1px ${isDark ? mujiDarkTheme.colorBorder : mujiLightTheme.colorBorder}`,
                         },
 
                         // Drawer - clean panel
                         Drawer: {
                             paddingLG: 24,
-                            boxShadow: 'none',
+                            boxShadow: `0 0 0 1px ${isDark ? mujiDarkTheme.colorBorder : mujiLightTheme.colorBorder}`,
                         },
 
                         // Dropdown - subtle border, no shadow
                         Dropdown: {
                             paddingBlock: 6,
-                            boxShadowSecondary: 'none',
+                            boxShadowSecondary: `0 0 0 1px ${isDark ? mujiDarkTheme.colorBorder : mujiLightTheme.colorBorder}`,
                             colorBgElevated: isDark ? '#2D2B28' : '#FAF8F5',
                             borderRadiusLG: 8,
                         },
 
                         // Popover - clean tooltips
                         Popover: {
-                            boxShadowSecondary: 'none',
+                            boxShadowSecondary: `0 0 0 1px ${isDark ? mujiDarkTheme.colorBorder : mujiLightTheme.colorBorder}`,
                         },
 
                         // Tooltip - vibrant, high contrast

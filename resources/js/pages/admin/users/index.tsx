@@ -2,13 +2,14 @@ import type { ContentHeaderProps } from '@/components/ui/ContentHeader';
 import DataTable from '@/components/ui/DataTable';
 import { Icon } from '@/components/ui/Icon';
 import PageCard from '@/components/ui/PageCard';
+import AdminLayout from '@/layouts/admin-layout';
 import axios from '@/lib/axios';
-import { create, data, edit, index, show } from '@/routes/admin/users';
+import { create, data, edit, index } from '@/routes/admin/users';
 import type { LaravelPaginatedResponse, User } from '@/types';
 import type { DataTableQueryParams, FilterConfig, TabConfig } from '@/types/datatable';
-import { Link, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { App, Avatar, Button, Dropdown, Space, Tag, theme } from 'antd';
+import { Avatar, Space, Tag, theme } from 'antd';
 import React from 'react';
 
 const { useToken } = theme;
@@ -76,7 +77,6 @@ const fetchUsers = async (params: DataTableQueryParams): Promise<LaravelPaginate
 
 export default function UsersIndex() {
     const { token } = useToken();
-    const { message } = App.useApp();
 
     // ContentHeader configuration
     const contentHeader: ContentHeaderProps = {
@@ -163,61 +163,6 @@ export default function UsersIndex() {
             size: 120,
             cell: ({ getValue }) => new Date(getValue() as string).toLocaleDateString(),
         },
-        {
-            id: 'actions',
-            header: 'Actions',
-            size: 100,
-            enableSorting: false,
-            cell: ({ row }) => {
-                const user = row.original;
-                const menuItems = [
-                    {
-                        key: 'view',
-                        label: (
-                            <Link href={show.url(user.id)}>
-                                <Space>
-                                    <Icon name="eye" size={16} />
-                                    View
-                                </Space>
-                            </Link>
-                        ),
-                    },
-                    {
-                        key: 'edit',
-                        label: (
-                            <Link href={edit({ user: user.id }).url}>
-                                <Space>
-                                    <Icon name="edit" size={16} />
-                                    Edit
-                                </Space>
-                            </Link>
-                        ),
-                    },
-                    {
-                        type: 'divider' as const,
-                    },
-                    {
-                        key: 'delete',
-                        label: (
-                            <Space>
-                                <Icon name="trash" size={16} />
-                                Delete
-                            </Space>
-                        ),
-                        danger: true,
-                        onClick: () => {
-                            message.info('Delete functionality coming soon');
-                        },
-                    },
-                ];
-
-                return (
-                    <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
-                        <Button type="text" icon={<Icon name="dots" size={16} />} />
-                    </Dropdown>
-                );
-            },
-        },
     ];
 
     return (
@@ -243,13 +188,11 @@ export default function UsersIndex() {
                     defaultPageSize={15}
                     emptyMessage="No users have been created yet."
                     emptyFilterMessage="No users match your search criteria."
+                    onRowClick={(row) => router.visit(edit({ user: row.original.id }).url)}
                 />
             </PageCard>
         </AdminLayout>
     );
 }
-
-// Import AdminLayout here to fix the usage
-import AdminLayout from '@/layouts/admin-layout';
 
 UsersIndex.layout = (page: React.ReactNode) => page;

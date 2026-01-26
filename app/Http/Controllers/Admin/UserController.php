@@ -37,7 +37,7 @@ class UserController extends Controller
 
     public function data(UserDataTableRequest $request): UserCollection
     {
-        $query = User::query();
+        $query = User::query()->with('role');
         $paginatedUsers = (new UserDataTableQueryService($query, $request))->getResults();
 
         return new UserCollection($paginatedUsers);
@@ -56,6 +56,8 @@ class UserController extends Controller
 
     public function edit(User $user): Response
     {
+        $user->load('role');
+
         return Inertia::render('admin/users/edit', [
             'user' => $user,
         ]);

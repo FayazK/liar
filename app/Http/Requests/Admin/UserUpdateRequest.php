@@ -43,8 +43,8 @@ class UserUpdateRequest extends FormRequest
             'date_of_birth' => ['nullable', 'date', 'before:today'],
             'avatar' => ['nullable', 'string', 'max:255'],
             'bio' => ['nullable', 'string', 'max:1000'],
-            'timezone' => ['required', 'string', 'max:100'],
-            'locale' => ['required', 'string', 'max:10'],
+            'timezone_id' => ['nullable', 'integer'],
+            'language_id' => ['nullable', 'integer'],
             'is_active' => ['boolean'],
         ];
     }

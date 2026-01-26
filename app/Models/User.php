@@ -99,6 +99,14 @@ class User extends Authenticatable implements HasMedia
     }
 
     /**
+     * Get the user's role.
+     */
+    public function getRoleAttribute(): ?Role
+    {
+        return $this->getRelationValue('role');
+    }
+
+    /**
      * Register media collections for the user.
      */
     public function registerMediaCollections(): void
@@ -150,7 +158,7 @@ class User extends Authenticatable implements HasMedia
         return Cache::remember(
             "user_permissions_{$this->id}",
             now()->addHour(),
-            fn (): Collection => $this->role?->permissions ?? new Collection()
+            fn (): Collection => $this->role?->permissions ?? new Collection
         );
     }
 

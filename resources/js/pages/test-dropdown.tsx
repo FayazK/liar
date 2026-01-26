@@ -1,5 +1,5 @@
 import AdvancedSelect from '@/components/advanced-select';
-import { Form, Button, Card, Space, Typography } from 'antd';
+import { Button, Card, Form, Space, Typography } from 'antd';
 
 const { Title, Paragraph } = Typography;
 
@@ -12,11 +12,11 @@ export default function TestDropdownPage() {
     };
 
     return (
-        <div className="p-8 max-w-4xl mx-auto">
+        <div className="mx-auto max-w-4xl p-8">
             <Title level={2}>Dropdown Component Tests</Title>
             <Paragraph>
-                This page demonstrates all the enhanced dropdown capabilities including taxonomy integration,
-                multi-select, and backward compatibility with existing dropdown types.
+                This page demonstrates all the enhanced dropdown capabilities including taxonomy integration, multi-select, and backward compatibility
+                with existing dropdown types.
             </Paragraph>
 
             <Form form={form} layout="vertical" onFinish={onFinish}>
@@ -39,19 +39,11 @@ export default function TestDropdownPage() {
                     {/* Taxonomy Single Select */}
                     <Card title="2. Taxonomy - Single Select" size="small">
                         <Form.Item label="Post Category" name="category_id">
-                            <AdvancedSelect
-                                type="taxonomies"
-                                params={{ taxonomy_type: 'post_categories' }}
-                                placeholder="Select a category"
-                            />
+                            <AdvancedSelect type="taxonomies" params={{ taxonomy_type: 'post_categories' }} placeholder="Select a category" />
                         </Form.Item>
 
                         <Form.Item label="Region" name="region_id">
-                            <AdvancedSelect
-                                type="taxonomies"
-                                params={{ taxonomy_type: 'regions' }}
-                                placeholder="Select a region"
-                            />
+                            <AdvancedSelect type="taxonomies" params={{ taxonomy_type: 'regions' }} placeholder="Select a region" />
                         </Form.Item>
                     </Card>
 
@@ -83,8 +75,7 @@ export default function TestDropdownPage() {
                     {/* Tags Mode (Creatable) */}
                     <Card title="4. Tags Mode - Type to Create New Items" size="small">
                         <Paragraph type="secondary">
-                            Note: Tags mode allows typing custom values. The onCreate callback would normally save new
-                            items to the database.
+                            Note: Tags mode allows typing custom values. The onCreate callback would normally save new items to the database.
                         </Paragraph>
                         <Form.Item label="Custom Tags" name="custom_tags">
                             <AdvancedSelect
@@ -98,18 +89,12 @@ export default function TestDropdownPage() {
 
                     {/* Initial Values Test */}
                     <Card title="5. Initial Values - Pre-selected Options" size="small">
-                        <Paragraph type="secondary">
-                            The dropdowns below should have pre-selected values on page load (if IDs exist).
-                        </Paragraph>
+                        <Paragraph type="secondary">The dropdowns below should have pre-selected values on page load (if IDs exist).</Paragraph>
                         <Form.Item label="Timezone (with initial ID)" name="timezone_with_initial" initialValue={1}>
                             <AdvancedSelect type="timezones" initialId={1} placeholder="Should be pre-selected" />
                         </Form.Item>
 
-                        <Form.Item
-                            label="Tags (with multiple initial IDs)"
-                            name="tags_with_initial"
-                            initialValue={[1, 2]}
-                        >
+                        <Form.Item label="Tags (with multiple initial IDs)" name="tags_with_initial" initialValue={[1, 2]}>
                             <AdvancedSelect
                                 type="taxonomies"
                                 params={{ taxonomy_type: 'product_tags' }}
@@ -124,11 +109,7 @@ export default function TestDropdownPage() {
                     <Card title="6. Search - Type to Filter Results" size="small">
                         <Paragraph type="secondary">Start typing to search and filter options.</Paragraph>
                         <Form.Item label="Search Categories" name="search_category">
-                            <AdvancedSelect
-                                type="taxonomies"
-                                params={{ taxonomy_type: 'post_categories' }}
-                                placeholder="Start typing to search..."
-                            />
+                            <AdvancedSelect type="taxonomies" params={{ taxonomy_type: 'post_categories' }} placeholder="Start typing to search..." />
                         </Form.Item>
 
                         <Form.Item label="Search Users" name="search_user">

@@ -18,15 +18,7 @@ type AdvancedSelectProps = {
     onCreate?: (value: string) => Promise<{ id: number; name: string }>;
 } & Omit<React.ComponentProps<typeof Select>, 'loading' | 'showSearch' | 'filterOption' | 'onSearch' | 'mode'>;
 
-const AdvancedSelect: React.FC<AdvancedSelectProps> = ({
-    type,
-    params,
-    initialId,
-    mode,
-    grouped,
-    onCreate,
-    ...props
-}) => {
+const AdvancedSelect: React.FC<AdvancedSelectProps> = ({ type, params, initialId, mode, grouped, onCreate, ...props }) => {
     const { options, loading, fetchOptions } = useDropdown(type, params ?? {}, initialId ?? null);
     const [creating, setCreating] = useState(false);
 
@@ -71,15 +63,7 @@ const AdvancedSelect: React.FC<AdvancedSelectProps> = ({
 
     // Standard rendering
     return (
-        <Select
-            mode={mode}
-            showSearch
-            filterOption={false}
-            onSearch={fetchOptions}
-            loading={loading || creating}
-            onSelect={handleSelect}
-            {...props}
-        >
+        <Select mode={mode} showSearch filterOption={false} onSearch={fetchOptions} loading={loading || creating} onSelect={handleSelect} {...props}>
             {options.map((option) => (
                 <Select.Option key={option.id} value={option.id}>
                     {option.name}

@@ -1,6 +1,5 @@
 import type { ContentHeaderProps } from '@/components/ui/ContentHeader';
 import DataTable from '@/components/ui/DataTable';
-import { Icon } from '@/components/ui/Icon';
 import PageCard from '@/components/ui/PageCard';
 import AdminLayout from '@/layouts/admin-layout';
 import axios from '@/lib/axios';
@@ -9,7 +8,7 @@ import type { LaravelPaginatedResponse, Role } from '@/types';
 import type { DataTableQueryParams, FilterConfig } from '@/types/datatable';
 import { router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { App, Badge, Button, Dropdown, Space } from 'antd';
+import { Badge } from 'antd';
 import React from 'react';
 
 // Filter configurations
@@ -38,8 +37,6 @@ const fetchRoles = async (params: DataTableQueryParams): Promise<LaravelPaginate
 };
 
 export default function RolesIndex() {
-    const { modal, message } = App.useApp();
-
     const contentHeader: ContentHeaderProps = {
         primaryAction: {
             label: 'Add Role',
@@ -50,24 +47,6 @@ export default function RolesIndex() {
             { title: 'Admin', href: '/admin' },
             { title: 'Roles', href: index.url() },
         ],
-    };
-
-    // Handle delete
-    const handleDelete = async (role: Role) => {
-        modal.confirm({
-            title: `Delete ${role.name}?`,
-            content: 'This action cannot be undone.',
-            okText: 'Delete',
-            okType: 'danger',
-            onOk: async () => {
-                try {
-                    await axios.delete(`/admin/roles/${role.id}`);
-                    message.success('Role deleted successfully');
-                } catch {
-                    message.error('Failed to delete role');
-                }
-            },
-        });
     };
 
     // Column definitions
@@ -111,45 +90,6 @@ export default function RolesIndex() {
                 return <Badge count={count} showZero color="blue" />;
             },
         },
-        {
-            id: 'actions',
-            header: 'Actions',
-            size: 100,
-            enableSorting: false,
-            cell: ({ row }) => {
-                const role = row.original;
-                const menuItems = [
-                    {
-                        key: 'edit',
-                        label: (
-                            <Space>
-                                <Icon name="edit" size={16} />
-                                Edit
-                            </Space>
-                        ),
-                        onClick: () => router.visit(edit.url(role.id)),
-                    },
-                    { type: 'divider' as const },
-                    {
-                        key: 'delete',
-                        label: (
-                            <Space>
-                                <Icon name="trash" size={16} />
-                                Delete
-                            </Space>
-                        ),
-                        danger: true,
-                        onClick: () => handleDelete(role),
-                    },
-                ];
-
-                return (
-                    <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
-                        <Button type="text" icon={<Icon name="dots-vertical" size={16} />} />
-                    </Dropdown>
-                );
-            },
-        },
     ];
 
     return (
@@ -166,6 +106,7 @@ export default function RolesIndex() {
                     defaultPageSize={15}
                     emptyMessage="No roles have been created yet."
                     emptyFilterMessage="No roles match your search criteria."
+                    onRowClick={(row) => router.visit(edit.url(row.original.id))}
                 />
             </PageCard>
         </AdminLayout>
