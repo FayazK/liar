@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\Role;
@@ -19,15 +21,17 @@ class DatabaseSeeder extends Seeder
 
         $adminRole = Role::where('name', 'Admin')->first();
 
-        User::create([
-            'first_name' => 'Fayaz',
-            'last_name' => 'K',
-            'email' => 'info@fayazk.com',
-            'password' => Hash::make('@Password1'),
-            'role_id' => $adminRole?->id,
-            'timezone_id' => 0,
-            'language_id' => 40,
-            'is_active' => true,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'info@fayazk.com'],
+            [
+                'first_name' => 'Fayaz',
+                'last_name' => 'K',
+                'password' => Hash::make('@Password1'),
+                'role_id' => $adminRole?->id,
+                'timezone_id' => null,
+                'language_id' => null,
+                'is_active' => true,
+            ]
+        );
     }
 }

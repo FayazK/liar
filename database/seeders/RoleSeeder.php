@@ -18,19 +18,19 @@ class RoleSeeder extends Seeder
         $this->command->info('Creating default roles...');
 
         // Admin role - all permissions (super admin)
-        $adminRole = Role::create([
-            'name' => 'Admin',
-            'description' => 'Administrator with full access to all features',
-        ]);
+        $adminRole = Role::firstOrCreate(
+            ['name' => 'Admin'],
+            ['description' => 'Administrator with full access to all features']
+        );
 
         $allPermissions = Permission::all()->pluck('id')->toArray();
         $adminRole->permissions()->sync($allPermissions);
 
         // Editor role - limited permissions
-        $editorRole = Role::create([
-            'name' => 'Editor',
-            'description' => 'Editor with access to user and library management',
-        ]);
+        $editorRole = Role::firstOrCreate(
+            ['name' => 'Editor'],
+            ['description' => 'Editor with access to user and library management']
+        );
 
         $editorPermissionKeys = [
             'users.view',
@@ -46,10 +46,10 @@ class RoleSeeder extends Seeder
         $editorRole->permissions()->sync($editorPermissions);
 
         // User role - read-only permissions
-        $userRole = Role::create([
-            'name' => 'User',
-            'description' => 'Standard user with limited access',
-        ]);
+        $userRole = Role::firstOrCreate(
+            ['name' => 'User'],
+            ['description' => 'Standard user with limited access']
+        );
 
         $userPermissionKeys = [
             'users.view',
