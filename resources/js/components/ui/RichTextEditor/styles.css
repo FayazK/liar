@@ -1,0 +1,489 @@
+/* TipTap Rich Text Editor Styles */
+
+/* Base editor container */
+.rich-text-editor {
+    position: relative;
+    border: 1px solid var(--ant-color-border);
+    border-radius: var(--ant-border-radius);
+    background-color: var(--ant-color-bg-container);
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+.rich-text-editor:focus-within {
+    border-color: var(--ant-color-primary);
+    box-shadow: 0 0 0 2px var(--ant-color-primary-bg);
+}
+
+.rich-text-editor--disabled {
+    background-color: var(--ant-color-bg-container-disabled);
+    cursor: not-allowed;
+}
+
+.rich-text-editor--error {
+    border-color: var(--ant-color-error);
+}
+
+.rich-text-editor--error:focus-within {
+    box-shadow: 0 0 0 2px var(--ant-color-error-bg);
+}
+
+.rich-text-editor--warning {
+    border-color: var(--ant-color-warning);
+}
+
+.rich-text-editor--warning:focus-within {
+    box-shadow: 0 0 0 2px var(--ant-color-warning-bg);
+}
+
+/* Editor content area */
+.rich-text-editor__content {
+    padding: 12px 16px;
+    min-height: 150px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.rich-text-editor__content:focus {
+    outline: none;
+}
+
+/* ProseMirror styles */
+.ProseMirror {
+    outline: none;
+    min-height: inherit;
+}
+
+.ProseMirror > * + * {
+    margin-top: 0.75em;
+}
+
+/* Placeholder */
+.ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: var(--ant-color-text-placeholder);
+    pointer-events: none;
+    height: 0;
+}
+
+/* Typography */
+.ProseMirror h1 {
+    font-size: 2em;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+.ProseMirror h2 {
+    font-size: 1.5em;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+.ProseMirror h3 {
+    font-size: 1.25em;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+.ProseMirror h4 {
+    font-size: 1.1em;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+.ProseMirror h5 {
+    font-size: 1em;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+.ProseMirror h6 {
+    font-size: 0.875em;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+.ProseMirror p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Lists */
+.ProseMirror ul,
+.ProseMirror ol {
+    padding-left: 1.5em;
+    margin: 0.5em 0;
+}
+
+.ProseMirror li {
+    margin: 0.25em 0;
+}
+
+.ProseMirror li > p {
+    margin: 0;
+}
+
+/* Task lists */
+.ProseMirror ul[data-type='taskList'] {
+    list-style: none;
+    padding-left: 0;
+}
+
+.ProseMirror ul[data-type='taskList'] li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5em;
+}
+
+.ProseMirror ul[data-type='taskList'] li > label {
+    flex-shrink: 0;
+    margin-top: 0.25em;
+}
+
+.ProseMirror ul[data-type='taskList'] li > label input[type='checkbox'] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--ant-color-primary);
+}
+
+.ProseMirror ul[data-type='taskList'] li > div {
+    flex: 1;
+}
+
+.ProseMirror ul[data-type='taskList'] li[data-checked='true'] > div {
+    text-decoration: line-through;
+    color: var(--ant-color-text-tertiary);
+}
+
+/* Blockquote */
+.ProseMirror blockquote {
+    border-left: 3px solid var(--ant-color-primary);
+    padding-left: 1em;
+    margin: 0.5em 0;
+    color: var(--ant-color-text-secondary);
+    font-style: italic;
+}
+
+/* Horizontal rule */
+.ProseMirror hr {
+    border: none;
+    border-top: 1px solid var(--ant-color-border);
+    margin: 1em 0;
+}
+
+/* Code */
+.ProseMirror code {
+    font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-size: 0.9em;
+    background-color: var(--ant-color-fill-tertiary);
+    padding: 0.125em 0.25em;
+    border-radius: 4px;
+}
+
+.ProseMirror pre {
+    background-color: var(--ant-color-fill-tertiary);
+    border-radius: var(--ant-border-radius);
+    padding: 1em;
+    margin: 0.5em 0;
+    overflow-x: auto;
+}
+
+.ProseMirror pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.875em;
+    line-height: 1.5;
+}
+
+/* Links */
+.ProseMirror a {
+    color: var(--ant-color-primary);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.ProseMirror a:hover {
+    color: var(--ant-color-primary-hover);
+}
+
+/* Images */
+.ProseMirror img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--ant-border-radius);
+    margin: 0.5em 0;
+}
+
+.ProseMirror img.ProseMirror-selectednode {
+    outline: 2px solid var(--ant-color-primary);
+}
+
+/* Tables */
+.ProseMirror table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.5em 0;
+    table-layout: fixed;
+    overflow: hidden;
+}
+
+.ProseMirror td,
+.ProseMirror th {
+    border: 1px solid var(--ant-color-border);
+    padding: 0.5em;
+    vertical-align: top;
+    min-width: 100px;
+    position: relative;
+}
+
+.ProseMirror th {
+    background-color: var(--ant-color-fill-quaternary);
+    font-weight: 600;
+    text-align: left;
+}
+
+.ProseMirror .selectedCell::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--ant-color-primary-bg);
+    pointer-events: none;
+}
+
+.ProseMirror .column-resize-handle {
+    position: absolute;
+    right: -2px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: var(--ant-color-primary);
+    cursor: col-resize;
+}
+
+/* Mentions */
+.ProseMirror .mention {
+    background-color: var(--ant-color-primary-bg);
+    color: var(--ant-color-primary);
+    padding: 0.125em 0.25em;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* Text alignment */
+.ProseMirror [style*='text-align: center'] {
+    text-align: center;
+}
+
+.ProseMirror [style*='text-align: right'] {
+    text-align: right;
+}
+
+.ProseMirror [style*='text-align: justify'] {
+    text-align: justify;
+}
+
+/* Highlight */
+.ProseMirror mark {
+    background-color: var(--ant-color-warning-bg);
+    padding: 0.125em 0;
+}
+
+/* Selection */
+.ProseMirror ::selection {
+    background-color: var(--ant-color-primary-bg);
+}
+
+/* Fixed Toolbar */
+.rich-text-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--ant-color-border);
+    background-color: var(--ant-color-fill-quaternary);
+    border-radius: var(--ant-border-radius) var(--ant-border-radius) 0 0;
+}
+
+.rich-text-toolbar__group {
+    display: flex;
+    gap: 2px;
+    padding-right: 8px;
+    border-right: 1px solid var(--ant-color-border);
+}
+
+.rich-text-toolbar__group:last-child {
+    border-right: none;
+    padding-right: 0;
+}
+
+.rich-text-toolbar__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: var(--ant-border-radius-sm);
+    background: transparent;
+    color: var(--ant-color-text);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.rich-text-toolbar__button:hover {
+    background-color: var(--ant-color-fill-secondary);
+}
+
+.rich-text-toolbar__button--active {
+    background-color: var(--ant-color-primary-bg);
+    color: var(--ant-color-primary);
+}
+
+.rich-text-toolbar__button:disabled {
+    color: var(--ant-color-text-disabled);
+    cursor: not-allowed;
+}
+
+/* Floating Toolbar (Bubble Menu) */
+.rich-text-bubble-menu {
+    display: flex;
+    gap: 2px;
+    padding: 6px 8px;
+    background-color: var(--ant-color-bg-elevated);
+    border: 1px solid var(--ant-color-border);
+    border-radius: var(--ant-border-radius);
+    box-shadow: var(--ant-box-shadow);
+}
+
+/* Slash Commands Menu */
+.rich-text-slash-menu {
+    position: absolute;
+    z-index: 1000;
+    min-width: 220px;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: var(--ant-color-bg-elevated);
+    border: 1px solid var(--ant-color-border);
+    border-radius: var(--ant-border-radius);
+    box-shadow: var(--ant-box-shadow);
+    padding: 4px;
+}
+
+.rich-text-slash-menu__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: var(--ant-border-radius-sm);
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.rich-text-slash-menu__item:hover,
+.rich-text-slash-menu__item--selected {
+    background-color: var(--ant-color-fill-secondary);
+}
+
+.rich-text-slash-menu__item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--ant-border-radius-sm);
+    background-color: var(--ant-color-fill-tertiary);
+    color: var(--ant-color-text-secondary);
+}
+
+.rich-text-slash-menu__item-content {
+    flex: 1;
+}
+
+.rich-text-slash-menu__item-title {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--ant-color-text);
+}
+
+.rich-text-slash-menu__item-description {
+    font-size: 12px;
+    color: var(--ant-color-text-tertiary);
+}
+
+/* Mention List */
+.rich-text-mention-list {
+    position: absolute;
+    z-index: 1000;
+    min-width: 200px;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: var(--ant-color-bg-elevated);
+    border: 1px solid var(--ant-color-border);
+    border-radius: var(--ant-border-radius);
+    box-shadow: var(--ant-box-shadow);
+    padding: 4px;
+}
+
+.rich-text-mention-list__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: var(--ant-border-radius-sm);
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.rich-text-mention-list__item:hover,
+.rich-text-mention-list__item--selected {
+    background-color: var(--ant-color-fill-secondary);
+}
+
+.rich-text-mention-list__item-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: var(--ant-color-fill-tertiary);
+}
+
+.rich-text-mention-list__item-name {
+    font-size: 14px;
+    color: var(--ant-color-text);
+}
+
+/* Link popup */
+.rich-text-link-popup {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    background-color: var(--ant-color-bg-elevated);
+    border: 1px solid var(--ant-color-border);
+    border-radius: var(--ant-border-radius);
+    box-shadow: var(--ant-box-shadow);
+}
+
+/* Read-only mode */
+.rich-text-editor--readonly {
+    border: none;
+}
+
+.rich-text-editor--readonly .rich-text-editor__content {
+    padding: 0;
+}

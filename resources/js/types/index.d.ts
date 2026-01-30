@@ -137,3 +137,6 @@ export type {
     SelectFilterConfig,
     SortState,
 } from './datatable';
+
+// Re-export RichTextEditor types
+export type { JSONContent, MentionSuggestion, RichTextEditorProps, RichTextEditorRef } from './editor';
