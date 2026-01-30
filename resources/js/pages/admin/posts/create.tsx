@@ -6,7 +6,7 @@ import { useRef, useState } from 'react';
 import PostForm, { type PostFormRef } from './partials/post-form';
 
 export default function CreatePost() {
-    const { postType, postTypeLabel, supports, categories, tags, authors } = usePage<PostCreatePageProps>().props;
+    const { postType, postTypeLabel, supports, categories, tags } = usePage<PostCreatePageProps>().props;
     const formRef = useRef<PostFormRef>(null);
     const [loading, setLoading] = useState(false);
 
@@ -42,7 +42,6 @@ export default function CreatePost() {
                 supports={supports}
                 categories={categories}
                 tags={tags}
-                authors={authors}
                 onLoadingChange={setLoading}
             />
         </AdminLayout>

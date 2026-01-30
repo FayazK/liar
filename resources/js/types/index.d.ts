@@ -143,7 +143,6 @@ export type { JSONContent, MentionSuggestion, RichTextEditorProps, RichTextEdito
 
 // Re-export Post types
 export type {
-    AuthorOption,
     CategoryTreeNode,
     Post,
     PostAuthor,

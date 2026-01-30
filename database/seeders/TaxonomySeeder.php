@@ -16,8 +16,8 @@ class TaxonomySeeder extends Seeder
             'post_categories' => [
                 'Technology', 'Business', 'Lifestyle', 'Education',
             ],
-            'product_tags' => [
-                'Featured', 'Sale', 'New Arrival', 'Popular',
+            'post_tags' => [
+                'Tutorial', 'News', 'Review', 'Guide',
             ],
             'regions' => [
                 'North America', 'Europe', 'Asia', 'Africa',

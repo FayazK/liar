@@ -28,7 +28,7 @@ class PostStoreRequest extends FormRequest
             'content' => ['nullable', 'array'],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'status' => ['nullable', 'string', Rule::enum(PostStatus::class)],
-            'author_id' => ['required', 'integer', 'exists:users,id'],
+            'author_id' => ['nullable', 'integer', 'exists:users,id'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:500'],
             'published_at' => ['nullable', 'date'],

@@ -73,7 +73,6 @@ export interface PostFormValues {
     content?: JSONContent | null;
     excerpt?: string;
     status?: PostStatus;
-    author_id: number;
     meta_title?: string;
     meta_description?: string;
     published_at?: string | null;
@@ -123,7 +122,6 @@ export interface PostCreatePageProps {
     supports: string[];
     categories: CategoryTreeNode[];
     tags: TagOption[];
-    authors: AuthorOption[];
     [key: string]: unknown;
 }
 
@@ -134,7 +132,6 @@ export interface PostEditPageProps {
     supports: string[];
     categories: CategoryTreeNode[];
     tags: TagOption[];
-    authors: AuthorOption[];
     [key: string]: unknown;
 }
 

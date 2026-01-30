@@ -70,6 +70,11 @@ class PostService
             $data['status'] = config('post_types.default_status', PostStatus::Draft->value);
         }
 
+        // Auto-assign current user as author if not provided
+        if (empty($data['author_id'])) {
+            $data['author_id'] = auth()->id();
+        }
+
         // Handle published_at for published posts
         if ($data['status'] === PostStatus::Published->value && empty($data['published_at'])) {
             $data['published_at'] = now();

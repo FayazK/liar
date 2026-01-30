@@ -13,7 +13,6 @@ use App\Http\Requests\Admin\PostUpdateRequest;
 use App\Http\Resources\Admin\PostCollection;
 use App\Http\Resources\Admin\PostResource;
 use App\Models\Post;
-use App\Models\User;
 use App\Queries\PostDataTableQueryService;
 use App\Services\PostService;
 use Illuminate\Http\JsonResponse;
@@ -87,7 +86,6 @@ class PostController extends Controller
             'tags' => in_array('tags', $supports, true)
                 ? $this->getTagsList()
                 : [],
-            'authors' => $this->getAuthorsList(),
         ]);
     }
 
@@ -118,7 +116,6 @@ class PostController extends Controller
             'tags' => in_array('tags', $supports, true)
                 ? $this->getTagsList()
                 : [],
-            'authors' => $this->getAuthorsList(),
         ]);
     }
 
@@ -200,23 +197,6 @@ class PostController extends Controller
                 'id' => $tag->id,
                 'name' => $tag->name,
                 'slug' => $tag->slug,
-            ])
-            ->toArray();
-    }
-
-    /**
-     * Get authors list for select.
-     */
-    private function getAuthorsList(): array
-    {
-        return User::query()
-            ->where('is_active', true)
-            ->orderBy('first_name')
-            ->get()
-            ->map(fn ($user) => [
-                'id' => $user->id,
-                'name' => $user->full_name,
-                'avatar_thumb_url' => $user->avatar_thumb_url,
             ])
             ->toArray();
     }

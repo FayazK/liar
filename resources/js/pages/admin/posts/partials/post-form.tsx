@@ -1,12 +1,12 @@
 import { Icon } from '@/components/ui/Icon';
 import { RichTextEditor } from '@/components/ui/RichTextEditor/RichTextEditor';
 import api from '@/lib/axios';
-import type { AuthorOption, CategoryTreeNode, Post, PostFormValues, PostStatus, TagOption } from '@/types';
+import type { CategoryTreeNode, Post, PostFormValues, PostStatus, TagOption } from '@/types';
 import type { JSONContent } from '@/types/editor';
 import { POST_STATUS_OPTIONS } from '@/types/post';
 import { isApiError } from '@/utils/errors';
 import { router } from '@inertiajs/react';
-import { App, Avatar, Button, Collapse, Form, Input, Select, TreeSelect, Upload } from 'antd';
+import { App, Button, Collapse, Form, Input, Select, TreeSelect, Upload } from 'antd';
 import type { UploadFile, UploadProps } from 'antd';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 
@@ -17,7 +17,6 @@ interface PostFormProps {
     supports: string[];
     categories: CategoryTreeNode[];
     tags: TagOption[];
-    authors: AuthorOption[];
     isEdit?: boolean;
     onLoadingChange?: (loading: boolean) => void;
 }
@@ -30,7 +29,7 @@ export interface PostFormRef {
 }
 
 const PostForm = forwardRef<PostFormRef, PostFormProps>(
-    ({ post, postType, postTypeLabel, supports, categories, tags, authors, isEdit = false, onLoadingChange }, ref) => {
+    ({ post, postType, postTypeLabel, supports, categories, tags, isEdit = false, onLoadingChange }, ref) => {
         const { notification, modal } = App.useApp();
         const [form] = Form.useForm<PostFormValues>();
         const [loading, setLoading] = useState(false);
@@ -72,23 +71,6 @@ const PostForm = forwardRef<PostFormRef, PostFormProps>(
         // Convert tags to options format
         const tagOptions = useMemo(() => tags.map((tag) => ({ value: tag.id, label: tag.name })), [tags]);
 
-        // Convert authors to options format
-        const authorOptions = useMemo(
-            () =>
-                authors.map((author) => ({
-                    value: author.id,
-                    label: (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <Avatar src={author.avatar_thumb_url} size="small">
-                                {author.name?.charAt(0)}
-                            </Avatar>
-                            <span>{author.name}</span>
-                        </div>
-                    ),
-                })),
-            [authors],
-        );
-
         // Initialize form values
         useEffect(() => {
             form.setFieldsValue({
@@ -96,7 +78,6 @@ const PostForm = forwardRef<PostFormRef, PostFormProps>(
                 slug: post?.slug || '',
                 excerpt: post?.excerpt || '',
                 status: post?.status || 'draft',
-                author_id: post?.author_id,
                 meta_title: post?.meta_title || '',
                 meta_description: post?.meta_description || '',
                 category_ids: post?.category_ids || [],
@@ -147,7 +128,6 @@ const PostForm = forwardRef<PostFormRef, PostFormProps>(
             if (content) formData.append('content', JSON.stringify(content));
             if (values.excerpt) formData.append('excerpt', values.excerpt);
             formData.append('status', values.status || 'draft');
-            formData.append('author_id', String(values.author_id));
             if (values.meta_title) formData.append('meta_title', values.meta_title);
             if (values.meta_description) formData.append('meta_description', values.meta_description);
             if (values.published_at) formData.append('published_at', values.published_at);
@@ -365,25 +345,6 @@ const PostForm = forwardRef<PostFormRef, PostFormProps>(
                             </h4>
                             <Form.Item name="status" style={{ marginBottom: 0 }}>
                                 <Select options={POST_STATUS_OPTIONS.map((s) => ({ value: s.value, label: s.label }))} style={{ width: '100%' }} />
-                            </Form.Item>
-                        </div>
-
-                        {/* Author */}
-                        <div
-                            style={{
-                                backgroundColor: 'var(--ant-color-bg-container)',
-                                border: '1px solid var(--ant-color-border)',
-                                borderRadius: 8,
-                                padding: 16,
-                                marginBottom: 16,
-                            }}
-                        >
-                            <h4 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600 }}>
-                                <Icon name="user" style={{ marginRight: 8 }} />
-                                Author
-                            </h4>
-                            <Form.Item name="author_id" rules={[{ required: true, message: 'Author is required' }]} style={{ marginBottom: 0 }}>
-                                <Select options={authorOptions} placeholder="Select author" style={{ width: '100%' }} showSearch optionFilterProp="label" />
                             </Form.Item>
                         </div>
 

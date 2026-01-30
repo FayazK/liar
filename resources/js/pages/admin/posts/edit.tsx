@@ -6,7 +6,7 @@ import { useRef, useState } from 'react';
 import PostForm, { type PostFormRef } from './partials/post-form';
 
 export default function EditPost() {
-    const { post, postType, postTypeLabel, supports, categories, tags, authors } = usePage<PostEditPageProps>().props;
+    const { post, postType, postTypeLabel, supports, categories, tags } = usePage<PostEditPageProps>().props;
     const formRef = useRef<PostFormRef>(null);
     const [loading, setLoading] = useState(false);
 
@@ -47,7 +47,6 @@ export default function EditPost() {
                 supports={supports}
                 categories={categories}
                 tags={tags}
-                authors={authors}
                 isEdit
                 onLoadingChange={setLoading}
             />

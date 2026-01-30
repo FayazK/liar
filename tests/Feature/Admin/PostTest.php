@@ -307,21 +307,24 @@ describe('Post Validation', function () {
             ->assertJsonValidationErrors(['title']);
     });
 
-    it('requires author_id when creating a post', function () {
+    it('auto-assigns current user as author when author_id not provided', function () {
         $response = $this->actingAs($this->user)
             ->postJson('/admin/posts/blog-post', [
-                'title' => 'Test Post',
+                'title' => 'Test Post Without Author',
             ]);
 
-        $response->assertUnprocessable()
-            ->assertJsonValidationErrors(['author_id']);
+        $response->assertCreated();
+
+        $this->assertDatabaseHas('posts', [
+            'title' => 'Test Post Without Author',
+            'author_id' => $this->user->id,
+        ]);
     });
 
     it('validates status enum values', function () {
         $response = $this->actingAs($this->user)
             ->postJson('/admin/posts/blog-post', [
                 'title' => 'Test Post',
-                'author_id' => $this->user->id,
                 'status' => 'invalid_status',
             ]);
 
@@ -333,7 +336,6 @@ describe('Post Validation', function () {
         $response = $this->actingAs($this->user)
             ->postJson('/admin/posts/blog-post', [
                 'title' => 'Test Post',
-                'author_id' => $this->user->id,
                 'slug' => 'Invalid Slug With Spaces',
             ]);
 
