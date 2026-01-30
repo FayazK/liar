@@ -222,6 +222,21 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
             setImageModalOpen(true);
         }, []);
 
+        const handleContainerClick = useCallback(
+            (e: React.MouseEvent<HTMLDivElement>) => {
+                // Focus editor when clicking anywhere in the content area
+                // Check if click was on the wrapper itself (empty area) not on editor content
+                const target = e.target as HTMLElement;
+                const isEmptyAreaClick = target.classList.contains('rich-text-editor-wrapper');
+
+                if (isEmptyAreaClick) {
+                    e.preventDefault();
+                    editor?.commands.focus('end');
+                }
+            },
+            [editor],
+        );
+
         if (!editor) {
             return null;
         }
@@ -238,9 +253,13 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
             .filter(Boolean)
             .join(' ');
 
-        const contentStyle: React.CSSProperties = {
+        const wrapperStyle: React.CSSProperties = {
             minHeight: minHeight ?? 150,
             maxHeight: maxHeight ?? 400,
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            cursor: 'text',
         };
 
         return (
@@ -248,8 +267,12 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
                 {editable && toolbar === 'fixed' && <FixedToolbar editor={editor} onImageClick={openImageModal} />}
                 {editable && toolbar === 'floating' && <FloatingToolbar editor={editor} onImageClick={openImageModal} />}
 
-                <div style={contentStyle}>
-                    <EditorContent editor={editor} />
+                <div
+                    className="rich-text-editor-wrapper"
+                    style={wrapperStyle}
+                    onClick={handleContainerClick}
+                >
+                    <EditorContent editor={editor} style={{ flex: 1 }} />
                 </div>
 
                 <ImageModal

@@ -99,7 +99,15 @@ export type IconName =
     | 'star'
     | 'star-filled'
     // Drag & Drop
-    | 'grip-vertical';
+    | 'grip-vertical'
+    // Content & Posts
+    | 'arrow-left'
+    | 'align-left'
+    | 'tag'
+    | 'message'
+    | 'link'
+    | 'globe'
+    | 'warning';
 
 /**
  * Props for the Icon wrapper component

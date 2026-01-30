@@ -85,6 +85,52 @@ return [
         ],
     ],
 
+    'posts' => [
+        'posts.view' => [
+            'title' => 'View Blog Posts',
+            'description' => 'View blog post list and details',
+        ],
+        'posts.create' => [
+            'title' => 'Create Blog Posts',
+            'description' => 'Create new blog posts',
+        ],
+        'posts.update' => [
+            'title' => 'Update Blog Posts',
+            'description' => 'Edit existing blog posts',
+        ],
+        'posts.delete' => [
+            'title' => 'Delete Blog Posts',
+            'description' => 'Delete blog posts from the system',
+        ],
+        'posts.publish' => [
+            'title' => 'Publish Blog Posts',
+            'description' => 'Publish and unpublish blog posts',
+        ],
+    ],
+
+    'pages' => [
+        'pages.view' => [
+            'title' => 'View Pages',
+            'description' => 'View page list and details',
+        ],
+        'pages.create' => [
+            'title' => 'Create Pages',
+            'description' => 'Create new pages',
+        ],
+        'pages.update' => [
+            'title' => 'Update Pages',
+            'description' => 'Edit existing pages',
+        ],
+        'pages.delete' => [
+            'title' => 'Delete Pages',
+            'description' => 'Delete pages from the system',
+        ],
+        'pages.publish' => [
+            'title' => 'Publish Pages',
+            'description' => 'Publish and unpublish pages',
+        ],
+    ],
+
     'admin' => [
         'admin.access' => [
             'title' => 'Access Admin Area',

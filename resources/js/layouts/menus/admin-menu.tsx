@@ -1,4 +1,6 @@
 import { dashboard as adminDashboard } from '@/routes/admin';
+import { index as blogPostIndex } from '@/routes/admin/posts/blog_post';
+import { index as pageIndex } from '@/routes/admin/posts/page';
 import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as libraryIndex } from '@/routes/library';
 import { type NavGroup, type NavItem } from '@/types';
@@ -17,6 +19,16 @@ export const adminNavGroups: NavGroup[] = [
     {
         title: 'Content',
         items: [
+            {
+                title: 'Posts',
+                href: blogPostIndex.url(),
+                icon: 'file-text',
+            },
+            {
+                title: 'Pages',
+                href: pageIndex.url(),
+                icon: 'file',
+            },
             {
                 title: 'Library',
                 href: libraryIndex(),

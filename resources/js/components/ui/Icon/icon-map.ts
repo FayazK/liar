@@ -1,7 +1,10 @@
 import {
     IconAlertCircle,
+    IconAlertTriangle,
+    IconAlignLeft,
     IconApi,
     IconArrowDown,
+    IconArrowLeft,
     IconArrowsSort,
     IconArrowUp,
     IconBell,
@@ -34,6 +37,7 @@ import {
     IconFolder,
     IconFolderOpen,
     IconFolderPlus,
+    IconGlobe,
     IconGripVertical,
     IconHome,
     IconInbox,
@@ -43,12 +47,14 @@ import {
     IconLayoutSidebarLeftCollapse,
     IconLayoutSidebarLeftExpand,
     IconLayoutSidebarRight,
+    IconLink,
     IconLoader2,
     IconLock,
     IconLogin,
     IconLogout,
     IconMail,
     IconMenu2,
+    IconMessage,
     IconMoon,
     IconMusic,
     IconPalette,
@@ -68,6 +74,7 @@ import {
     IconStar,
     IconStarFilled,
     IconSun,
+    IconTag,
     IconTrash,
     IconTrendingUp,
     IconUpload,
@@ -196,4 +203,13 @@ export const iconMap: Record<IconName, TablerIconComponent> = {
 
     // Misc
     'dots-vertical': IconDotsVertical,
+
+    // Content & Posts
+    'arrow-left': IconArrowLeft,
+    'align-left': IconAlignLeft,
+    tag: IconTag,
+    message: IconMessage,
+    link: IconLink,
+    globe: IconGlobe,
+    warning: IconAlertTriangle,
 };

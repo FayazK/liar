@@ -140,3 +140,22 @@ export type {
 
 // Re-export RichTextEditor types
 export type { JSONContent, MentionSuggestion, RichTextEditorProps, RichTextEditorRef } from './editor';
+
+// Re-export Post types
+export type {
+    AuthorOption,
+    CategoryTreeNode,
+    Post,
+    PostAuthor,
+    PostCreatePageProps,
+    PostEditPageProps,
+    PostFormValues,
+    PostIndexPageProps,
+    PostStatus,
+    PostSupports,
+    PostTaxonomy,
+    PostType,
+    PostTypeConfig,
+    TagOption,
+} from './post';
+export { POST_STATUS_OPTIONS } from './post';
