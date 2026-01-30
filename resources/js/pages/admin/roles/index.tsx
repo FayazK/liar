@@ -43,9 +43,7 @@ export default function RolesIndex() {
             icon: 'plus',
             onClick: () => router.visit(create.url()),
         },
-        breadcrumb: [
-            { title: 'Roles', href: index.url() },
-        ],
+        breadcrumb: [{ title: 'Roles', href: index.url() }],
     };
 
     // Column definitions

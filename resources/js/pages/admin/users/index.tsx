@@ -85,9 +85,7 @@ export default function UsersIndex() {
             icon: 'user-plus',
             onClick: () => router.visit(create.url()),
         },
-        breadcrumb: [
-            { title: 'Users', href: index.url() },
-        ],
+        breadcrumb: [{ title: 'Users', href: index.url() }],
         actionIcons: [{ icon: 'refresh', tooltip: 'Refresh', onClick: () => router.reload() }],
     };
 
