@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e35699d87ba13d5ba3b4aedb3ffb7557",
+    "content-hash": "797af89d7f6ce6044620dc9818d4f614",
     "packages": [
         {
             "name": "aliziodev/laravel-taxonomy",
@@ -1212,6 +1212,52 @@
             "time": "2025-08-22T14:27:06+00:00"
         },
         {
+            "name": "illuminate/json-schema",
+            "version": "v12.40.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/illuminate/json-schema.git",
+                "reference": "5a8ab3e084c91305196888cb9964b238cce3055b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/illuminate/json-schema/zipball/5a8ab3e084c91305196888cb9964b238cce3055b",
+                "reference": "5a8ab3e084c91305196888cb9964b238cce3055b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "12.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Illuminate\\JsonSchema\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "The Illuminate Json Schema package.",
+            "homepage": "https://laravel.com",
+            "support": {
+                "issues": "https://github.com/laravel/framework/issues",
+                "source": "https://github.com/laravel/framework"
+            },
+            "time": "2025-11-26T16:51:20+00:00"
+        },
+        {
             "name": "inertiajs/inertia-laravel",
             "version": "v2.0.5",
             "source": {
@@ -1280,6 +1326,72 @@
                 "source": "https://github.com/inertiajs/inertia-laravel/tree/v2.0.5"
             },
             "time": "2025-08-12T15:57:22+00:00"
+        },
+        {
+            "name": "laravel/ai",
+            "version": "v0.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/ai.git",
+                "reference": "7487f1208ba95a7d32e1609abb1b7f7a801a74fe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/ai/zipball/7487f1208ba95a7d32e1609abb1b7f7a801a74fe",
+                "reference": "7487f1208ba95a7d32e1609abb1b7f7a801a74fe",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^12.0",
+                "illuminate/container": "^12.0",
+                "illuminate/contracts": "^12.0",
+                "illuminate/filesystem": "^12.0",
+                "illuminate/json-schema": "^12.0",
+                "illuminate/support": "^12.0",
+                "laravel/prompts": "^0.3.6",
+                "laravel/serializable-closure": "^2.0",
+                "php": "^8.4",
+                "prism-php/prism": "^0.99.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.26",
+                "mockery/mockery": "^1.6.12",
+                "orchestra/testbench": "^10.6"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Laravel\\Ai\\AiServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "functions.php"
+                ],
+                "psr-4": {
+                    "Laravel\\Ai\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "The official AI SDK for Laravel.",
+            "homepage": "https://github.com/laravel/ai",
+            "keywords": [
+                "ai",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel/ai/issues",
+                "source": "https://github.com/laravel/ai"
+            },
+            "time": "2026-02-19T14:27:55+00:00"
         },
         {
             "name": "laravel/framework",
@@ -3222,6 +3334,85 @@
                 "source": "https://github.com/plank/laravel-metable/tree/6.2.0"
             },
             "time": "2025-02-20T02:31:25+00:00"
+        },
+        {
+            "name": "prism-php/prism",
+            "version": "v0.99.19",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/prism-php/prism.git",
+                "reference": "7ebf450f6137fcb6d79cc52f5bffb6d7569b2019"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/prism-php/prism/zipball/7ebf450f6137fcb6d79cc52f5bffb6d7569b2019",
+                "reference": "7ebf450f6137fcb6d79cc52f5bffb6d7569b2019",
+                "shasum": ""
+            },
+            "require": {
+                "ext-fileinfo": "*",
+                "laravel/framework": "^11.0|^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "brianium/paratest": "^7.8.4",
+                "laravel/mcp": "^0.5.2",
+                "laravel/pint": "^1.14",
+                "mockery/mockery": "^1.6",
+                "orchestra/testbench": "^10",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-arch": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0",
+                "phpstan/extension-installer": "^1.3",
+                "phpstan/phpdoc-parser": "^2.0",
+                "phpstan/phpstan": "2.1.34",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "projektgopher/whisky": "^0.7.0",
+                "rector/rector": "2.3.3",
+                "spatie/laravel-ray": "^1.39",
+                "symplify/rule-doc-generator-contracts": "^11.2"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "PrismServer": "Prism\\Prism\\Facades\\PrismServer"
+                    },
+                    "providers": [
+                        "Prism\\Prism\\PrismServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Prism\\Prism\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "TJ Miller",
+                    "email": "hello@echolabs.dev"
+                }
+            ],
+            "description": "A powerful Laravel package for integrating Large Language Models (LLMs) into your applications.",
+            "support": {
+                "issues": "https://github.com/prism-php/prism/issues",
+                "source": "https://github.com/prism-php/prism/tree/v0.99.19"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sixlive",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-01-28T12:09:02+00:00"
         },
         {
             "name": "psr/clock",
