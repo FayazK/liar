@@ -76,6 +76,7 @@ Modules/
       seeders/
     resources/
       js/
+        app.tsx            # Vite entry point for this module (imports module CSS/setup if needed)
         pages/
           admin/
             posts/
