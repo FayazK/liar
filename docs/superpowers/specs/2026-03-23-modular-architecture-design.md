@@ -289,10 +289,10 @@ return Inertia::render('Posts::admin/posts/index', [
 
 ### Disabled modules
 
-- `getEnabledModuleEntries()` in `vite.config.ts` reads `modules_statuses.json` and filters out disabled modules
-- Disabled module entry points are excluded from the Vite build entirely
-- Production build only contains JS/CSS for enabled modules
-- No dead code in the bundle
+- `getEnabledModuleEntries()` in `vite.config.ts` reads `modules_statuses.json` and filters out disabled modules' entry points
+- Disabled module `app.tsx` entry points are excluded from the Vite build
+- **Caveat:** The `import.meta.glob` in both `app.tsx` and `ssr.tsx` resolvers is a static pattern evaluated at build time — it will include page files from all modules on disk as lazy-loaded chunks, regardless of enabled status. However, these chunks are unreachable at runtime because disabled module routes are never registered server-side. The runtime impact is zero; the build artifact is slightly larger.
+- To fully eliminate disabled module pages from the build, a custom Vite plugin could exclude disabled module paths — this is an optional optimization for later.
 - After enabling/disabling a module, restart the Vite dev server (`npm run dev`) to pick up the change
 
 ### Cross-module shared components
