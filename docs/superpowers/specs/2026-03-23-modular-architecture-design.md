@@ -140,6 +140,34 @@ Key points:
 
 5. Autoloading: each module's `composer.json` defines PSR-4 namespaces (e.g., `Modules\\Posts\\` → `Modules/Posts/app/`), merged via `wikimedia/composer-merge-plugin`
 
+### Composer merge plugin setup
+
+The root `composer.json` must install and configure the merge plugin:
+
+```bash
+composer require wikimedia/composer-merge-plugin
+```
+
+Add to the root `composer.json` `extra` section:
+```json
+{
+    "extra": {
+        "merge-plugin": {
+            "include": ["Modules/*/composer.json"],
+            "recurse": false,
+            "replace": false
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "wikimedia/composer-merge-plugin": true
+        }
+    }
+}
+```
+
+**Note:** After adding or removing a module, run `composer update` to refresh autoloading. In CI, ensure `composer install` runs after `modules_statuses.json` is in place.
+
 ### Enable/Disable flow
 
 - `php artisan module:enable Posts` → adds to `modules_statuses.json`, provider loaded on next request
@@ -152,26 +180,53 @@ Key points:
 
 ### Vite configuration
 
-Main `vite.config.ts` discovers enabled modules' assets:
+The root `vite.config.ts` is extended to discover enabled modules' assets while preserving all existing plugins (Tailwind, Wayfinder, SSR, etc.):
 
 ```ts
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
+import { wayfinder } from '@laravel/vite-plugin-wayfinder';
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import { glob } from 'glob';
+import laravel from 'laravel-vite-plugin';
+import { defineConfig } from 'vite';
+import { readFileSync, existsSync } from 'fs';
+import { globSync } from 'glob';
 
-const moduleEntries = glob.sync('Modules/*/resources/js/app.tsx');
+// Read module statuses to only compile enabled modules' assets
+function getEnabledModuleEntries(): string[] {
+    const statusFile = './modules_statuses.json';
+    if (!existsSync(statusFile)) return [];
+
+    const statuses = JSON.parse(readFileSync(statusFile, 'utf-8'));
+    return globSync('Modules/*/resources/js/app.tsx').filter((entry) => {
+        const moduleName = entry.split('/')[1];
+        return statuses[moduleName] === true;
+    });
+}
+
+const moduleEntries = getEnabledModuleEntries();
 
 export default defineConfig({
     plugins: [
         laravel({
             input: [
+                'resources/css/app.css',
                 'resources/js/app.tsx',
+                'resources/css/front.css',
+                'resources/js/front.js',
                 ...moduleEntries,
             ],
+            ssr: 'resources/js/ssr.tsx',
+            refresh: true,
         }),
         react(),
+        tailwindcss(),
+        wayfinder({
+            formVariants: true,
+        }),
     ],
+    esbuild: {
+        jsx: 'automatic',
+    },
     resolve: {
         alias: {
             '@': '/resources/js',
@@ -181,21 +236,47 @@ export default defineConfig({
 });
 ```
 
-### Inertia page resolution
+**Key detail:** The `getEnabledModuleEntries()` function reads `modules_statuses.json` at build time to filter module assets. Disabled modules are excluded from the Vite build entirely.
+
+### Inertia page resolution (client-side)
+
+Update the `resolve` function in `resources/js/app.tsx`:
 
 ```ts
-createInertiaApp({
-    resolve: (name) => {
-        // Module page: "Posts::admin/posts/index"
-        if (name.includes('::')) {
-            const [module, path] = name.split('::');
-            return import(`../../Modules/${module}/resources/js/pages/${path}.tsx`);
-        }
-        // Core page: "admin/dashboard"
-        return import(`./pages/${name}.tsx`);
-    },
-});
+// Module pages are prefixed: "Posts::admin/posts/index"
+// Core pages remain unchanged: "admin/dashboard"
+resolve: (name) => {
+    if (name.includes('::')) {
+        const [module, ...rest] = name.split('::');
+        const path = rest.join('::');
+        const modulePages = import.meta.glob('../../Modules/*/resources/js/pages/**/*.tsx');
+        const key = `../../Modules/${module}/resources/js/pages/${path}.tsx`;
+        if (modulePages[key]) return modulePages[key]();
+        throw new Error(`Module page not found: ${name}`);
+    }
+    return resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx'));
+},
 ```
+
+### Inertia page resolution (SSR)
+
+The same module-aware resolver must be applied in `resources/js/ssr.tsx`:
+
+```ts
+resolve: (name) => {
+    if (name.includes('::')) {
+        const [module, ...rest] = name.split('::');
+        const path = rest.join('::');
+        const modulePages = import.meta.glob('../../Modules/*/resources/js/pages/**/*.tsx');
+        const key = `../../Modules/${module}/resources/js/pages/${path}.tsx`;
+        if (modulePages[key]) return modulePages[key]();
+        throw new Error(`Module page not found: ${name}`);
+    }
+    return resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx'));
+},
+```
+
+**Important:** Both `app.tsx` and `ssr.tsx` must use identical resolve logic, otherwise SSR will fail for module pages.
 
 ### Backend rendering from module controller
 
@@ -207,9 +288,11 @@ return Inertia::render('Posts::admin/posts/index', [
 
 ### Disabled modules
 
-- Entry point not in glob results → Vite never compiles assets
+- `getEnabledModuleEntries()` in `vite.config.ts` reads `modules_statuses.json` and filters out disabled modules
+- Disabled module entry points are excluded from the Vite build entirely
 - Production build only contains JS/CSS for enabled modules
 - No dead code in the bundle
+- After enabling/disabling a module, restart the Vite dev server (`npm run dev`) to pick up the change
 
 ### Cross-module shared components
 
@@ -248,7 +331,7 @@ php artisan module:status Posts        # Check status and dependencies
 
 ### Status tracking
 
-`modules_statuses.json` at project root (gitignored):
+`modules_statuses.json` at project root:
 ```json
 {
     "Posts": true,
@@ -257,6 +340,13 @@ php artisan module:status Posts        # Check status and dependencies
 ```
 
 Modules not listed default to disabled.
+
+**Git strategy:** A default `modules_statuses.json` is committed with all shipped modules enabled. This ensures:
+- New team members get a working app after cloning
+- CI pipelines have a deterministic module state
+- Individual developers can override locally (their changes won't be committed if the file is unchanged)
+
+If per-environment overrides are needed, use a `.env` variable (e.g., `DISABLED_MODULES=Posts,Library`) that the module loader checks as an override layer on top of `modules_statuses.json`.
 
 ### Custom command
 
