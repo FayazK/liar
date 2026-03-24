@@ -1,0 +1,12 @@
+{
+    "name": "Skeleton",
+    "alias": "skeleton",
+    "description": "Skeleton module for validating the modular architecture infrastructure",
+    "priority": 0,
+    "providers": [
+        "Modules\\Skeleton\\Providers\\SkeletonServiceProvider",
+        "Modules\\Skeleton\\Providers\\RouteServiceProvider"
+    ],
+    "dependencies": [],
+    "files": []
+}
