@@ -23,7 +23,8 @@ describe('ModuleDiscoveryService with Skeleton module', function () {
 
         // collectFromContract wraps each module's result, so flatten to check
         $flatItems = array_merge(...$navItems);
-        expect($flatItems[0]['label'])->toBe('Skeleton');
+        $labels = array_column($flatItems, 'label');
+        expect($labels)->toContain('Skeleton');
     });
 
     it('discovers permissions from the Skeleton module', function () {

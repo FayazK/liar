@@ -56,7 +56,7 @@ class PageBuilderService
         $builderPage = $this->builderPageRepository->findByPostId($postId);
 
         if ($builderPage === null) {
-            throw new \RuntimeException('No builder page data found for post ' . $postId);
+            throw new \RuntimeException('No builder page data found for post '.$postId);
         }
 
         $this->compilerService->compile($builderPage);
