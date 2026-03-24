@@ -8,14 +8,84 @@ use Modules\PageBuilder\Models\BuilderPage;
 
 class PageCompilerService
 {
+    /**
+     * Compile GrapesJS data into static HTML+CSS.
+     *
+     * GrapesJS stores the editor state as:
+     * - grapes_data['html']: The HTML output from editor.getHtml()
+     * - grapes_data['css'] or grapes_css: The CSS from editor.getCss()
+     */
     public function compile(BuilderPage $builderPage): BuilderPage
     {
+        $grapesData = $builderPage->grapes_data ?? [];
+        $html = $grapesData['html'] ?? '';
+        $css = $grapesData['css'] ?? $builderPage->grapes_css ?? '';
+
+        $sanitizedHtml = $this->sanitizeHtml($html);
+
+        if (config('page-builder.compilation.minify_html', true)) {
+            $sanitizedHtml = $this->minifyHtml($sanitizedHtml);
+        }
+
+        if (config('page-builder.compilation.minify_css', true)) {
+            $css = $this->minifyCss($css);
+        }
+
         $builderPage->update([
-            'compiled_html' => '',
-            'compiled_css' => '',
+            'compiled_html' => $sanitizedHtml,
+            'compiled_css' => $css,
             'compiled_at' => now(),
         ]);
 
         return $builderPage->fresh();
+    }
+
+    private function sanitizeHtml(string $html): string
+    {
+        if (empty($html)) {
+            return '';
+        }
+
+        // Strip script tags and their content
+        $html = preg_replace('#<script\b[^>]*>.*?</script>#is', '', $html);
+
+        // Strip event handlers (onclick, onerror, etc.)
+        $html = preg_replace('/\s+on\w+\s*=\s*["\'][^"\']*["\']/i', '', $html);
+
+        // Strip iframe tags
+        $html = preg_replace('#<iframe\b[^>]*>.*?</iframe>#is', '', $html);
+
+        // Strip object/embed tags
+        $html = preg_replace('#<(object|embed)\b[^>]*>.*?</\1>#is', '', $html);
+
+        return $html;
+    }
+
+    private function minifyHtml(string $html): string
+    {
+        if (empty($html)) {
+            return '';
+        }
+
+        $html = preg_replace('/\s+/', ' ', $html);
+        $html = preg_replace('/>\s+</', '><', $html);
+
+        return trim($html);
+    }
+
+    private function minifyCss(string $css): string
+    {
+        if (empty($css)) {
+            return '';
+        }
+
+        // Remove comments
+        $css = preg_replace('/\/\*.*?\*\//s', '', $css);
+        // Collapse whitespace
+        $css = preg_replace('/\s+/', ' ', $css);
+        // Remove spaces around selectors and properties
+        $css = preg_replace('/\s*([{}:;,])\s*/', '$1', $css);
+
+        return trim($css);
     }
 }
