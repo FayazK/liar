@@ -1,5 +1,6 @@
 import axios from '@/lib/axios';
 import type { Editor } from 'grapesjs';
+import { router } from '@inertiajs/react';
 import { Button, message, Space, Tooltip, Typography } from 'antd';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import GrapesEditor from '../../../components/GrapesEditor';
@@ -19,6 +20,8 @@ const AUTO_SAVE_INTERVAL = 30_000;
 
 export default function PageBuilderEditor({ post, builderPage, sectionTemplates }: Props) {
     const editorRef = useRef<Editor | null>(null);
+    const isDirty = useRef(false);
+    const handleSaveRef = useRef<() => Promise<void>>();
     const [saving, setSaving] = useState(false);
     const [publishing, setPublishing] = useState(false);
     const [activeDevice, setActiveDevice] = useState('Desktop');
@@ -46,7 +49,7 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
                 grapes_data: data.grapesData,
                 grapes_css: data.grapesCss,
             });
-            message.success('Saved');
+            isDirty.current = false;
         } catch {
             message.error('Failed to save');
         } finally {
@@ -54,22 +57,11 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
         }
     }, [post.id, getEditorData]);
 
+    // Keep ref in sync for stable interval callback
+    handleSaveRef.current = handleSave;
+
     const handlePublish = async (): Promise<void> => {
-        const data = getEditorData();
-        if (data) {
-            setSaving(true);
-            try {
-                await axios.put(`/admin/page-builder/${post.id}`, {
-                    grapes_data: data.grapesData,
-                    grapes_css: data.grapesCss,
-                });
-            } catch {
-                message.error('Failed to save before publishing');
-                setSaving(false);
-                return;
-            }
-            setSaving(false);
-        }
+        await handleSave();
 
         setPublishing(true);
         try {
@@ -97,6 +89,9 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
 
     const handleEditorReady = (editor: Editor): void => {
         editorRef.current = editor;
+        editor.on('update', () => {
+            isDirty.current = true;
+        });
     };
 
     const handleSectionInsert = (template: SectionTemplate): void => {
@@ -119,10 +114,12 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
         }
     };
 
-    // Auto-save
+    // Auto-save only when dirty, with stable ref to avoid interval restarts
     useEffect(() => {
         autoSaveTimer.current = setInterval(() => {
-            void handleSave();
+            if (isDirty.current) {
+                void handleSaveRef.current?.();
+            }
         }, AUTO_SAVE_INTERVAL);
 
         return () => {
@@ -130,11 +127,7 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
                 clearInterval(autoSaveTimer.current);
             }
         };
-    }, [handleSave]);
-
-    const handleBack = (): void => {
-        window.location.href = '/admin/page-builder';
-    };
+    }, []);
 
     const devices: Array<{ key: string; label: string }> = [
         { key: 'Desktop', label: 'Desktop' },
@@ -158,7 +151,7 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
                 }}
             >
                 <Space>
-                    <Button type="text" size="small" onClick={handleBack}>
+                    <Button type="text" size="small" onClick={() => router.visit('/admin/page-builder')}>
                         &larr; Back
                     </Button>
                     <Text strong style={{ fontSize: 14 }}>{post.title}</Text>

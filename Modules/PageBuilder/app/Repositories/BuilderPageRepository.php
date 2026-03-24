@@ -23,7 +23,7 @@ class BuilderPageRepository implements BuilderPageRepositoryInterface
         $builderPage = BuilderPage::findOrFail($id);
         $builderPage->update($data);
 
-        return $builderPage->fresh();
+        return $builderPage;
     }
 
     public function deleteByPostId(int $postId): bool

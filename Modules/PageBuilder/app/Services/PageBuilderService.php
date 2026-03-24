@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Modules\PageBuilder\Services;
 
+use App\Enums\EditorMode;
 use App\Enums\PostStatus;
 use App\Enums\PostType;
 use App\Models\Post;
 use App\Services\PostService;
+use Illuminate\Database\Eloquent\Collection;
 use Modules\PageBuilder\Models\BuilderPage;
 use Modules\PageBuilder\Repositories\BuilderPageRepositoryInterface;
 
@@ -19,6 +21,17 @@ class PageBuilderService
         private readonly PageCompilerService $compilerService,
     ) {}
 
+    public function getBuilderPages(): Collection
+    {
+        return Post::query()
+            ->select(['id', 'title', 'slug', 'status', 'editor_mode', 'updated_at', 'author_id'])
+            ->where('editor_mode', EditorMode::Builder)
+            ->ofType(PostType::Page)
+            ->with('author:id,first_name,last_name')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+    }
+
     public function createPage(array $data): Post
     {
         return $this->postService->createPost(
@@ -26,7 +39,7 @@ class PageBuilderService
                 'title' => $data['title'],
                 'slug' => $data['slug'] ?? '',
                 'status' => PostStatus::Draft->value,
-                'editor_mode' => 'builder',
+                'editor_mode' => EditorMode::Builder->value,
                 'content' => null,
             ],
             PostType::Page,
@@ -38,10 +51,12 @@ class PageBuilderService
         $existing = $this->builderPageRepository->findByPostId($postId);
 
         if ($existing) {
-            return $this->builderPageRepository->update($existing->id, [
+            $existing->update([
                 'grapes_data' => $grapesData,
                 'grapes_css' => $grapesCss,
             ]);
+
+            return $existing;
         }
 
         return $this->builderPageRepository->create([
@@ -68,5 +83,21 @@ class PageBuilderService
     public function getBuilderPage(int $postId): ?BuilderPage
     {
         return $this->builderPageRepository->findByPostId($postId);
+    }
+
+    public function findPublishedBuilderPage(string $slug): ?Post
+    {
+        return Post::query()
+            ->where('slug', $slug)
+            ->where('editor_mode', EditorMode::Builder)
+            ->ofType(PostType::Page)
+            ->published()
+            ->with('builderPage')
+            ->first();
+    }
+
+    public function deletePage(int $postId): bool
+    {
+        return $this->postService->deletePost($postId);
     }
 }

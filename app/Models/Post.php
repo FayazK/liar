@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Aliziodev\LaravelTaxonomy\Traits\HasTaxonomy;
+use App\Enums\EditorMode;
 use App\Enums\PostStatus;
 use App\Enums\PostType;
 use Database\Factories\PostFactory;
@@ -69,6 +70,7 @@ class Post extends Model implements HasMedia
         return [
             'type' => PostType::class,
             'status' => PostStatus::class,
+            'editor_mode' => EditorMode::class,
             'content' => 'array',
             'published_at' => 'datetime',
         ];

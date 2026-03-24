@@ -37,7 +37,7 @@ class PageCompilerService
             'compiled_at' => now(),
         ]);
 
-        return $builderPage->fresh();
+        return $builderPage;
     }
 
     private function sanitizeHtml(string $html): string
@@ -46,16 +46,9 @@ class PageCompilerService
             return '';
         }
 
-        // Strip script tags and their content
         $html = preg_replace('#<script\b[^>]*>.*?</script>#is', '', $html);
-
-        // Strip event handlers (onclick, onerror, etc.)
         $html = preg_replace('/\s+on\w+\s*=\s*["\'][^"\']*["\']/i', '', $html);
-
-        // Strip iframe tags
         $html = preg_replace('#<iframe\b[^>]*>.*?</iframe>#is', '', $html);
-
-        // Strip object/embed tags
         $html = preg_replace('#<(object|embed)\b[^>]*>.*?</\1>#is', '', $html);
 
         return $html;
@@ -79,11 +72,8 @@ class PageCompilerService
             return '';
         }
 
-        // Remove comments
         $css = preg_replace('/\/\*.*?\*\//s', '', $css);
-        // Collapse whitespace
         $css = preg_replace('/\s+/', ' ', $css);
-        // Remove spaces around selectors and properties
         $css = preg_replace('/\s*([{}:;,])\s*/', '$1', $css);
 
         return trim($css);

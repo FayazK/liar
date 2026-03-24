@@ -23,15 +23,8 @@ class PageBuilderController extends Controller
 
     public function index(): Response
     {
-        $pages = Post::query()
-            ->where('editor_mode', 'builder')
-            ->where('type', 'page')
-            ->with('author')
-            ->orderBy('updated_at', 'desc')
-            ->get();
-
         return Inertia::render('PageBuilder::admin/page-builder/index', [
-            'pages' => $pages,
+            'pages' => $this->pageBuilderService->getBuilderPages(),
         ]);
     }
 
@@ -88,7 +81,7 @@ class PageBuilderController extends Controller
 
     public function destroy(Post $post): JsonResponse
     {
-        $post->delete();
+        $this->pageBuilderService->deletePage($post->id);
 
         return response()->json(['message' => 'Page deleted']);
     }

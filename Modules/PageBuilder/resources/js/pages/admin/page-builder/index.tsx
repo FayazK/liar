@@ -2,6 +2,7 @@ import type { ContentHeaderProps } from '@/components/ui/ContentHeader';
 import PageCard from '@/components/ui/PageCard';
 import AdminLayout from '@/layouts/admin-layout';
 import { Head, router } from '@inertiajs/react';
+import { POST_STATUS_OPTIONS } from '@/types/post';
 import { Empty, List, Tag, Typography } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -22,19 +23,6 @@ interface BuilderPageItem {
 
 interface Props {
     pages: BuilderPageItem[];
-}
-
-function statusColor(status: string): string {
-    switch (status) {
-        case 'published':
-            return 'green';
-        case 'draft':
-            return 'default';
-        case 'scheduled':
-            return 'orange';
-        default:
-            return 'default';
-    }
 }
 
 export default function PageBuilderIndex({ pages }: Props) {
@@ -78,7 +66,7 @@ export default function PageBuilderIndex({ pages }: Props) {
                                     }
                                 />
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <Tag color={statusColor(page.status)}>{page.status}</Tag>
+                                    <Tag color={POST_STATUS_OPTIONS.find((s) => s.value === page.status)?.color ?? 'default'}>{page.status}</Tag>
                                     <Text type="secondary" style={{ fontSize: 12 }}>
                                         {dayjs(page.updated_at).fromNow()}
                                     </Text>

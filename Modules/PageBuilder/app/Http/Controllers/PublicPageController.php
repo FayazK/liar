@@ -5,20 +5,22 @@ declare(strict_types=1);
 namespace Modules\PageBuilder\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Post;
 use Illuminate\View\View;
+use Modules\PageBuilder\Services\PageBuilderService;
 
 class PublicPageController extends Controller
 {
+    public function __construct(
+        private readonly PageBuilderService $pageBuilderService,
+    ) {}
+
     public function show(string $slug): View
     {
-        $post = Post::query()
-            ->where('slug', $slug)
-            ->where('type', 'page')
-            ->where('editor_mode', 'builder')
-            ->published()
-            ->with('builderPage')
-            ->firstOrFail();
+        $post = $this->pageBuilderService->findPublishedBuilderPage($slug);
+
+        if ($post === null) {
+            abort(404);
+        }
 
         $builderPage = $post->builderPage;
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { Editor } from 'grapesjs';
 import grapesjs from 'grapesjs';
 import 'grapesjs/dist/css/grapes.min.css';
@@ -24,7 +24,6 @@ export default function GrapesEditor({
 }: GrapesEditorProps): React.ReactElement {
     const containerRef = useRef<HTMLDivElement>(null);
     const editorRef = useRef<Editor | null>(null);
-    const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
         if (!containerRef.current || editorRef.current) return;
@@ -51,7 +50,6 @@ export default function GrapesEditor({
         registerSectionBlocks(editor, sectionTemplates);
 
         editorRef.current = editor;
-        setIsReady(true);
 
         if (onEditorReady) {
             onEditorReady(editor);
@@ -63,9 +61,5 @@ export default function GrapesEditor({
         };
     }, []);
 
-    return (
-        <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div ref={containerRef} style={{ flex: 1 }} />
-        </div>
-    );
+    return <div ref={containerRef} style={{ height: '100%' }} />;
 }

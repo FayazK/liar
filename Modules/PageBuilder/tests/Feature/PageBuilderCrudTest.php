@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\EditorMode;
 use App\Enums\PostType;
 use App\Models\Post;
 use App\Models\Role;
@@ -70,13 +71,13 @@ describe('Post and BuilderPage relationship', function () {
         $post = Post::factory()->create();
         $post->refresh();
 
-        expect($post->editor_mode)->toBe('tiptap');
+        expect($post->editor_mode)->toBe(EditorMode::Tiptap);
     });
 
     it('post editor_mode can be set to builder', function () {
         $post = Post::factory()->create(['editor_mode' => 'builder']);
 
-        expect($post->editor_mode)->toBe('builder');
+        expect($post->editor_mode)->toBe(EditorMode::Builder);
     });
 });
 
@@ -163,7 +164,7 @@ describe('PageBuilder CRUD', function () {
 
         $post = Post::where('title', 'My Landing Page')->first();
         expect($post)->not->toBeNull();
-        expect($post->editor_mode)->toBe('builder');
+        expect($post->editor_mode)->toBe(EditorMode::Builder);
         expect($post->type->value)->toBe('page');
     });
 
