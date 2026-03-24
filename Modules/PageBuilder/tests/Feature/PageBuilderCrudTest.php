@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Enums\PostType;
 use App\Models\Post;
+use App\Models\Role;
+use App\Models\User;
 use Modules\PageBuilder\Models\BuilderPage;
 use Modules\PageBuilder\Models\SectionTemplate;
 
@@ -142,5 +145,79 @@ describe('SectionTemplate model', function () {
 
         expect($headers)->toHaveCount(1);
         expect($headers->first()->category)->toBe('headers');
+    });
+});
+
+describe('PageBuilder CRUD', function () {
+    beforeEach(function () {
+        $this->adminRole = Role::factory()->create(['name' => 'Admin']);
+        $this->admin = User::factory()->create(['role_id' => $this->adminRole->id]);
+    });
+
+    it('creates a new builder page', function () {
+        $response = $this->actingAs($this->admin)->post('/admin/page-builder', [
+            'title' => 'My Landing Page',
+        ]);
+
+        $response->assertCreated();
+
+        $post = Post::where('title', 'My Landing Page')->first();
+        expect($post)->not->toBeNull();
+        expect($post->editor_mode)->toBe('builder');
+        expect($post->type->value)->toBe('page');
+    });
+
+    it('saves editor state (auto-save)', function () {
+        $post = Post::factory()->create([
+            'type' => PostType::Page->value,
+            'editor_mode' => 'builder',
+            'author_id' => $this->admin->id,
+        ]);
+
+        $response = $this->actingAs($this->admin)->put("/admin/page-builder/{$post->id}", [
+            'grapes_data' => ['components' => [['type' => 'text']]],
+            'grapes_css' => '.text { color: red; }',
+        ]);
+
+        $response->assertOk();
+
+        $builderPage = BuilderPage::where('post_id', $post->id)->first();
+        expect($builderPage)->not->toBeNull();
+        expect($builderPage->grapes_data)->toBe(['components' => [['type' => 'text']]]);
+    });
+
+    it('loads the editor page', function () {
+        $post = Post::factory()->create([
+            'type' => PostType::Page->value,
+            'editor_mode' => 'builder',
+            'author_id' => $this->admin->id,
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->get("/admin/page-builder/{$post->id}/editor");
+
+        $response->assertOk();
+    });
+
+    it('deletes a builder page', function () {
+        $post = Post::factory()->create([
+            'type' => PostType::Page->value,
+            'editor_mode' => 'builder',
+            'author_id' => $this->admin->id,
+        ]);
+
+        BuilderPage::create([
+            'post_id' => $post->id,
+            'grapes_data' => [],
+            'grapes_css' => '',
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->delete("/admin/page-builder/{$post->id}");
+
+        $response->assertOk();
+        // Post uses SoftDeletes so it's trashed, not hard deleted
+        expect(Post::find($post->id))->toBeNull();
+        expect(Post::withTrashed()->find($post->id))->not->toBeNull();
     });
 });

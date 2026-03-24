@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Role;
 use App\Models\User;
+use Modules\PageBuilder\Providers\PageBuilderServiceProvider;
 
 describe('PageBuilder module', function () {
     it('is registered and enabled', function () {
@@ -12,7 +13,7 @@ describe('PageBuilder module', function () {
     });
 
     it('provides admin navigation items', function () {
-        $navItems = \Modules\PageBuilder\Providers\PageBuilderServiceProvider::adminNavItems();
+        $navItems = PageBuilderServiceProvider::adminNavItems();
         expect($navItems)->toBeArray()->not->toBeEmpty();
         expect($navItems[0]['label'])->toBe('Page Builder');
         expect($navItems[0]['route'])->toBe('/admin/page-builder');
@@ -20,7 +21,7 @@ describe('PageBuilder module', function () {
     });
 
     it('provides permissions including publish', function () {
-        $permissions = \Modules\PageBuilder\Providers\PageBuilderServiceProvider::permissions();
+        $permissions = PageBuilderServiceProvider::permissions();
         expect($permissions)->toHaveKey('page-builder');
         expect($permissions['page-builder'])->toContain('page-builder.view');
         expect($permissions['page-builder'])->toContain('page-builder.create');
@@ -39,7 +40,7 @@ describe('PageBuilder module', function () {
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('PageBuilder::admin/page-builder/index', shouldExist: false)
-            ->has('message')
+            ->has('pages')
         );
     });
 
