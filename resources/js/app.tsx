@@ -387,7 +387,19 @@ function ThemedApp({ App, props }: ThemedAppProps) {
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
+    resolve: (name) => {
+        if (name.includes('::')) {
+            const [module, ...rest] = name.split('::');
+            const path = rest.join('::');
+            const modulePages = import.meta.glob<ComponentType>('../../Modules/*/resources/js/pages/**/*.tsx');
+            const key = `../../Modules/${module}/resources/js/pages/${path}.tsx`;
+            if (modulePages[key]) {
+                return modulePages[key]();
+            }
+            throw new Error(`Module page not found: ${name}`);
+        }
+        return resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx'));
+    },
     setup({ el, App, props }) {
         const root = createRoot(el);
 
