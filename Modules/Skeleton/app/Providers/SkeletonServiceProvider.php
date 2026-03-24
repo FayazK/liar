@@ -20,11 +20,6 @@ class SkeletonServiceProvider extends ServiceProvider implements HasAdminNavigat
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
     }
 
-    public function register(): void
-    {
-        //
-    }
-
     protected function registerConfig(): void
     {
         $configPath = module_path($this->moduleName, 'config/config.php');

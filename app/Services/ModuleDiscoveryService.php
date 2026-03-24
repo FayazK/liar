@@ -28,14 +28,9 @@ class ModuleDiscoveryService
      */
     public function getPermissions(): array
     {
-        $all = [];
-        foreach ($this->getEnabledModuleProviders() as $provider) {
-            if ($provider instanceof HasPermissions) {
-                $all = array_merge($all, $provider::permissions());
-            }
-        }
+        $collected = $this->collectFromContract(HasPermissions::class, 'permissions');
 
-        return $all;
+        return $collected ? array_merge(...$collected) : [];
     }
 
     /**
