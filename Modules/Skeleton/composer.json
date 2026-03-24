@@ -1,0 +1,22 @@
+{
+    "name": "modules/skeleton",
+    "description": "Skeleton module for validating the modular architecture infrastructure",
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Skeleton\\": "app/",
+            "Modules\\Skeleton\\Database\\Factories\\": "database/factories/",
+            "Modules\\Skeleton\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Skeleton\\Tests\\": "tests/"
+        }
+    }
+}
