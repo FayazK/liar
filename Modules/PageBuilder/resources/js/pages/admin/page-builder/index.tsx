@@ -1,18 +1,95 @@
-import { Head } from '@inertiajs/react';
+import type { ContentHeaderProps } from '@/components/ui/ContentHeader';
+import PageCard from '@/components/ui/PageCard';
 import AdminLayout from '@/layouts/admin-layout';
+import { Head, router } from '@inertiajs/react';
+import { Empty, List, Tag, Typography } from 'antd';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
-interface PageBuilderIndexProps {
-    message: string;
+dayjs.extend(relativeTime);
+
+const { Text } = Typography;
+
+interface BuilderPageItem {
+    id: number;
+    title: string;
+    slug: string;
+    status: string;
+    editor_mode: string;
+    updated_at: string;
+    author?: { first_name: string; last_name: string };
 }
 
-export default function PageBuilderIndex({ message }: PageBuilderIndexProps) {
+interface Props {
+    pages: BuilderPageItem[];
+}
+
+function statusColor(status: string): string {
+    switch (status) {
+        case 'published':
+            return 'green';
+        case 'draft':
+            return 'default';
+        case 'scheduled':
+            return 'orange';
+        default:
+            return 'default';
+    }
+}
+
+export default function PageBuilderIndex({ pages }: Props) {
+    const contentHeader: ContentHeaderProps = {
+        primaryAction: {
+            label: 'New Builder Page',
+            icon: 'plus',
+            onClick: () => router.visit('/admin/page-builder/create'),
+        },
+        breadcrumb: [{ title: 'Page Builder', href: '/admin/page-builder' }],
+    };
+
     return (
-        <AdminLayout>
+        <AdminLayout contentHeader={contentHeader}>
             <Head title="Page Builder" />
-            <div className="p-6">
-                <h1 className="text-2xl font-semibold">Page Builder</h1>
-                <p className="mt-2 text-gray-600">{message}</p>
-            </div>
+            <PageCard>
+                {pages.length === 0 ? (
+                    <Empty description="No builder pages yet. Create your first page to get started." />
+                ) : (
+                    <List
+                        dataSource={pages}
+                        renderItem={(page) => (
+                            <List.Item
+                                key={page.id}
+                                onClick={() => router.visit(`/admin/page-builder/${page.id}/editor`)}
+                                style={{ cursor: 'pointer' }}
+                                className="hover:bg-gray-50"
+                            >
+                                <List.Item.Meta
+                                    title={page.title}
+                                    description={
+                                        <Text type="secondary">
+                                            /{page.slug}
+                                            {page.author && (
+                                                <span>
+                                                    {' '}
+                                                    &middot; {page.author.first_name} {page.author.last_name}
+                                                </span>
+                                            )}
+                                        </Text>
+                                    }
+                                />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <Tag color={statusColor(page.status)}>{page.status}</Tag>
+                                    <Text type="secondary" style={{ fontSize: 12 }}>
+                                        {dayjs(page.updated_at).fromNow()}
+                                    </Text>
+                                </div>
+                            </List.Item>
+                        )}
+                    />
+                )}
+            </PageCard>
         </AdminLayout>
     );
 }
+
+PageBuilderIndex.layout = (page: React.ReactNode) => page;
