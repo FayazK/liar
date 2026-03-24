@@ -13,7 +13,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\PageBuilder\Models\BuilderPage;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -44,6 +46,7 @@ class Post extends Model implements HasMedia
         'meta_title',
         'meta_description',
         'published_at',
+        'editor_mode',
     ];
 
     /**
@@ -77,6 +80,14 @@ class Post extends Model implements HasMedia
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
+    }
+
+    /**
+     * Get the builder page associated with the post.
+     */
+    public function builderPage(): HasOne
+    {
+        return $this->hasOne(BuilderPage::class);
     }
 
     /**
