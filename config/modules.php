@@ -164,7 +164,7 @@ return [
             'policies' => ['path' => 'app/Policies', 'generate' => false],
             'provider' => ['path' => 'app/Providers', 'generate' => true],
             'repository' => ['path' => 'app/Repositories', 'generate' => false],
-            'resource' => ['path' => 'app/Transformers', 'generate' => false],
+            'resource' => ['path' => 'app/Http/Resources', 'generate' => false],
             'route-provider' => ['path' => 'app/Providers', 'generate' => true],
             'rules' => ['path' => 'app/Rules', 'generate' => false],
             'services' => ['path' => 'app/Services', 'generate' => false],
@@ -191,8 +191,8 @@ return [
             'assets' => ['path' => 'resources/assets', 'generate' => true],
             'component-view' => ['path' => 'resources/views/components', 'generate' => false],
             'views' => ['path' => 'resources/views', 'generate' => true],
-            'inertia' => ['path' => 'resources/js/Pages', 'generate' => false],
-            'inertia-components' => ['path' => 'resources/js/Components', 'generate' => false],
+            'inertia' => ['path' => 'resources/js/pages', 'generate' => false],
+            'inertia-components' => ['path' => 'resources/js/components', 'generate' => false],
 
             // routes/
             'routes' => ['path' => 'routes', 'generate' => true],
@@ -327,6 +327,6 @@ return [
     |
     */
     'inertia' => [
-        'frontend' => 'vue',
+        'frontend' => 'react',
     ],
 ];
