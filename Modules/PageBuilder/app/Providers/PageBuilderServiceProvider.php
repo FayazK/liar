@@ -20,6 +20,7 @@ class PageBuilderServiceProvider extends ServiceProvider implements HasAdminNavi
     {
         $this->registerConfig();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
+        $this->loadViewsFrom(module_path($this->moduleName, 'resources/views'), $this->moduleNameLower);
     }
 
     public function register(): void

@@ -8,5 +8,8 @@ use App\Http\Controllers\Controller;
 
 class PublicPageController extends Controller
 {
-    //
+    public function show(string $slug): void
+    {
+        abort(404); // Implemented in Task 6
+    }
 }
