@@ -32,8 +32,7 @@ Modules/PageBuilder/
 │   │   └── RouteServiceProvider.php
 │   ├── Http/
 │   │   ├── Controllers/Admin/
-│   │   │   ├── PageBuilderController.php     # CRUD for builder pages
-│   │   │   └── BrandProfileController.php    # Brand settings
+│   │   │   └── PageBuilderController.php     # CRUD for builder pages
 │   │   └── Requests/
 │   │       ├── StorePageRequest.php
 │   │       └── UpdatePageRequest.php
@@ -42,6 +41,7 @@ Modules/PageBuilder/
 │   │   ├── PageCompilerService.php           # GrapesJS JSON → static HTML
 │   │   └── SectionTemplateService.php        # Manages pre-built sections
 │   ├── Repositories/
+│   │   ├── BuilderPageRepositoryInterface.php
 │   │   └── BuilderPageRepository.php
 │   └── Models/
 │       ├── BuilderPage.php                   # Stores GrapesJS data
@@ -88,25 +88,35 @@ Modules/PageBuilder/
 
 ## Data Model
 
+### `posts` table (existing — new column)
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| `editor_mode` | enum(`tiptap`, `builder`) default `tiptap` | Determines which editor loads for pages |
+
+This column is added via a module migration. Defaults to `tiptap` so all existing pages are unaffected. The column lives on `posts` (not `builder_pages`) because it needs to be checked before loading the editor, regardless of whether a `builder_pages` row exists yet (e.g., when creating a new page).
+
 ### `builder_pages`
 
 | Column | Type | Purpose |
 |--------|------|---------|
 | `id` | bigint PK | |
-| `post_id` | FK → posts | Links to existing Post model (type: page) |
+| `post_id` | FK → posts (unique) | Links to existing Post model (type: page) |
 | `grapes_data` | JSON | GrapesJS component tree (editor state) |
 | `grapes_css` | longText | GrapesJS generated CSS |
 | `compiled_html` | longText | Final static HTML output (generated at publish) |
 | `compiled_css` | longText | Final static CSS output (generated at publish) |
 | `compiled_at` | timestamp | When last compiled |
-| `editor_mode` | enum(`builder`, `tiptap`) | Determines which editor loads |
 
 **Relationships:**
 - `BuilderPage belongsTo Post`
 - `Post hasOne BuilderPage`
-- Pages without a `builder_pages` row use TipTap (backward compatible)
+- `editor_mode` on `posts` determines the editor; `builder_pages` row stores the builder data
+- A page with `editor_mode = builder` but no `builder_pages` row is a new builder page (row created on first save)
 
-### `brand_profiles`
+### `brand_profiles` (deferred to SP3)
+
+Schema documented here for reference. Table, model, and UI are implemented in Sub-project 3 (AI Integration).
 
 | Column | Type | Purpose |
 |--------|------|---------|
@@ -231,17 +241,24 @@ GrapesJS Editor State
 
 ### Public Route Handler
 
+**The PageBuilder module only owns rendering of builder pages.** It does not take over routing for TipTap pages or any other content. If the module is disabled, builder pages return 404 — all other pages are unaffected.
+
+**Route registration:** The module registers a public route in its own `routes/web.php` (loaded by its `RouteServiceProvider`):
+
 ```
-GET /{slug}
-  1. Find Post by slug
-  2. Check if Post has a BuilderPage record
-  3. If yes → render compiled HTML in a Blade layout
+GET /p/{slug}                          # Module-scoped prefix to avoid conflicts
+  1. Find published Post by slug where editor_mode = 'builder'
+  2. If not found → 404
+  3. Load BuilderPage → render compiled HTML in Blade layout
      - Blade layout adds <head> (meta tags, OG tags, favicon)
      - Optional header/footer (configurable per page)
      - Injects compiled CSS
      - No React, no Inertia, no JS runtime
-  4. If no → render via Inertia (existing TipTap flow)
 ```
+
+The `/p/{slug}` prefix avoids route conflicts with existing routes (`/dashboard`, `/login`, etc.). If a vanity URL is needed (e.g., `/pricing` instead of `/p/pricing`), an optional redirect or catch-all route can be added later as an enhancement — but the base implementation uses the prefix for safety.
+
+**TipTap pages** continue to render through their existing mechanism (or a future public page system) — the PageBuilder module does not interfere with them.
 
 ### Security
 
@@ -271,6 +288,13 @@ GET /{slug}
 | Footer | Multi-column links, minimal, social-focused | 3 |
 | Header/Nav | Sticky nav, centered logo, hamburger mobile | 3 |
 | Stats | Counter row, progress bars, icon+number grid | 3 |
+
+### Template Storage
+
+- Templates are stored as structured arrays in `SectionTemplateSeeder` (HTML+CSS strings in PHP)
+- No external template files — everything self-contained in the seeder class
+- Each template entry includes: name, slug, category, html_template, css_template, sort_order
+- Thumbnails generated as simple SVG placeholders initially; real previews can be added later
 
 ### Template Design
 
