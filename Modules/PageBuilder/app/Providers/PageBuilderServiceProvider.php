@@ -56,6 +56,7 @@ class PageBuilderServiceProvider extends ServiceProvider implements HasAdminNavi
                 'page-builder.create',
                 'page-builder.update',
                 'page-builder.delete',
+                'page-builder.publish',
             ],
         ];
     }
