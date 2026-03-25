@@ -5,6 +5,8 @@ export interface SectionTemplate {
     name: string;
     slug: string;
     category: string;
+    tags: string[] | null;
+    is_custom: boolean;
     html_template: string;
     css_template: string | null;
     thumbnail: string | null;
