@@ -22,7 +22,9 @@ class SectionTemplate extends Model
         'grapes_data',
         'html_template',
         'css_template',
+        'tags',
         'is_active',
+        'is_custom',
         'sort_order',
     ];
 
@@ -35,7 +37,9 @@ class SectionTemplate extends Model
     {
         return [
             'grapes_data' => 'array',
+            'tags' => 'array',
             'is_active' => 'boolean',
+            'is_custom' => 'boolean',
             'sort_order' => 'integer',
         ];
     }
@@ -54,5 +58,29 @@ class SectionTemplate extends Model
     public function scopeByCategory(Builder $query, string $category): Builder
     {
         return $query->where('category', $category);
+    }
+
+    /**
+     * Scope a query to filter templates by tag.
+     */
+    public function scopeByTag(Builder $query, string $tag): Builder
+    {
+        return $query->whereJsonContains('tags', $tag);
+    }
+
+    /**
+     * Scope a query to only include custom templates.
+     */
+    public function scopeCustom(Builder $query): Builder
+    {
+        return $query->where('is_custom', true);
+    }
+
+    /**
+     * Scope a query to only include built-in templates.
+     */
+    public function scopeBuiltIn(Builder $query): Builder
+    {
+        return $query->where('is_custom', false);
     }
 }
