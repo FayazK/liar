@@ -9,6 +9,8 @@ use App\Contracts\ModuleContracts\HasPermissions;
 use Illuminate\Support\ServiceProvider;
 use Modules\PageBuilder\Repositories\BuilderPageRepository;
 use Modules\PageBuilder\Repositories\BuilderPageRepositoryInterface;
+use Modules\PageBuilder\Repositories\SectionTemplateRepository;
+use Modules\PageBuilder\Repositories\SectionTemplateRepositoryInterface;
 
 class PageBuilderServiceProvider extends ServiceProvider implements HasAdminNavigation, HasPermissions
 {
@@ -26,6 +28,7 @@ class PageBuilderServiceProvider extends ServiceProvider implements HasAdminNavi
     public function register(): void
     {
         $this->app->bind(BuilderPageRepositoryInterface::class, BuilderPageRepository::class);
+        $this->app->bind(SectionTemplateRepositoryInterface::class, SectionTemplateRepository::class);
     }
 
     protected function registerConfig(): void

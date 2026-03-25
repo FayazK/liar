@@ -5,10 +5,19 @@ declare(strict_types=1);
 namespace Modules\PageBuilder\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\PageBuilder\Database\Factories\SectionTemplateFactory;
 
 class SectionTemplate extends Model
 {
+    use HasFactory;
+
+    protected static function newFactory(): SectionTemplateFactory
+    {
+        return SectionTemplateFactory::new();
+    }
+
     /**
      * The attributes that are mass assignable.
      *
