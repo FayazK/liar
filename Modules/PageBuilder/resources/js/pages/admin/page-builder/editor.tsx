@@ -22,7 +22,7 @@ const AUTO_SAVE_INTERVAL = 30_000;
 export default function PageBuilderEditor({ post, builderPage, sectionTemplates }: Props) {
     const editorRef = useRef<Editor | null>(null);
     const isDirty = useRef(false);
-    const handleSaveRef = useRef<() => Promise<void>>();
+    const handleSaveRef = useRef<(() => Promise<void>) | null>(null);
     const [saving, setSaving] = useState(false);
     const [publishing, setPublishing] = useState(false);
     const [activeDevice, setActiveDevice] = useState('Desktop');

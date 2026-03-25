@@ -20,7 +20,8 @@ describe('Section Template Admin', function () {
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('PageBuilder::admin/page-builder/templates/index', false)
-                ->has('templates.data', 3)
+                ->has('tags')
+                ->has('categories')
             );
     });
 

@@ -24,6 +24,15 @@ export default function GrapesEditor({
 }: GrapesEditorProps): React.ReactElement {
     const containerRef = useRef<HTMLDivElement>(null);
     const editorRef = useRef<Editor | null>(null);
+    const onSaveRef = useRef(onSave);
+    const onEditorReadyRef = useRef(onEditorReady);
+    const sectionTemplatesRef = useRef(sectionTemplates);
+    const initialDataRef = useRef(initialData);
+
+    onSaveRef.current = onSave;
+    onEditorReadyRef.current = onEditorReady;
+    sectionTemplatesRef.current = sectionTemplates;
+    initialDataRef.current = initialData;
 
     useEffect(() => {
         if (!containerRef.current || editorRef.current) return;
@@ -37,8 +46,8 @@ export default function GrapesEditor({
             plugins: [stylePresetsPlugin, devicePreviewPlugin],
         });
 
-        if (initialData?.grapes_data) {
-            const data = initialData.grapes_data;
+        const data = initialDataRef.current?.grapes_data;
+        if (data) {
             if (data.components) {
                 editor.setComponents(data.components as string);
             }
@@ -47,12 +56,21 @@ export default function GrapesEditor({
             }
         }
 
-        registerSectionBlocks(editor, sectionTemplates);
+        registerSectionBlocks(editor, sectionTemplatesRef.current);
+
+        editor.on('storage:store', () => {
+            const components = editor.getComponents();
+            const styles = editor.getStyle();
+            onSaveRef.current({
+                grapesData: { components: components as unknown as Record<string, unknown>, styles: styles as unknown as Record<string, unknown> },
+                grapesCss: editor.getCss() ?? '',
+            });
+        });
 
         editorRef.current = editor;
 
-        if (onEditorReady) {
-            onEditorReady(editor);
+        if (onEditorReadyRef.current) {
+            onEditorReadyRef.current(editor);
         }
 
         return () => {
