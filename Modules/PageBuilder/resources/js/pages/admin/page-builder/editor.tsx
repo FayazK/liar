@@ -4,6 +4,7 @@ import { router } from '@inertiajs/react';
 import { Button, message, Space, Tooltip, Typography } from 'antd';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import GrapesEditor from '../../../components/GrapesEditor';
+import SaveAsTemplateModal from '../../../components/SaveAsTemplateModal';
 import SectionPanel from '../../../components/SectionPanel';
 import StylePresets from '../../../components/StylePresets';
 import type { SectionTemplate } from '../../../lib/grapes-blocks';
@@ -25,6 +26,9 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
     const [saving, setSaving] = useState(false);
     const [publishing, setPublishing] = useState(false);
     const [activeDevice, setActiveDevice] = useState('Desktop');
+    const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
+    const [templateHtml, setTemplateHtml] = useState('');
+    const [templateCss, setTemplateCss] = useState('');
     const autoSaveTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const getEditorData = useCallback((): { grapesData: Record<string, unknown>; grapesCss: string } | null => {
@@ -114,6 +118,19 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
         }
     };
 
+    const handleSaveAsTemplate = (): void => {
+        const editor = editorRef.current;
+        if (!editor) return;
+
+        const selected = editor.getSelected();
+        const html = selected ? selected.toHTML() : (editor.getHtml() ?? '');
+        const css = editor.getCss() ?? '';
+
+        setTemplateHtml(html);
+        setTemplateCss(css);
+        setSaveTemplateOpen(true);
+    };
+
     // Auto-save only when dirty, with stable ref to avoid interval restarts
     useEffect(() => {
         autoSaveTimer.current = setInterval(() => {
@@ -183,6 +200,9 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
                 </Space>
 
                 <Space>
+                    <Button size="small" onClick={handleSaveAsTemplate}>
+                        Save as Template
+                    </Button>
                     <Button size="small" onClick={() => void handleSave()} loading={saving}>
                         Save
                     </Button>
@@ -235,6 +255,14 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
                     <StylePresets onApply={handleStylePreset} />
                 </div>
             </div>
+
+            <SaveAsTemplateModal
+                open={saveTemplateOpen}
+                onClose={() => setSaveTemplateOpen(false)}
+                html={templateHtml}
+                css={templateCss}
+                categories={Object.keys(sectionTemplates)}
+            />
         </div>
     );
 }
