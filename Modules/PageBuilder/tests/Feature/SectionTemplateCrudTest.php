@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Modules\PageBuilder\Models\SectionTemplate;
 use Modules\PageBuilder\Repositories\SectionTemplateRepositoryInterface;
+use Modules\PageBuilder\Services\SectionTemplateService;
 
 describe('SectionTemplateRepository', function () {
     it('creates a custom template', function () {
@@ -52,5 +53,48 @@ describe('SectionTemplateRepository', function () {
         $repo->delete($template->id);
 
         expect(SectionTemplate::find($template->id))->toBeNull();
+    });
+});
+
+describe('SectionTemplateService', function () {
+    it('returns all unique tags from active templates', function () {
+        SectionTemplate::factory()->create(['tags' => ['dark', 'minimal'], 'is_active' => true]);
+        SectionTemplate::factory()->create(['tags' => ['dark', 'bold'], 'is_active' => true]);
+        SectionTemplate::factory()->create(['tags' => ['colorful'], 'is_active' => true]);
+
+        $service = app(SectionTemplateService::class);
+        $tags = $service->getAllTags();
+
+        expect($tags)->toContain('dark', 'minimal', 'bold', 'colorful');
+        expect(count($tags))->toBe(4);
+    });
+
+    it('groups templates by category with tag filtering', function () {
+        SectionTemplate::factory()->create(['category' => 'hero', 'tags' => ['dark'], 'is_active' => true]);
+        SectionTemplate::factory()->create(['category' => 'hero', 'tags' => ['light'], 'is_active' => true]);
+        SectionTemplate::factory()->create(['category' => 'cta', 'tags' => ['dark'], 'is_active' => true]);
+
+        $service = app(SectionTemplateService::class);
+        $grouped = $service->getGroupedByCategory(tag: 'dark');
+
+        expect($grouped)->toHaveKey('hero');
+        expect($grouped)->toHaveKey('cta');
+        expect($grouped['hero'])->toHaveCount(1);
+    });
+
+    it('creates custom template from editor data', function () {
+        $service = app(SectionTemplateService::class);
+
+        $template = $service->createFromEditor(
+            name: 'My Custom Section',
+            category: 'hero',
+            htmlTemplate: '<section>Custom</section>',
+            cssTemplate: '.custom { color: red; }',
+            tags: ['custom', 'dark'],
+        );
+
+        expect($template->is_custom)->toBeTrue();
+        expect($template->slug)->toStartWith('my-custom-section');
+        expect($template->tags)->toBe(['custom', 'dark']);
     });
 });
