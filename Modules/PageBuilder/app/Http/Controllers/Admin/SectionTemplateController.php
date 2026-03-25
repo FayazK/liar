@@ -6,11 +6,14 @@ namespace Modules\PageBuilder\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Inertia\Inertia;
 use Inertia\Response;
+use Modules\PageBuilder\Http\Requests\SectionTemplateDataTableRequest;
 use Modules\PageBuilder\Http\Requests\StoreSectionTemplateRequest;
 use Modules\PageBuilder\Http\Requests\UpdateSectionTemplateRequest;
 use Modules\PageBuilder\Models\SectionTemplate;
+use Modules\PageBuilder\Queries\SectionTemplateDataTableQueryService;
 use Modules\PageBuilder\Services\SectionTemplateService;
 
 class SectionTemplateController extends Controller
@@ -22,16 +25,20 @@ class SectionTemplateController extends Controller
     public function index(): Response
     {
         return Inertia::render('PageBuilder::admin/page-builder/templates/index', [
-            'templates' => fn () => SectionTemplate::query()
-                ->orderBy('category')
-                ->orderBy('sort_order')
-                ->paginate(20),
             'tags' => fn () => $this->service->getAllTags(),
             'categories' => fn () => SectionTemplate::query()
                 ->select('category')
                 ->distinct()
                 ->pluck('category'),
         ]);
+    }
+
+    public function data(SectionTemplateDataTableRequest $request): ResourceCollection
+    {
+        $query = SectionTemplate::query();
+        $paginated = (new SectionTemplateDataTableQueryService($query, $request))->getResults();
+
+        return new ResourceCollection($paginated);
     }
 
     public function store(StoreSectionTemplateRequest $request): JsonResponse

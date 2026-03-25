@@ -19,6 +19,7 @@ Route::middleware(['web', 'auth', 'admin'])
         Route::delete('/{post}', [PageBuilderController::class, 'destroy'])->name('destroy');
 
         Route::get('/templates', [SectionTemplateController::class, 'index'])->name('templates.index');
+        Route::get('/templates/data', [SectionTemplateController::class, 'data'])->name('templates.data');
         Route::post('/templates', [SectionTemplateController::class, 'store'])->name('templates.store');
         Route::put('/templates/{template}', [SectionTemplateController::class, 'update'])->name('templates.update');
         Route::delete('/templates/{template}', [SectionTemplateController::class, 'destroy'])->name('templates.destroy');
