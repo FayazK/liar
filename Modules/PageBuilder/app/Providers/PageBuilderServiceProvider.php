@@ -52,6 +52,12 @@ class PageBuilderServiceProvider extends ServiceProvider implements HasAdminNavi
                 'route' => '/admin/page-builder',
                 'permission' => 'page-builder.view',
             ],
+            [
+                'label' => 'Brand Profile',
+                'icon' => 'palette',
+                'route' => '/admin/page-builder/brand-profile',
+                'permission' => 'page-builder.ai.brand-profile',
+            ],
         ];
     }
 
