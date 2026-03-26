@@ -321,14 +321,18 @@ The GrapesJS-based editor, data model, compilation pipeline, section templates, 
 - Template versioning — update without breaking existing pages
 - Industry-specific packs (SaaS, restaurant, portfolio, ecommerce)
 
-### SP3: AI Integration
-- Brand profile management UI (settings page)
-- AI section generation — prompt → GrapesJS-compatible HTML+CSS using brand profile + template patterns
-- AI full page generation — prompt → complete page assembled from templates
-- AI content rewriting — select text, rewrite with tone/length controls
-- AI style suggestions — analyze page, suggest design improvements
-- AI image generation — hero backgrounds, illustrations via `config/ai.php` providers
-- All AI calls through Laravel AI package (already configured)
+### SP3: AI Integration ✅
+**Completed:**
+- ✅ Brand profile management UI — standalone settings page with color palette, font preferences, tone of voice
+- ✅ AI section generation — prompt → GrapesJS-compatible HTML+CSS using brand profile + template patterns via SSE streaming
+- ✅ AI full page generation — two-step: PageGeneratorAgent plans sections, SectionGeneratorAgent generates each
+- ✅ AI content rewriting — floating toolbar over selected text with quick presets (Rewrite, Shorter, Professional, Expand)
+- ✅ AI style suggestions — analyze page design, suggest improvements with one-click apply
+- ✅ AI image generation — generate images via Laravel AI Image API with aspect ratio control, insert/replace in canvas
+- ✅ All AI agents use Laravel AI SDK with `HasStructuredOutput` for reliable JSON responses
+- ✅ Collapsible AI drawer in editor with 5 tabbed panels
+- ✅ Blade prompt templates with shared partials (brand context, HTML rules, examples)
+- ✅ Rate-limited AI endpoints with permission-based access control
 
 ### SP4: Responsive System
 - Smart responsive defaults via CSS container queries + flexbox/grid
