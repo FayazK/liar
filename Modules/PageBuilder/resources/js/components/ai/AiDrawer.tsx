@@ -1,6 +1,7 @@
 import { Drawer, Tabs } from 'antd';
 import type { Editor } from 'grapesjs';
 import AiContentRewriter from './AiContentRewriter';
+import AiImageGenerator from './AiImageGenerator';
 import AiPageGenerator from './AiPageGenerator';
 import AiSectionGenerator from './AiSectionGenerator';
 import AiStyleSuggestions from './AiStyleSuggestions';
@@ -36,7 +37,7 @@ export default function AiDrawer({ open, onClose, editor }: AiDrawerProps): Reac
         {
             key: 'images',
             label: 'Images',
-            children: <div style={{ padding: '12px 0', color: '#999' }}>Coming in next update</div>,
+            children: <AiImageGenerator editor={editor} />,
         },
     ];
 

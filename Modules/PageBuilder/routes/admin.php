@@ -25,6 +25,7 @@ Route::middleware(['web', 'auth', 'admin'])
             Route::post('/page', [AiController::class, 'generatePage'])->name('page');
             Route::post('/rewrite', [AiController::class, 'rewriteContent'])->name('rewrite');
             Route::post('/style-suggestions', [AiController::class, 'styleSuggestions'])->name('style');
+            Route::post('/image', [AiController::class, 'generateImage'])->name('image');
         });
 
         Route::get('/{post}/editor', [PageBuilderController::class, 'editor'])->name('editor');
