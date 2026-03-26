@@ -4,7 +4,8 @@ import AdminLayout from '@/layouts/admin-layout';
 import axios from '@/lib/axios';
 import { Head, router } from '@inertiajs/react';
 import { App, Button, ColorPicker, Form, Input, Radio, Select } from 'antd';
-import React, { useState } from 'react';
+import { isApiError } from '@/utils/errors';
+import { type ReactNode, useState } from 'react';
 
 const { TextArea } = Input;
 
@@ -71,7 +72,7 @@ const FONT_OPTIONS = [
 
 export default function BrandProfilePage({ brandProfile }: Props) {
     const { notification } = App.useApp();
-    const [form] = Form.useForm<FormValues>();
+    const [form] = Form.useForm();
     const [submitting, setSubmitting] = useState(false);
 
     const contentHeader: ContentHeaderProps = {
@@ -100,10 +101,25 @@ export default function BrandProfilePage({ brandProfile }: Props) {
             notification.success({ message: 'Brand profile saved successfully.' });
             router.reload();
         } catch (error: unknown) {
-            const axiosError = error as { response?: { data?: { message?: string } } };
-            notification.error({
-                message: axiosError.response?.data?.message ?? 'Failed to save brand profile.',
-            });
+            if (isApiError(error) && error.response?.status === 422) {
+                const validationErrors = error.response.data.errors;
+                if (validationErrors) {
+                    const formErrors = Object.keys(validationErrors).map((key) => ({
+                        name: key.split('.'),
+                        errors: validationErrors[key],
+                    }));
+                    form.setFields(formErrors);
+                }
+                notification.error({
+                    message: 'Validation Error',
+                    description: error.response.data.message,
+                });
+            } else {
+                notification.error({
+                    message: 'Error',
+                    description: 'Failed to save brand profile.',
+                });
+            }
         } finally {
             setSubmitting(false);
         }
@@ -112,7 +128,7 @@ export default function BrandProfilePage({ brandProfile }: Props) {
     return (
         <AdminLayout contentHeader={contentHeader}>
             <Head title="Brand Profile" />
-            <PageCard header={{ title: 'Brand Profile', description: 'Configure your brand identity. This information is used by AI agents when generating content.' }}>
+            <PageCard header={{ title: 'Brand Profile', subtitle: 'Configure your brand identity. This information is used by AI agents when generating content.' }}>
                 <Form
                     form={form}
                     layout="vertical"
@@ -209,4 +225,4 @@ export default function BrandProfilePage({ brandProfile }: Props) {
     );
 }
 
-BrandProfilePage.layout = (page: React.ReactNode) => page;
+BrandProfilePage.layout = (page: ReactNode) => page;
