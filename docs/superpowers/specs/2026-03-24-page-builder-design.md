@@ -304,13 +304,20 @@ The `/p/{slug}` prefix avoids route conflicts with existing routes (`/dashboard`
 
 ## Sub-Project Roadmap
 
-### SP1: Core Builder Engine (this spec)
+### SP1: Core Builder Engine ✅
 The GrapesJS-based editor, data model, compilation pipeline, section templates, and public rendering.
 
-### SP2: Section Template Library Expansion
-- Expand from 44 to 150+ sections
-- Template designer tool — create new templates from existing pages
-- Template tagging and advanced search/filtering
+### SP2: Section Template Library Expansion ✅ (foundation)
+**Completed:**
+- ✅ Expanded from 10 to 44 sections across all 12 categories (hero, features, pricing, testimonials, CTA, content, gallery, team, contact, footer, header, stats)
+- ✅ Template tagging (JSON tags column) and tag-based filtering in editor panel
+- ✅ Save as Template — create custom templates from editor selections
+- ✅ Admin template management CRUD with built-in template protection
+- ✅ Seeder refactored into per-category files with upsert for efficiency
+- ✅ Repository + service layer for templates with caching
+
+**Deferred to future iterations:**
+- Expand from 44 to 150+ sections (add more seeder category files)
 - Template versioning — update without breaking existing pages
 - Industry-specific packs (SaaS, restaurant, portfolio, ecommerce)
 
