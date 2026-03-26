@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Modules\PageBuilder\Http\Controllers\Admin;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Modules\PageBuilder\Http\Requests\GenerateSectionRequest;
 use Modules\PageBuilder\Http\Requests\RewriteContentRequest;
 use Modules\PageBuilder\Services\AiGenerationService;
@@ -28,5 +30,23 @@ class AiController
             $request->string('original_text')->toString(),
             $request->string('instruction')->toString(),
         );
+    }
+
+    public function styleSuggestions(Request $request): JsonResponse
+    {
+        $request->validate([
+            'html' => ['required', 'string'],
+            'css' => ['nullable', 'string'],
+        ]);
+
+        $response = $this->aiGenerationService->suggestStyles(
+            $request->string('html')->toString(),
+            $request->string('css')->toString(),
+        );
+
+        return response()->json([
+            'success' => true,
+            'data' => $response->json(),
+        ]);
     }
 }
