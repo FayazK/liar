@@ -10,4 +10,10 @@ return [
         'purge_css' => true,
     ],
     'public_route_prefix' => 'p',
+    'ai' => [
+        'timeout' => env('PAGE_BUILDER_AI_TIMEOUT', 90),
+        'provider' => env('PAGE_BUILDER_AI_PROVIDER', null),
+        'image_provider' => env('PAGE_BUILDER_AI_IMAGE_PROVIDER', null),
+        'max_sections_per_page' => 8,
+    ],
 ];

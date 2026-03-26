@@ -21,7 +21,7 @@ class PageCompilerService
         $html = $grapesData['html'] ?? '';
         $css = $grapesData['css'] ?? $builderPage->grapes_css ?? '';
 
-        $sanitizedHtml = $this->sanitizeHtml($html);
+        $sanitizedHtml = self::sanitizeHtml($html);
 
         if (config('page-builder.compilation.minify_html', true)) {
             $sanitizedHtml = $this->minifyHtml($sanitizedHtml);
@@ -40,7 +40,7 @@ class PageCompilerService
         return $builderPage;
     }
 
-    private function sanitizeHtml(string $html): string
+    public static function sanitizeHtml(string $html): string
     {
         if (empty($html)) {
             return '';
