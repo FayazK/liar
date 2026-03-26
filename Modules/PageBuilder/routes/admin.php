@@ -16,8 +16,10 @@ Route::middleware(['web', 'auth', 'admin'])
         Route::get('/create', [PageBuilderController::class, 'create'])->name('create');
         Route::post('/', [PageBuilderController::class, 'store'])->name('store');
 
-        Route::get('/brand-profile', [BrandProfileController::class, 'edit'])->name('brand-profile.edit');
-        Route::put('/brand-profile', [BrandProfileController::class, 'update'])->name('brand-profile.update');
+        Route::middleware('can:page-builder.ai.brand-profile')->group(function () {
+            Route::get('/brand-profile', [BrandProfileController::class, 'edit'])->name('brand-profile.edit');
+            Route::put('/brand-profile', [BrandProfileController::class, 'update'])->name('brand-profile.update');
+        });
 
         // AI Generation routes
         Route::prefix('ai')->name('ai.')->middleware(['can:page-builder.ai.generate', 'throttle:10,1'])->group(function () {

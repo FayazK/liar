@@ -1,6 +1,6 @@
 import { Button, Space } from 'antd';
 import type { Editor } from 'grapesjs';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAiGeneration } from '../../hooks/useAiGeneration';
 import { useSelectedText } from '../../hooks/useSelectedText';
 
@@ -44,27 +44,33 @@ export default function AiFloatingToolbar({ editor }: AiFloatingToolbarProps): R
         }
     }, [selectedText, range, editor]);
 
-    // Apply rewritten text
-    useEffect(() => {
-        if (!result || isGenerating || !range) return;
-
+    const parsedResult = useMemo((): string | null => {
+        if (!result || isGenerating) return null;
         try {
             const parsed = JSON.parse(result) as { text?: string };
-            if (parsed.text && range) {
-                const canvasDoc = editor?.Canvas?.getDocument();
-                if (canvasDoc) {
-                    const selection = canvasDoc.getSelection();
-                    if (selection) {
-                        selection.removeAllRanges();
-                        selection.addRange(range);
-                        canvasDoc.execCommand('insertText', false, parsed.text);
-                    }
-                }
-            }
+            return parsed.text ?? null;
         } catch {
-            // Result not ready yet or parse error
+            return null;
         }
-    }, [result, isGenerating, range, editor]);
+    }, [result, isGenerating]);
+
+    const applyRewrite = useCallback(() => {
+        if (!parsedResult || !range || !editor) return;
+
+        const canvasDoc = editor.Canvas?.getDocument();
+        if (canvasDoc) {
+            const selection = canvasDoc.getSelection();
+            if (selection) {
+                selection.removeAllRanges();
+                selection.addRange(range);
+                canvasDoc.execCommand('insertText', false, parsedResult);
+            }
+        }
+    }, [parsedResult, range, editor]);
+
+    const discardRewrite = useCallback(() => {
+        abort();
+    }, [abort]);
 
     const handlePreset = useCallback(
         (instruction: string) => {
@@ -93,10 +99,36 @@ export default function AiFloatingToolbar({ editor }: AiFloatingToolbarProps): R
                 borderRadius: 6,
                 padding: '4px 6px',
                 display: 'flex',
+                flexDirection: 'column',
                 gap: 4,
+                maxWidth: 360,
             }}
         >
-            {isGenerating ? (
+            {parsedResult ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div
+                        style={{
+                            fontSize: 12,
+                            padding: '4px 8px',
+                            background: '#f9fafb',
+                            borderRadius: 4,
+                            maxHeight: 120,
+                            overflow: 'auto',
+                            whiteSpace: 'pre-wrap',
+                        }}
+                    >
+                        {parsedResult}
+                    </div>
+                    <Space size={4}>
+                        <Button size="small" type="primary" onClick={applyRewrite}>
+                            Apply
+                        </Button>
+                        <Button size="small" onClick={discardRewrite}>
+                            Discard
+                        </Button>
+                    </Space>
+                </div>
+            ) : isGenerating ? (
                 <Button size="small" danger onClick={abort}>
                     Stop
                 </Button>

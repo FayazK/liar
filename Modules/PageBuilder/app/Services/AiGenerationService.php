@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\PageBuilder\Services;
 
+use Laravel\Ai\Responses\AgentResponse;
 use Laravel\Ai\Responses\StreamableAgentResponse;
 use Modules\PageBuilder\Agents\ContentRewriterAgent;
 use Modules\PageBuilder\Agents\PageGeneratorAgent;
@@ -18,6 +19,10 @@ class AiGenerationService
 
     /**
      * Generate a section using the AI agent.
+     *
+     * Note: Returns a raw stream. HTML sanitization is not applied here for streamed
+     * responses; instead, sanitization occurs at compilation time when the page is
+     * published via PageCompilerService::compile().
      */
     public function generateSection(string $prompt, ?string $category = null): StreamableAgentResponse
     {
@@ -71,7 +76,7 @@ class AiGenerationService
     /**
      * Suggest style improvements for the given HTML and CSS.
      */
-    public function suggestStyles(string $html, string $css): mixed
+    public function suggestStyles(string $html, string $css): AgentResponse
     {
         $brandProfile = $this->brandProfileService->getActive();
         $agent = new StyleSuggestionAgent($brandProfile);

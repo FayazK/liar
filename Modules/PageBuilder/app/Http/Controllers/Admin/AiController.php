@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Modules\PageBuilder\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Modules\PageBuilder\Http\Requests\GenerateImageRequest;
 use Modules\PageBuilder\Http\Requests\GeneratePageRequest;
 use Modules\PageBuilder\Http\Requests\GenerateSectionRequest;
 use Modules\PageBuilder\Http\Requests\RewriteContentRequest;
+use Modules\PageBuilder\Http\Requests\StyleSuggestionsRequest;
 use Modules\PageBuilder\Services\AiGenerationService;
 use Modules\PageBuilder\Services\AiImageService;
 
-class AiController
+class AiController extends Controller
 {
     public function __construct(
         private readonly AiGenerationService $aiGenerationService,
@@ -62,13 +63,8 @@ class AiController
         ]);
     }
 
-    public function styleSuggestions(Request $request): JsonResponse
+    public function styleSuggestions(StyleSuggestionsRequest $request): JsonResponse
     {
-        $request->validate([
-            'html' => ['required', 'string'],
-            'css' => ['nullable', 'string'],
-        ]);
-
         $response = $this->aiGenerationService->suggestStyles(
             $request->string('html')->toString(),
             $request->string('css')->toString(),
@@ -76,7 +72,7 @@ class AiController
 
         return response()->json([
             'success' => true,
-            'data' => $response->json(),
+            'data' => ['suggestions' => $response['suggestions']],
         ]);
     }
 }
