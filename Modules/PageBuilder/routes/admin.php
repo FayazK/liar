@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Modules\PageBuilder\Http\Controllers\Admin\AiController;
 use Modules\PageBuilder\Http\Controllers\Admin\BrandProfileController;
 use Modules\PageBuilder\Http\Controllers\Admin\PageBuilderController;
 use Modules\PageBuilder\Http\Controllers\Admin\SectionTemplateController;
@@ -17,6 +18,11 @@ Route::middleware(['web', 'auth', 'admin'])
 
         Route::get('/brand-profile', [BrandProfileController::class, 'edit'])->name('brand-profile.edit');
         Route::put('/brand-profile', [BrandProfileController::class, 'update'])->name('brand-profile.update');
+
+        // AI Generation routes
+        Route::prefix('ai')->name('ai.')->middleware(['can:page-builder.ai.generate', 'throttle:10,1'])->group(function () {
+            Route::post('/section', [AiController::class, 'generateSection'])->name('section');
+        });
 
         Route::get('/{post}/editor', [PageBuilderController::class, 'editor'])->name('editor');
         Route::put('/{post}', [PageBuilderController::class, 'update'])->name('update');
