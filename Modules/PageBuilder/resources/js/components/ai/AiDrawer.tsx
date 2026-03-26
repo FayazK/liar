@@ -1,6 +1,7 @@
 import { Drawer, Tabs } from 'antd';
 import type { Editor } from 'grapesjs';
 import AiContentRewriter from './AiContentRewriter';
+import AiPageGenerator from './AiPageGenerator';
 import AiSectionGenerator from './AiSectionGenerator';
 import AiStyleSuggestions from './AiStyleSuggestions';
 
@@ -20,7 +21,7 @@ export default function AiDrawer({ open, onClose, editor }: AiDrawerProps): Reac
         {
             key: 'page',
             label: 'Full Page',
-            children: <div style={{ padding: '12px 0', color: '#999' }}>Coming in next update</div>,
+            children: <AiPageGenerator editor={editor} />,
         },
         {
             key: 'rewrite',

@@ -6,6 +6,7 @@ namespace Modules\PageBuilder\Http\Controllers\Admin;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\PageBuilder\Http\Requests\GeneratePageRequest;
 use Modules\PageBuilder\Http\Requests\GenerateSectionRequest;
 use Modules\PageBuilder\Http\Requests\RewriteContentRequest;
 use Modules\PageBuilder\Services\AiGenerationService;
@@ -30,6 +31,19 @@ class AiController
             $request->string('original_text')->toString(),
             $request->string('instruction')->toString(),
         );
+    }
+
+    public function generatePage(GeneratePageRequest $request): JsonResponse
+    {
+        $sections = $this->aiGenerationService->generatePage(
+            $request->string('prompt')->toString(),
+            $request->integer('section_count', 6),
+        );
+
+        return response()->json([
+            'success' => true,
+            'data' => ['sections' => $sections],
+        ]);
     }
 
     public function styleSuggestions(Request $request): JsonResponse
