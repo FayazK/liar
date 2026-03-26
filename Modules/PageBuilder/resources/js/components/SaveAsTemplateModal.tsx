@@ -1,5 +1,6 @@
 import axios from '@/lib/axios';
 import { handleFormError } from '@/utils/form-errors';
+import { capitalize } from '@/utils/string';
 import { App, Form, Input, Modal, Select } from 'antd';
 import { useState } from 'react';
 
@@ -17,21 +18,6 @@ interface FormValues {
     tags: string[];
 }
 
-const DEFAULT_CATEGORIES = [
-    'hero',
-    'features',
-    'pricing',
-    'testimonials',
-    'cta',
-    'content',
-    'gallery',
-    'team',
-    'contact',
-    'footer',
-    'header',
-    'stats',
-];
-
 export default function SaveAsTemplateModal({
     open,
     onClose,
@@ -42,8 +28,6 @@ export default function SaveAsTemplateModal({
     const [form] = Form.useForm<FormValues>();
     const { message } = App.useApp();
     const [loading, setLoading] = useState(false);
-
-    const allCategories = [...new Set([...DEFAULT_CATEGORIES, ...categories])];
 
     const handleSubmit = async (values: FormValues): Promise<void> => {
         setLoading(true);
@@ -99,9 +83,9 @@ export default function SaveAsTemplateModal({
                     rules={[{ required: true, message: 'Please select a category' }]}
                 >
                     <Select placeholder="Select a category">
-                        {allCategories.map((cat) => (
+                        {categories.map((cat) => (
                             <Select.Option key={cat} value={cat}>
-                                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                                {capitalize(cat)}
                             </Select.Option>
                         ))}
                     </Select>

@@ -8,6 +8,7 @@ import type { DataTableQueryParams, FilterConfig } from '@/types/datatable';
 import { Head, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Tag } from 'antd';
+import { capitalize } from '@/utils/string';
 import React from 'react';
 
 interface SectionTemplateItem {
@@ -24,7 +25,6 @@ interface SectionTemplateItem {
 }
 
 interface Props {
-    tags: string[];
     categories: string[];
 }
 
@@ -55,7 +55,7 @@ function buildFilters(categories: string[]): FilterConfig[] {
             key: 'category',
             label: 'Category',
             placeholder: 'All categories',
-            options: categories.map((c) => ({ value: c, label: c.charAt(0).toUpperCase() + c.slice(1) })),
+            options: categories.map((c) => ({ value: c, label: capitalize(c) })),
         },
         {
             type: 'boolean',
@@ -105,7 +105,7 @@ const columns: ColumnDef<SectionTemplateItem>[] = [
         size: 140,
         cell: ({ getValue }) => {
             const category = getValue() as string;
-            return <Tag color={getCategoryColor(category)}>{category.charAt(0).toUpperCase() + category.slice(1)}</Tag>;
+            return <Tag color={getCategoryColor(category)}>{capitalize(category)}</Tag>;
         },
     },
     {

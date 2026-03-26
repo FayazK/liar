@@ -1,3 +1,4 @@
+import { capitalize } from '@/utils/string';
 import type { Editor } from 'grapesjs';
 
 export interface SectionTemplate {
@@ -22,7 +23,7 @@ export function registerSectionBlocks(
         sections.forEach((template) => {
             blockManager.add(`section-${template.slug}`, {
                 label: template.name,
-                category: category.charAt(0).toUpperCase() + category.slice(1),
+                category: capitalize(category),
                 content: {
                     type: 'wrapper',
                     components: template.html_template,

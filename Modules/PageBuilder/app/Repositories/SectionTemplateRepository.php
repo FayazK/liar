@@ -19,7 +19,7 @@ class SectionTemplateRepository implements SectionTemplateRepositoryInterface
         $template = SectionTemplate::findOrFail($id);
         $template->update($data);
 
-        return $template->fresh();
+        return $template;
     }
 
     public function delete(int $id): void

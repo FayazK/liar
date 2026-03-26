@@ -25,11 +25,7 @@ class SectionTemplateController extends Controller
     public function index(): Response
     {
         return Inertia::render('PageBuilder::admin/page-builder/templates/index', [
-            'tags' => fn () => $this->service->getAllTags(),
-            'categories' => fn () => SectionTemplate::query()
-                ->select('category')
-                ->distinct()
-                ->pluck('category'),
+            'categories' => fn () => $this->service->getAllCategories(),
         ]);
     }
 

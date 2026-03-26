@@ -53,41 +53,26 @@ class SectionTemplate extends Model
         ];
     }
 
-    /**
-     * Scope a query to only include active templates.
-     */
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
 
-    /**
-     * Scope a query to filter templates by category.
-     */
     public function scopeByCategory(Builder $query, string $category): Builder
     {
         return $query->where('category', $category);
     }
 
-    /**
-     * Scope a query to filter templates by tag.
-     */
     public function scopeByTag(Builder $query, string $tag): Builder
     {
         return $query->whereJsonContains('tags', $tag);
     }
 
-    /**
-     * Scope a query to only include custom templates.
-     */
     public function scopeCustom(Builder $query): Builder
     {
         return $query->where('is_custom', true);
     }
 
-    /**
-     * Scope a query to only include built-in templates.
-     */
     public function scopeBuiltIn(Builder $query): Builder
     {
         return $query->where('is_custom', false);

@@ -19,10 +19,21 @@ class SectionTemplateService
     /** @return list<string> */
     public function getAllTags(): array
     {
-        return $this->repository->getAllActive()
+        return $this->getCachedTemplates()
             ->pluck('tags')
             ->flatten()
             ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+    }
+
+    /** @return list<string> */
+    public function getAllCategories(): array
+    {
+        return $this->getCachedTemplates()
+            ->pluck('category')
             ->unique()
             ->sort()
             ->values()
@@ -34,9 +45,7 @@ class SectionTemplateService
      */
     public function getGroupedByCategory(?string $tag = null): array
     {
-        $all = Cache::remember('section_templates.grouped', 3600, function () {
-            return $this->repository->getAllActive();
-        });
+        $all = $this->getCachedTemplates();
 
         if ($tag) {
             $all = $all->filter(fn (SectionTemplate $t): bool => in_array($tag, $t->tags ?? [], true));
@@ -95,6 +104,13 @@ class SectionTemplateService
     {
         $this->clearCache();
         $this->repository->delete($id);
+    }
+
+    private function getCachedTemplates(): Collection
+    {
+        return Cache::remember('section_templates.grouped', 3600, function () {
+            return $this->repository->getAllActive();
+        });
     }
 
     private function clearCache(): void

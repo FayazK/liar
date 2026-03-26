@@ -1,3 +1,4 @@
+import { capitalize } from '@/utils/string';
 import type { SectionTemplate } from '../lib/grapes-blocks';
 import { Collapse, Empty, Input, Tag, Typography } from 'antd';
 import React, { useState } from 'react';
@@ -43,7 +44,7 @@ export default function SectionPanel({ templates, onInsert }: SectionPanelProps)
 
     const collapseItems = categories.map((category) => ({
         key: category,
-        label: category.charAt(0).toUpperCase() + category.slice(1),
+        label: capitalize(category),
         children: (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {filteredTemplates[category].map((template) => (

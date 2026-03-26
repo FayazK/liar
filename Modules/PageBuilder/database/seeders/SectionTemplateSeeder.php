@@ -40,13 +40,19 @@ class SectionTemplateSeeder extends Seeder
 
     public function run(): void
     {
+        $templates = [];
         foreach (self::CATEGORIES as $categoryClass) {
             foreach ($categoryClass::templates() as $template) {
-                SectionTemplate::updateOrCreate(
-                    ['slug' => $template['slug']],
-                    $template,
-                );
+                if (isset($template['tags']) && is_array($template['tags'])) {
+                    $template['tags'] = json_encode($template['tags']);
+                }
+                $templates[] = $template;
             }
         }
+
+        SectionTemplate::upsert($templates, uniqueBy: ['slug'], update: [
+            'name', 'category', 'tags', 'html_template', 'css_template',
+            'is_active', 'is_custom', 'sort_order',
+        ]);
     }
 }
