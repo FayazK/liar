@@ -3,6 +3,8 @@ import type { Editor } from 'grapesjs';
 import { router } from '@inertiajs/react';
 import { Button, message, Space, Tooltip, Typography } from 'antd';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import AiDrawer from '../../../components/ai/AiDrawer';
+import AiFloatingToolbar from '../../../components/ai/AiFloatingToolbar';
 import GrapesEditor from '../../../components/GrapesEditor';
 import SaveAsTemplateModal from '../../../components/SaveAsTemplateModal';
 import SectionPanel from '../../../components/SectionPanel';
@@ -27,6 +29,7 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
     const [publishing, setPublishing] = useState(false);
     const [activeDevice, setActiveDevice] = useState('Desktop');
     const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
+    const [aiDrawerOpen, setAiDrawerOpen] = useState(false);
     const [templateHtml, setTemplateHtml] = useState('');
     const [templateCss, setTemplateCss] = useState('');
     const autoSaveTimer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -197,6 +200,13 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
                             </Button>
                         ))}
                     </Space.Compact>
+                    <Button
+                        type={aiDrawerOpen ? 'primary' : 'default'}
+                        size="small"
+                        onClick={() => setAiDrawerOpen(!aiDrawerOpen)}
+                    >
+                        AI
+                    </Button>
                 </Space>
 
                 <Space>
@@ -234,6 +244,7 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
 
                 {/* GrapesJS Canvas */}
                 <div style={{ flex: 1, overflow: 'hidden' }}>
+                    <AiFloatingToolbar editor={editorRef.current} />
                     <GrapesEditor
                         initialData={builderPage ?? undefined}
                         sectionTemplates={sectionTemplates}
@@ -242,18 +253,26 @@ export default function PageBuilderEditor({ post, builderPage, sectionTemplates 
                     />
                 </div>
 
-                {/* Right sidebar - Style Presets */}
-                <div
-                    style={{
-                        width: 220,
-                        borderLeft: '1px solid #e5e7eb',
-                        backgroundColor: '#fafafa',
-                        flexShrink: 0,
-                        overflowY: 'auto',
-                    }}
-                >
-                    <StylePresets onApply={handleStylePreset} />
-                </div>
+                {/* Right sidebar - Style Presets (hidden when AI drawer is open) */}
+                {!aiDrawerOpen && (
+                    <div
+                        style={{
+                            width: 220,
+                            borderLeft: '1px solid #e5e7eb',
+                            backgroundColor: '#fafafa',
+                            flexShrink: 0,
+                            overflowY: 'auto',
+                        }}
+                    >
+                        <StylePresets onApply={handleStylePreset} />
+                    </div>
+                )}
+
+                <AiDrawer
+                    open={aiDrawerOpen}
+                    onClose={() => setAiDrawerOpen(false)}
+                    editor={editorRef.current}
+                />
             </div>
 
             <SaveAsTemplateModal

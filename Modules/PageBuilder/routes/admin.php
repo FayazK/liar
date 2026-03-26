@@ -22,6 +22,7 @@ Route::middleware(['web', 'auth', 'admin'])
         // AI Generation routes
         Route::prefix('ai')->name('ai.')->middleware(['can:page-builder.ai.generate', 'throttle:10,1'])->group(function () {
             Route::post('/section', [AiController::class, 'generateSection'])->name('section');
+            Route::post('/rewrite', [AiController::class, 'rewriteContent'])->name('rewrite');
         });
 
         Route::get('/{post}/editor', [PageBuilderController::class, 'editor'])->name('editor');
