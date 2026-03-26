@@ -4,10 +4,19 @@ declare(strict_types=1);
 
 namespace Modules\PageBuilder\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\PageBuilder\Database\Factories\BrandProfileFactory;
 
 class BrandProfile extends Model
 {
+    use HasFactory;
+
+    protected static function newFactory(): BrandProfileFactory
+    {
+        return BrandProfileFactory::new();
+    }
+
     /**
      * The attributes that are mass assignable.
      *

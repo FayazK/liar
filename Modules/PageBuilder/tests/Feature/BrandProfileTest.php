@@ -7,7 +7,7 @@ use Modules\PageBuilder\Repositories\BrandProfileRepository;
 
 describe('BrandProfile', function () {
     it('creates a brand profile', function () {
-        $profile = BrandProfile::create([
+        $profile = BrandProfile::factory()->create([
             'business_name' => 'Acme Corp',
             'industry' => 'Technology',
             'tone_of_voice' => 'friendly',
@@ -24,7 +24,7 @@ describe('BrandProfile', function () {
     });
 
     it('updates existing profile via createOrUpdate', function () {
-        BrandProfile::create(['business_name' => 'Original Name']);
+        BrandProfile::factory()->create(['business_name' => 'Original Name']);
 
         $repository = new BrandProfileRepository;
         $updated = $repository->createOrUpdate(['business_name' => 'Updated Name']);
@@ -39,8 +39,17 @@ describe('BrandProfile', function () {
         expect($repository->getActive())->toBeNull();
     });
 
+    it('returns the brand profile when one exists', function () {
+        $profile = BrandProfile::factory()->create();
+
+        $repository = new BrandProfileRepository;
+
+        expect($repository->getActive())->not->toBeNull();
+        expect($repository->getActive()->id)->toBe($profile->id);
+    });
+
     it('casts color_palette to array', function () {
-        $profile = BrandProfile::create([
+        $profile = BrandProfile::factory()->create([
             'business_name' => 'Color Corp',
             'color_palette' => ['primary' => '#111111', 'secondary' => '#222222', 'accent' => '#333333'],
         ]);
@@ -52,7 +61,7 @@ describe('BrandProfile', function () {
     });
 
     it('casts font_preferences to array', function () {
-        $profile = BrandProfile::create([
+        $profile = BrandProfile::factory()->create([
             'business_name' => 'Font Corp',
             'font_preferences' => ['heading' => 'Roboto', 'body' => 'Open Sans'],
         ]);
