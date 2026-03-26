@@ -64,6 +64,7 @@ class PageBuilderServiceProvider extends ServiceProvider implements HasAdminNavi
                 'page-builder.update',
                 'page-builder.delete',
                 'page-builder.publish',
+                'page-builder.ai.brand-profile',
             ],
         ];
     }

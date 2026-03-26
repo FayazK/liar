@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Modules\PageBuilder\Http\Controllers\Admin\BrandProfileController;
 use Modules\PageBuilder\Http\Controllers\Admin\PageBuilderController;
 use Modules\PageBuilder\Http\Controllers\Admin\SectionTemplateController;
 
@@ -13,6 +14,10 @@ Route::middleware(['web', 'auth', 'admin'])
         Route::get('/', [PageBuilderController::class, 'index'])->name('index');
         Route::get('/create', [PageBuilderController::class, 'create'])->name('create');
         Route::post('/', [PageBuilderController::class, 'store'])->name('store');
+
+        Route::get('/brand-profile', [BrandProfileController::class, 'edit'])->name('brand-profile.edit');
+        Route::put('/brand-profile', [BrandProfileController::class, 'update'])->name('brand-profile.update');
+
         Route::get('/{post}/editor', [PageBuilderController::class, 'editor'])->name('editor');
         Route::put('/{post}', [PageBuilderController::class, 'update'])->name('update');
         Route::post('/{post}/publish', [PageBuilderController::class, 'publish'])->name('publish');

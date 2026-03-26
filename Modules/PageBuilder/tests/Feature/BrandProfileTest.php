@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Models\Role;
+use App\Models\User;
 use Modules\PageBuilder\Models\BrandProfile;
 use Modules\PageBuilder\Repositories\BrandProfileRepository;
 
@@ -71,5 +73,73 @@ describe('BrandProfile', function () {
         expect($profile->font_preferences)->toBeArray();
         expect($profile->font_preferences['heading'])->toBe('Roboto');
         expect($profile->font_preferences['body'])->toBe('Open Sans');
+    });
+});
+
+describe('BrandProfile Controller', function () {
+    beforeEach(function () {
+        $adminRole = Role::factory()->create(['name' => 'Admin']);
+        $this->admin = User::factory()->create(['role_id' => $adminRole->id]);
+    });
+
+    it('renders brand profile page', function () {
+        $this->actingAs($this->admin)
+            ->get('/admin/page-builder/brand-profile')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('PageBuilder::admin/page-builder/brand-profile', false)
+                ->has('brandProfile')
+            );
+    });
+
+    it('renders brand profile page with null when no profile exists', function () {
+        $this->actingAs($this->admin)
+            ->get('/admin/page-builder/brand-profile')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('brandProfile', null)
+            );
+    });
+
+    it('saves brand profile', function () {
+        $this->actingAs($this->admin)
+            ->put('/admin/page-builder/brand-profile', [
+                'business_name' => 'Test Corp',
+                'tone_of_voice' => 'professional',
+                'industry' => 'Technology',
+                'target_audience' => 'Developers',
+                'brand_description' => 'A great company.',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('brand_profiles', [
+            'business_name' => 'Test Corp',
+            'tone_of_voice' => 'professional',
+            'industry' => 'Technology',
+        ]);
+    });
+
+    it('validates required fields', function () {
+        $this->actingAs($this->admin)
+            ->put('/admin/page-builder/brand-profile', [])
+            ->assertSessionHasErrors(['business_name', 'tone_of_voice']);
+    });
+
+    it('updates existing profile', function () {
+        BrandProfile::factory()->create([
+            'business_name' => 'Old Name',
+            'tone_of_voice' => 'casual',
+        ]);
+
+        $this->actingAs($this->admin)
+            ->put('/admin/page-builder/brand-profile', [
+                'business_name' => 'New Name',
+                'tone_of_voice' => 'professional',
+            ])
+            ->assertRedirect();
+
+        expect(BrandProfile::count())->toBe(1);
+        expect(BrandProfile::first()->business_name)->toBe('New Name');
+        expect(BrandProfile::first()->tone_of_voice)->toBe('professional');
     });
 });
