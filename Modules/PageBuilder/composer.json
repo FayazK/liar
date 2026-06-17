@@ -1,0 +1,22 @@
+{
+    "name": "modules/page-builder",
+    "description": "Visual page builder module for creating and managing dynamic pages",
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\PageBuilder\\": "app/",
+            "Modules\\PageBuilder\\Database\\Factories\\": "database/factories/",
+            "Modules\\PageBuilder\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\PageBuilder\\Tests\\": "tests/"
+        }
+    }
+}

@@ -19,6 +19,7 @@
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.10",
         "nnjeim/world": "^1.1",
+        "nwidart/laravel-modules": "^12.0",
         "plank/laravel-metable": "^6.2",
         "spatie/laravel-medialibrary": "^11.17"
     },
@@ -81,6 +82,11 @@
     "extra": {
         "laravel": {
             "dont-discover": []
+        },
+        "merge-plugin": {
+            "include": ["Modules/*/composer.json"],
+            "recurse": false,
+            "replace": false
         }
     },
     "config": {
@@ -89,7 +95,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "wikimedia/composer-merge-plugin": true
         }
     },
     "minimum-stability": "stable",

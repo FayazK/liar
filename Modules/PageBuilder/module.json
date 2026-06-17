@@ -1,0 +1,12 @@
+{
+    "name": "PageBuilder",
+    "alias": "page-builder",
+    "description": "Visual page builder module for creating and managing dynamic pages",
+    "priority": 0,
+    "providers": [
+        "Modules\\PageBuilder\\Providers\\PageBuilderServiceProvider",
+        "Modules\\PageBuilder\\Providers\\RouteServiceProvider"
+    ],
+    "dependencies": [],
+    "files": []
+}

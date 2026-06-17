@@ -1,8 +1,8 @@
 import { createInertiaApp } from '@inertiajs/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { App as AntApp, ConfigProvider, theme } from 'antd';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { ComponentType } from 'react';
+import { resolveModulePage } from './lib/resolve-module-page';
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../css/app.css';
@@ -387,7 +387,12 @@ function ThemedApp({ App, props }: ThemedAppProps) {
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
+    resolve: (name) =>
+        resolveModulePage(
+            name,
+            import.meta.glob('../../Modules/*/resources/js/pages/**/*.tsx'),
+            import.meta.glob('./pages/**/*.tsx'),
+        ),
     setup({ el, App, props }) {
         const root = createRoot(el);
 
